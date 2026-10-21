@@ -39,13 +39,13 @@ export const wedding = {
   },
 
   /**
-   * Section 01 — the invitation's words. The guest's name is added to
-   * `greeting`; a "\n" in the quote is where its line breaks.
+   * Section 01 — the invitation, which the opening becomes: the gold line-art
+   * hands with the couple's names beneath, Shiv–Parvati at the foot of the
+   * screen, and these words. The guest's name is added to `greeting`.
    */
   invitation: {
     mantra: "ॐ गं गणपतये नमः",
     blessing: "With the blessings of Lord Ganesha",
-    quote: "Two hearts, one sacred journey,\nblessed by the divine.",
     greeting: "Dear {guest},",
     request: "request the honour of your presence at their wedding",
     /**
@@ -352,6 +352,9 @@ export const wedding = {
     opening: {
       shivaHand: "/art/opening/hand-shiva.webp",
       parvatiHand: "/art/opening/hand-parvati.webp",
+      /** Their inner lines in gold, which stay with the gold outlines once the paint fades. */
+      shivaSketch: "/art/opening/hand-shiva-sketch.webp",
+      parvatiSketch: "/art/opening/hand-parvati-sketch.webp",
     },
     /** Shiv–Parvati seated together (Thank You, gallery). */
     divineCouple: "/art/shiva-parvati-seated.webp",

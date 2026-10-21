@@ -221,15 +221,19 @@
   /* ── Opening ── */
 
   /* The hands' artboard (792 × 581, both hands on one board so they meet
-     exactly). Wider than the screen, so each arm arrives from beyond its own
-     edge; the point where the fingertips meet sits at the centre. */
+     exactly), part of the invitation's flow. Wider than the screen, so each
+     arm arrives from beyond its own edge; shifted so the point where the
+     fingertips meet (52.8% across) sits on the centre line; the empty sky
+     above and below the hands is trimmed away. */
   .opening-stage {
-    --stage-w: clamp(420px, 108vw, 1000px);
-    position: absolute;
+    --stage-w: clamp(400px, 106vw, 760px);
+    position: relative;
+    flex-shrink: 0;
     width: var(--stage-w);
     aspect-ratio: 792 / 581;
-    left: calc(50% - var(--stage-w) * 0.528);
-    top: calc(46% - var(--stage-w) * 0.3418);
+    left: calc(var(--stage-w) * -0.028);
+    margin-top: calc(var(--stage-w) * -0.06);
+    margin-bottom: calc(var(--stage-w) * -0.19);
   }
 
   .opening-layer {

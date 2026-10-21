@@ -1,5 +1,3 @@
-import { useState } from "react";
-import { Preloader } from "@/components/opening/Preloader";
 import { Invitation } from "@/components/sections/Invitation";
 import { Couple } from "@/components/sections/Couple";
 import { Countdown } from "@/components/sections/Countdown";
@@ -13,15 +11,11 @@ import { Venue } from "@/components/sections/Venue";
 import { ThankYou } from "@/components/sections/ThankYou";
 import { LoveNote } from "@/components/sections/LoveNote";
 
-type OpeningState = "playing" | "revealing" | "done";
-
-/** The whole guest journey: the opening, then the sections in order. */
+/** The whole guest journey, in order. The invitation plays the opening itself. */
 export function Experience() {
-  const [opening, setOpening] = useState<OpeningState>("playing");
-
   return (
     <>
-      <Invitation revealed={opening !== "playing"} />
+      <Invitation />
       <Couple />
       <Countdown />
       <Story />
@@ -33,7 +27,6 @@ export function Experience() {
       <Venue />
       <ThankYou />
       <LoveNote />
-      {opening !== "done" && <Preloader onReveal={() => setOpening("revealing")} onDone={() => setOpening("done")} />}
     </>
   );
 }
