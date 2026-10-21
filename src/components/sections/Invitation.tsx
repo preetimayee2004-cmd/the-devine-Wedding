@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react"
 import { wedding } from "@/config/wedding";
 import { REDUCED_MOTION_QUERY } from "@/hooks/useMediaQuery";
 import { dissolveToDust } from "@/lib/goldDust";
+import { iceBurst } from "@/lib/iceBurst";
 import { EASE } from "@/lib/motion";
 import { glideTo, USER_INPUT_EVENTS } from "@/lib/scroll";
 import { readSessionFlag, writeSessionFlag } from "@/lib/session";
@@ -17,10 +18,12 @@ import { PetalShower } from "@/components/ui/PetalShower";
  *           from the bottom-right (the board is turned 45°, as in the reference)
  *   meet    their fingertips meet and rest a moment in a soft golden light
  *   dust    the hands turn to gold and dissolve into golden dust
- *   burst   an ice burst spreads from where they met and frosts the screen
- *   reveal  behind the frost, the whole Save the Date is put in place
- *   melt    the frost melts away from the centre: the complete card — words,
- *           Shiv and Parvati before Kailash — is there at once; petals fall
+ *   burst   an ice burst from where they met: a white flash, shards shooting
+ *           out, frost and cracks spreading over the whole screen
+ *   reveal  behind the ice, the whole Save the Date is put in place
+ *   melt    the ice breaks up, centre first, and its flakes drift away: the
+ *           complete card — words, Shiv and Parvati before Kailash — is there
+ *           at once; petals fall
  *
  * Never a gate: Skip is always there, a guest who already watched it this
  * visit gets a quicker version, and reduced motion shows the finished card.
@@ -30,7 +33,7 @@ import { PetalShower } from "@/components/ui/PetalShower";
 const SEEN_KEY = "dw:opening-seen";
 
 /** The beats, in order, and when each begins (ms, full version). */
-const BEATS = { arrive: 0, meet: 3300, dust: 4700, burst: 4900, reveal: 6000, melt: 6150, done: 7700 } as const;
+const BEATS = { arrive: 0, meet: 3300, dust: 4700, burst: 4900, reveal: 6200, melt: 6500, done: 8100 } as const;
 type Beat = keyof typeof BEATS;
 const ORDER = Object.keys(BEATS) as Beat[];
 
@@ -52,6 +55,7 @@ function pickMode(): Mode {
 }
 
 const MAX_ART_WAIT = 3500;
+const FROST = "/art/frost.jpg";
 
 export function Invitation() {
   const [mode] = useState<Mode>(pickMode);
@@ -61,6 +65,8 @@ export function Invitation() {
   const stage = useRef<HTMLDivElement>(null);
   const shiva = useRef<HTMLImageElement>(null);
   const parvati = useRef<HTMLImageElement>(null);
+  const section = useRef<HTMLElement>(null);
+  const glowEl = useRef<HTMLDivElement>(null);
 
   const still = mode === "still";
   const pace = mode === "short" ? 0.6 : 1;
@@ -108,6 +114,28 @@ export function Invitation() {
     }, 300 * pace);
     return () => clearTimeout(t);
   }, [dustTime, dusted, pace]);
+
+  // The ice burst, from where the fingertips met (the centre of the glow). The card
+  // is put in place as soon as the ice covers the screen; Skip clears the ice at once.
+  const burstTime = reached("burst") && !skipped && !still;
+  useEffect(() => {
+    const host = section.current;
+    if (!burstTime || !host) return;
+    const box = glowEl.current?.getBoundingClientRect();
+    const origin = box
+      ? { x: box.left + box.width / 2, y: box.top + box.height / 2 }
+      : { x: window.innerWidth / 2, y: window.innerHeight * 0.46 };
+    const stop = new AbortController();
+    void iceBurst({
+      host,
+      origin,
+      frost: FROST,
+      pace,
+      signal: stop.signal,
+      onCovered: () => setBeat((cur) => Math.max(cur, ORDER.indexOf("reveal"))),
+    });
+    return () => stop.abort();
+  }, [burstTime, pace]);
 
   const skip = () => {
     setSkipped(true);
@@ -193,28 +221,9 @@ export function Invitation() {
         }
       : { transform: "scale(0.25)", opacity: beat < 0 ? 0.45 : 0.4 };
 
-  // the ice burst: spreads from where the fingertips met, frosts the screen, then melts from the centre
-  const frost: CSSProperties | null =
-    still || skipped
-      ? null
-      : reached("melt")
-        ? ({
-            "--burst": "170%",
-            "--hole": "190%",
-            opacity: 0,
-            transition: `--hole ${1400 * pace}ms ease-in, opacity ${1300 * pace}ms ease-in ${250 * pace}ms`,
-          } as CSSProperties)
-        : reached("burst")
-          ? ({
-              "--burst": "170%",
-              "--hole": "-20%",
-              opacity: 1,
-              transition: `--burst ${1250 * pace}ms cubic-bezier(0.3, 0.6, 0.3, 1), opacity ${250 * pace}ms ease-out`,
-            } as CSSProperties)
-          : ({ "--burst": "-15%", "--hole": "-20%", opacity: 0 } as CSSProperties);
-
   return (
     <section
+      ref={section}
       id="invitation"
       aria-labelledby="invitation-names"
       className="relative flex min-h-[100dvh] flex-col items-center overflow-x-clip px-[var(--gutter)] text-center"
@@ -295,7 +304,12 @@ export function Invitation() {
       </div>
 
       {/* ── the two hands, meeting, then turning to golden dust ── */}
-      <div ref={stage} aria-hidden className="opening-stage">
+      <div
+        ref={stage}
+        aria-hidden
+        className="opening-stage"
+        style={skipped ? { opacity: 0, transition: "opacity 300ms ease-out" } : undefined}
+      >
         {/* the far ends of the arm and the sleeve melt into the sky, so no edge of the board ever shows */}
         <div
           className="opening-layer [-webkit-mask-image:linear-gradient(to_right,transparent,#000_9%)] [mask-image:linear-gradient(to_right,transparent,#000_9%)]"
@@ -309,11 +323,8 @@ export function Invitation() {
         >
           <img ref={parvati} src={assets.opening.parvatiHand} alt="" className="opening-layer" style={gilt} />
         </div>
-        <div className="opening-glow" data-waiting={beat < 0 || undefined} style={glow} />
+        <div ref={glowEl} className="opening-glow" data-waiting={beat < 0 || undefined} style={glow} />
       </div>
-
-      {/* the ice burst */}
-      {frost && <div aria-hidden className="ice-burst" style={frost} />}
 
       {/* a short shower of red petals once the card is revealed */}
       {reached("melt") && !still && !skipped && <PetalShower />}
