@@ -39,15 +39,15 @@ export const wedding = {
   },
 
   /**
-   * Section 01 — the invitation, which the opening becomes: the gold line-art
-   * hands with the couple's names beneath, Shiv–Parvati at the foot of the
-   * screen, and these words. The guest's name is added to `greeting`.
+   * Section 01 — the Save the Date, which the opening becomes: the hands meet
+   * and turn to golden dust, Shiv–Parvati appear and settle before Kailash,
+   * and these words write themselves in. Date and city come from `wedding`
+   * and `venue`.
    */
   invitation: {
-    mantra: "ॐ गं गणपतये नमः",
-    blessing: "With the blessings of Lord Ganesha",
-    greeting: "Dear {guest},",
-    request: "request the honour of your presence at their wedding",
+    title: "Save the Date",
+    blessing: "With the blessings of Mahadev and Maa Parvati, two hearts begin their sacred journey together.",
+    request: "request the honour of your presence as they celebrate their union",
     /**
      * Once the invitation has been on screen this long (ms) and the guest
      * hasn't touched anything, it glides up to reveal the couple. 0 = never.
@@ -55,9 +55,12 @@ export const wedding = {
     autoAdvanceMs: 5000,
   },
 
-  /** Section 02 — the couple, at the Shivling. */
+  /** Section 02 — the couple, at the Shivling, crowned by Ganpati's blessing and the guest's own welcome. */
   hero: {
-    welcome: "Welcome, Dear Guests",
+    mantra: "ॐ गं गणपतये नमः",
+    blessing: "With the blessings of Lord Ganesha",
+    /** The guest's name from the link replaces {guest} ("Guest" without one). */
+    welcome: "Welcome, Dear {guest}",
     tagline: "are beginning their forever",
     ceremonyLabel: "लग्न",
     ceremony: "Wedding Ceremony",
@@ -352,10 +355,14 @@ export const wedding = {
     opening: {
       shivaHand: "/art/opening/hand-shiva.webp",
       parvatiHand: "/art/opening/hand-parvati.webp",
-      /** Their inner lines in gold, which stay with the gold outlines once the paint fades. */
-      shivaSketch: "/art/opening/hand-shiva-sketch.webp",
-      parvatiSketch: "/art/opening/hand-parvati-sketch.webp",
     },
+    /**
+     * The Save the Date's illustration: seen in close-up, then settling before
+     * Kailash. STAND-IN: a large Shiv–Parvati illustration (1500 px+ wide,
+     * transparent background) makes the close-up sharp — put it in public/art/
+     * and point this at it.
+     */
+    saveTheDateArt: "/art/shiva-parvati-seated.webp",
     /** Shiv–Parvati seated together (Thank You, gallery). */
     divineCouple: "/art/shiva-parvati-seated.webp",
     /** Soft-edged bloom used for every watercolour reveal. */

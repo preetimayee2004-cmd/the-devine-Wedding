@@ -1,47 +1,42 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { wedding } from "@/config/wedding";
-import { useGuest } from "@/context/GuestContext";
 import { REDUCED_MOTION_QUERY } from "@/hooks/useMediaQuery";
+import { dissolveToDust } from "@/lib/goldDust";
 import { EASE } from "@/lib/motion";
 import { glideTo, USER_INPUT_EVENTS } from "@/lib/scroll";
 import { readSessionFlag, writeSessionFlag } from "@/lib/session";
 import { formatVenueDate, parseVenueDateTime } from "@/lib/venueTime";
-import { Ganpati } from "@/components/art/Ganpati";
-import { HAND_OUTLINES } from "@/components/art/handLineArt";
-import { OrnamentDivider } from "@/components/ui/OrnamentDivider";
-import { Reveal } from "@/components/ui/Reveal";
+import { Icon } from "@/components/art/Icons";
+import { Kailash } from "@/components/art/Kailash";
+import { PetalShower } from "@/components/ui/PetalShower";
 
 /**
- * Sections 00 + 01 — the opening, which becomes the invitation.
+ * Sections 00 + 01 — the opening, which becomes the Save the Date.
  *
  *   arrive  Shiva's hand glides in slowly from the left, Parvati's from the right
- *   glow    their fingertips meet in a soft golden light
- *   line    a gold line draws around both hands
- *   names   the couple's names are written beneath them
- *   fade    the painted hands fade slowly, leaving gold line art on the sky
- *   art     Shiv and Parvati paint in at the foot of the screen, like watercolour
- *   text    the invitation's words arrive from above
+ *   meet    their fingertips meet in a soft golden light
+ *   dust    the hands turn to gold and dissolve into golden dust
+ *   art     Shiv and Parvati appear in close-up, painted in like watercolour;
+ *           red petals begin to fall
+ *   zoom    the view draws back: they settle at the foot of the screen, before
+ *           Kailash and a still lake
+ *   text    "Save the Date", the blessing, the names, the date and the city
+ *           write themselves in at the top
  *
  * Never a gate: Skip is always there, a guest who already watched it this
- * visit gets a quicker version, and reduced motion shows it all at once.
+ * visit gets a quicker version, and reduced motion shows the finished card.
  * Once read, the page glides on to the couple.
  */
 
 const SEEN_KEY = "dw:opening-seen";
 
 /** The beats, in order, and when each begins (ms, full version). */
-const BEATS = {
-  arrive: 0,
-  glow: 2200,
-  line: 2600,
-  names: 3400,
-  fade: 4300,
-  art: 5400,
-  text: 6200,
-  done: 7600,
-} as const;
+const BEATS = { arrive: 0, meet: 2300, dust: 3000, art: 3900, zoom: 6200, text: 7400, done: 10600 } as const;
 type Beat = keyof typeof BEATS;
 const ORDER = Object.keys(BEATS) as Beat[];
+
+/** Where the fingertips meet on the hands' board (fractions). */
+const MEET = { x: 0.528, y: 0.466 };
 
 type Mode = "full" | "short" | "still";
 
@@ -52,30 +47,36 @@ function pickMode(): Mode {
   return readSessionFlag(SEEN_KEY) ? "short" : "full";
 }
 
-/** Longest wait for the hands' artwork before starting anyway. */
 const MAX_ART_WAIT = 3500;
 
 export function Invitation() {
-  const { guestName } = useGuest();
   const [mode] = useState<Mode>(pickMode);
   const [beat, setBeat] = useState(-1); // index into ORDER; -1 = waiting for the artwork
   const [skipped, setSkipped] = useState(false);
+  const [dusted, setDusted] = useState(false);
+  const stage = useRef<HTMLDivElement>(null);
   const shiva = useRef<HTMLImageElement>(null);
   const parvati = useRef<HTMLImageElement>(null);
+  const art = useRef<HTMLDivElement>(null);
+  const [closeUp, setCloseUp] = useState("none");
+  const measureRef = useRef<() => void>(() => {});
 
-  const reached = (b: Beat) => beat >= ORDER.indexOf(b);
-  /** Transition length for a beat: quicker on a repeat visit, brief after Skip, a plain fade for reduced motion. */
-  const dur = (ms: number) => (skipped ? 350 : mode === "still" ? 500 : mode === "short" ? ms * 0.6 : ms);
   const still = mode === "still";
+  const pace = mode === "short" ? 0.45 : 1;
+  const reached = (b: Beat) => beat >= ORDER.indexOf(b);
+  /** Transition length: quicker on a repeat visit, brief after Skip, a plain fade for reduced motion. */
+  const dur = (ms: number) => (skipped ? 350 : still ? 500 : ms * (mode === "short" ? 0.6 : 1));
+  /** The words' stagger once they begin. */
+  const word = (ms: number) => (still || skipped ? 0 : ms * pace);
 
   // ── the timeline ──
   useEffect(() => {
     let cancelled = false;
     const timers: number[] = [];
     (async () => {
-      const art = [shiva.current, parvati.current].filter((i): i is HTMLImageElement => i !== null);
+      const hands = [shiva.current, parvati.current].filter((i): i is HTMLImageElement => i !== null);
       await Promise.race([
-        Promise.all(art.map((img) => img.decode().catch(() => undefined))),
+        Promise.all(hands.map((img) => img.decode().catch(() => undefined))),
         new Promise((r) => setTimeout(r, MAX_ART_WAIT)),
       ]);
       if (cancelled) return;
@@ -85,7 +86,6 @@ export function Invitation() {
         timers.push(window.setTimeout(() => setBeat(ORDER.length - 1), 900));
         return;
       }
-      const pace = mode === "short" ? 0.45 : 1;
       ORDER.forEach((b, i) =>
         timers.push(window.setTimeout(() => setBeat((cur) => Math.max(cur, i)), BEATS[b] * pace)),
       );
@@ -94,14 +94,56 @@ export function Invitation() {
       cancelled = true;
       timers.forEach(clearTimeout);
     };
-  }, [mode]);
+  }, [mode, pace]);
+
+  // The close-up: where the illustration must sit (centre of the screen, filling
+  // its width) relative to its final place at the foot of the screen.
+  useLayoutEffect(() => {
+    const measure = (measureRef.current = () => {
+      const el = art.current;
+      if (!el) return;
+      // measure where it rests, not where the close-up has put it
+      const previous = el.style.transform;
+      el.style.transform = "none";
+      const r = el.getBoundingClientRect();
+      el.style.transform = previous;
+      const top = r.top + window.scrollY;
+      const scale = Math.min(1.75, (window.innerWidth * 1.04) / r.width);
+      const dx = window.innerWidth / 2 - (r.left + r.width / 2);
+      const dy = window.innerHeight * 0.47 - (top + r.height / 2);
+      setCloseUp(`translate(${dx}px, ${dy}px) scale(${scale})`);
+    });
+    measure();
+    const img = art.current?.querySelector("img");
+    img?.addEventListener("load", measure);
+    void document.fonts?.ready.then(measure);
+    window.addEventListener("resize", measure);
+    return () => {
+      img?.removeEventListener("load", measure);
+      window.removeEventListener("resize", measure);
+    };
+  }, []);
+
+  // The hands turn to golden dust (and the close-up is lined up, now that everything has its size).
+  const dustTime = reached("dust") && !skipped && !still;
+  useEffect(() => {
+    if (!dustTime || dusted) return;
+    measureRef.current();
+    const t = window.setTimeout(() => {
+      const el = stage.current;
+      const imgs = [shiva.current, parvati.current].filter((i): i is HTMLImageElement => i !== null);
+      if (el) void dissolveToDust(el, imgs, MEET, 2200 * pace);
+      setDusted(true);
+    }, 450 * pace);
+    return () => clearTimeout(t);
+  }, [dustTime, dusted, pace]);
 
   const skip = () => {
     setSkipped(true);
     setBeat(ORDER.length - 1);
   };
 
-  // No scrolling until the invitation's words have arrived.
+  // No scrolling until the view has drawn back and the words begin.
   const locked = !reached("text");
   useEffect(() => {
     if (!locked) return;
@@ -113,8 +155,8 @@ export function Invitation() {
     };
   }, [locked]);
 
-  // Invitation → Hero (PRD §5): after reading time, glide up to the couple —
-  // unless the guest has already touched, scrolled or pressed anything.
+  // Save the Date → the couple: after reading time, glide on — unless the
+  // guest has already touched, scrolled or pressed anything.
   const done = reached("done");
   useEffect(() => {
     const readingMs = wedding.invitation.autoAdvanceMs;
@@ -139,74 +181,50 @@ export function Invitation() {
 
   const date = useMemo(() => {
     const parts = parseVenueDateTime(wedding.wedding.dateTime);
-    return parts ? formatVenueDate(parts) : null;
+    return parts ? { ...formatVenueDate(parts), ordinal: ordinal(parts.day) } : null;
   }, []);
 
-  const { invitation: copy, couple, assets } = wedding;
-  const greeting = copy.greeting.replace("{guest}", guestName);
+  const { invitation: copy, couple, venue, assets } = wedding;
   const text = reached("text");
-  /** The words' stagger after they begin (all together for reduced motion or after Skip). */
-  const word = (ms: number) => (still || skipped ? 0 : mode === "short" ? ms * 0.6 : ms);
 
   // ── styles for each beat ──
+  const handsGone = still || skipped || dusted;
   const arrive = (from: string): CSSProperties =>
     mode === "full" && !skipped
       ? {
-          opacity: reached("arrive") ? 1 : 0,
+          opacity: reached("arrive") && !handsGone ? 1 : 0,
           transform: reached("arrive") ? "translateX(0)" : `translateX(${from})`,
-          transition: `transform 2600ms ${EASE.glide}, opacity 1000ms ease-out`,
+          transition: `transform 2600ms ${EASE.glide}, opacity ${handsGone ? 120 : 1000}ms ease-out`,
         }
-      : { opacity: reached("arrive") ? 1 : 0, transition: `opacity ${dur(600)}ms ease-out` };
-  // with reduced motion the painted hands never show: just their gold line art
-  const paint: CSSProperties = {
-    opacity: still || reached("fade") ? 0 : 1,
-    transition: `opacity ${dur(1500)}ms ease-in-out`,
+      : {
+          opacity: reached("arrive") && !handsGone ? 1 : 0,
+          transition: `opacity ${handsGone ? 120 : dur(600)}ms ease-out`,
+        };
+  // just before they dissolve, the hands turn to gold
+  const gilt: CSSProperties = {
+    filter: reached("dust") ? "sepia(0.85) saturate(1.6) hue-rotate(-12deg) brightness(1.12)" : "none",
+    transition: `filter ${450 * pace}ms ease-in`,
   };
-  const sketch: CSSProperties = {
-    opacity: reached("fade") ? 1 : 0,
-    transition: `opacity ${dur(1300)}ms ease-out`,
-  };
-  const outline: CSSProperties = still
-    ? { opacity: reached("line") ? 1 : 0, transition: "opacity 500ms linear" }
-    : {
-        strokeDasharray: "1 1",
-        strokeDashoffset: reached("line") ? 0 : 1,
-        transition: `stroke-dashoffset ${dur(1700)}ms ${EASE.silk}`,
-      };
-  const drawing = reached("line") && !reached("fade") && !still;
-  const lineGlow: CSSProperties = {
-    stroke: drawing ? "#F6D78F" : "#B48C4E",
-    strokeWidth: drawing ? 2.4 : 1.3,
-    filter: drawing ? "drop-shadow(0 0 3px rgb(255 228 160 / 0.95))" : "none",
-    transition: `stroke ${dur(1400)}ms ease, stroke-width ${dur(1400)}ms ease`,
-  };
-  const glow: CSSProperties = reached("fade")
+  const glow: CSSProperties = reached("dust")
     ? {
-        transform: "scale(0.55)",
-        opacity: 0.55,
-        transition: `transform ${dur(1400)}ms ${EASE.breath}, opacity ${dur(1400)}ms ease`,
+        transform: "scale(0.4)",
+        opacity: 0,
+        transition: `transform ${dur(1600)}ms ${EASE.breath}, opacity ${dur(1600)}ms ease`,
       }
-    : reached("line")
+    : reached("meet")
       ? {
-          transform: "scale(0.95)",
-          opacity: 0.75,
-          transition: `transform ${dur(900)}ms ${EASE.breath}, opacity ${dur(900)}ms ease`,
+          transform: "scale(1.4)",
+          opacity: 1,
+          transition: `transform ${dur(800)}ms ${EASE.breath}, opacity ${dur(600)}ms ease`,
         }
-      : reached("glow")
-        ? {
-            transform: "scale(1.45)",
-            opacity: 1,
-            transition: `transform ${dur(700)}ms ${EASE.breath}, opacity ${dur(500)}ms ease`,
-          }
-        : { transform: "scale(0.25)", opacity: beat < 0 ? 0.45 : 0.4 };
-  const names: CSSProperties = still
-    ? { opacity: reached("names") ? 1 : 0, transition: "opacity 500ms linear" }
-    : {
-        opacity: reached("names") ? 1 : 0,
-        clipPath: reached("names") ? "inset(-20% -5% -20% -5%)" : "inset(-20% 105% -20% -5%)",
-        transition: `clip-path ${dur(1300)}ms ${EASE.drift}, opacity ${dur(500)}ms ease-out`,
-      };
-  const watercolour: CSSProperties = still
+      : { transform: "scale(0.25)", opacity: beat < 0 ? 0.45 : 0.4 };
+
+  const zoomed = reached("zoom") || still || skipped;
+  const camera: CSSProperties = {
+    transform: zoomed ? "none" : closeUp,
+    transition: zoomed ? `transform ${dur(1800)}ms ${EASE.drift}` : "none",
+  };
+  const paint: CSSProperties = still
     ? {
         opacity: reached("art") ? 1 : 0,
         maskSize: "320% 320%",
@@ -219,114 +237,134 @@ export function Invitation() {
         WebkitMaskSize: reached("art") ? "320% 320%" : "30% 30%",
         filter: reached("art") ? "saturate(1)" : "saturate(0.3) brightness(1.1)",
         transition: [
-          `opacity ${dur(800)}ms ease-out`,
+          `opacity ${dur(900)}ms ease-out`,
           `mask-size ${dur(2200)}ms ${EASE.silk}`,
           `-webkit-mask-size ${dur(2200)}ms ${EASE.silk}`,
           `filter ${dur(2400)}ms ${EASE.silk}`,
         ].join(", "),
       };
+  const landscape: CSSProperties = {
+    opacity: zoomed ? 1 : 0,
+    transform: zoomed ? "none" : "translateY(24px)",
+    transition: `opacity ${dur(1600)}ms ease-out ${word(300)}ms, transform ${dur(1800)}ms ${EASE.silk} ${word(300)}ms`,
+  };
+
+  /** Handwriting: the line is uncovered from left to right. */
+  const write = (delay: number, ms: number): CSSProperties =>
+    still
+      ? { opacity: text ? 1 : 0, transition: "opacity 500ms linear" }
+      : {
+          opacity: text ? 1 : 0,
+          clipPath: text ? "inset(-30% -8% -30% -8%)" : "inset(-30% 108% -30% -8%)",
+          transition: `clip-path ${dur(ms)}ms ${EASE.drift} ${delay}ms, opacity 300ms ease-out ${delay}ms`,
+        };
+  const fade = (delay: number): CSSProperties => ({
+    opacity: text ? 1 : 0,
+    transform: text || still ? "none" : "translateY(8px)",
+    transition: `opacity ${dur(900)}ms ${EASE.silk} ${delay}ms, transform ${dur(900)}ms ${EASE.silk} ${delay}ms`,
+  });
 
   return (
     <section
       id="invitation"
       aria-labelledby="invitation-names"
-      className="relative flex min-h-[100dvh] flex-col items-center px-[var(--gutter)] text-center"
-      style={{ paddingTop: "calc(var(--status-bar) + 14px)" }}
+      className="relative flex min-h-[100dvh] flex-col items-center overflow-x-clip px-[var(--gutter)] text-center"
+      style={{ paddingTop: "calc(var(--status-bar) + 26px)" }}
     >
-      {/* light gathered behind the words above the hands, so gold reads on the bright upper sky */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-[46%]"
+        className="pointer-events-none absolute inset-x-0 top-0 h-[60%]"
         style={{
           background:
-            "radial-gradient(ellipse 80% 70% at 50% 30%, rgb(var(--ivory) / 0.75) 0%, rgb(var(--ivory) / 0.4) 50%, rgb(var(--ivory) / 0) 82%)",
+            "radial-gradient(ellipse 85% 62% at 50% 34%, rgb(var(--ivory) / 0.8) 0%, rgb(var(--ivory) / 0.45) 52%, rgb(var(--ivory) / 0) 82%)",
           opacity: text ? 1 : 0,
           transition: `opacity ${dur(1400)}ms ${EASE.silk}`,
         }}
       />
 
-      {/* ── the invitation's words, arriving from above ── */}
-      <FromAbove show={text} delay={word(0)}>
-        <Medallion show={text} still={still || skipped} />
-      </FromAbove>
-      <FromAbove show={text} delay={word(450)} className="mt-2 font-deva text-[20px] leading-snug text-gold-ink">
-        <span lang="sa">{copy.mantra}</span>
-      </FromAbove>
-      <FromAbove
-        show={text}
-        delay={word(600)}
-        className="mt-1 font-sans text-[10.5px] font-medium uppercase tracking-eyebrow text-slate"
+      {/* ── the words, written in at the top ── */}
+      <p className="relative font-script text-[48px] leading-none text-gold-ink" style={write(word(0), 1500)}>
+        {copy.title}
+      </p>
+      <p
+        className="relative mt-3 max-w-[18rem] text-balance font-display text-[16px] font-medium italic leading-snug text-slate"
+        style={fade(word(1000))}
       >
         {copy.blessing}
-      </FromAbove>
-      <FromAbove show={text} delay={word(800)} className="mt-3 font-display text-[23px] font-medium italic text-navy">
-        {greeting}
-      </FromAbove>
+      </p>
+      <h1
+        id="invitation-names"
+        className="relative mt-3 font-display text-[clamp(34px,10.4vw,44px)] font-semibold italic leading-tight text-navy"
+        style={write(word(1500), 1500)}
+      >
+        <span className="text-balance">
+          {couple.bride.displayName} <span className="font-medium text-gold-ink">&amp;</span> {couple.groom.displayName}
+        </span>
+      </h1>
+      <p
+        className="relative mt-1 max-w-[18rem] text-balance font-display text-[15px] italic leading-snug text-slate"
+        style={fade(word(2600))}
+      >
+        {copy.request}
+      </p>
+      {date && (
+        <div className="relative mt-4 flex flex-col items-center" style={fade(word(3000))}>
+          <p className="font-sans text-[11px] font-medium uppercase tracking-eyebrow text-gold-ink">{date.month}</p>
+          <p className="flex items-start font-display font-semibold leading-none text-navy">
+            <span className="text-[58px] leading-[0.9]">{date.day}</span>
+            <span className="ml-0.5 mt-1 text-[22px] font-medium italic text-gold-ink">{date.ordinal}</span>
+          </p>
+          <p className="mt-1 font-sans text-[12px] font-medium tracking-[0.5em] text-gold-ink">{date.year}</p>
+        </div>
+      )}
+      {venue.city && (
+        <p
+          className="relative mt-2 flex items-center gap-1 font-sans text-[11px] font-medium uppercase tracking-eyebrow text-navy"
+          style={fade(word(3400))}
+        >
+          <Icon name="pin" className="h-4 w-4 text-gold-ink" /> {venue.city}
+        </p>
+      )}
 
-      {/* ── the two hands: painted, then gold line art that stays ── */}
-      <div aria-hidden className="opening-stage">
+      {/* ── Shiv and Parvati before Kailash, at the foot of the screen ── */}
+      <div className="relative mt-auto w-full pt-6">
+        <div
+          aria-hidden
+          className="absolute bottom-0 h-[min(105vw,480px)] w-screen"
+          style={{ left: "calc(50% - 50vw)", ...landscape }}
+        >
+          <Kailash className="h-full w-full" />
+        </div>
+        <div ref={art} className="relative z-[1] mx-auto w-[min(78vw,350px)]" style={camera}>
+          <div className="[-webkit-mask-image:linear-gradient(#000_82%,transparent)] [mask-image:linear-gradient(#000_82%,transparent)]">
+            <div
+              className="watercolor-reveal"
+              style={{ ...paint, "--watercolor-mask": `url(${assets.watercolorMask})` } as CSSProperties}
+            >
+              <img
+                src={assets.saveTheDateArt}
+                alt="Shiva and Parvati together"
+                className="block h-auto w-full"
+                draggable={false}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── the two hands, meeting, then turning to golden dust ── */}
+      <div ref={stage} aria-hidden className="opening-stage">
         <div className="opening-layer" style={arrive("-46%")}>
-          <img ref={shiva} src={assets.opening.shivaHand} alt="" className="opening-layer" style={paint} />
-          <img src={assets.opening.shivaSketch} alt="" className="opening-layer" style={sketch} />
+          <img ref={shiva} src={assets.opening.shivaHand} alt="" className="opening-layer" style={gilt} />
         </div>
         <div className="opening-layer" style={arrive("46%")}>
-          <img ref={parvati} src={assets.opening.parvatiHand} alt="" className="opening-layer" style={paint} />
-          <img src={assets.opening.parvatiSketch} alt="" className="opening-layer" style={sketch} />
+          <img ref={parvati} src={assets.opening.parvatiHand} alt="" className="opening-layer" style={gilt} />
         </div>
-        <svg viewBox={HAND_OUTLINES.viewBox} className="opening-layer overflow-visible">
-          <g fill="none" strokeLinecap="round" strokeLinejoin="round" style={lineGlow}>
-            {[...HAND_OUTLINES.shiva, ...HAND_OUTLINES.parvati].map((d) => (
-              <path key={d.slice(0, 24)} d={d} pathLength={1} vectorEffect="non-scaling-stroke" style={outline} />
-            ))}
-          </g>
-        </svg>
         <div className="opening-glow" data-waiting={beat < 0 || undefined} style={glow} />
       </div>
 
-      {/* ── the names, written beneath the hands ── */}
-      <h1
-        id="invitation-names"
-        className="relative font-display text-[clamp(36px,11vw,46px)] font-semibold leading-tight text-navy"
-        style={names}
-      >
-        <span className="text-balance">
-          {couple.bride.displayName} <span className="font-medium italic text-gold-ink">&amp;</span>{" "}
-          {couple.groom.displayName}
-        </span>
-      </h1>
-
-      <Reveal
-        show={text}
-        delay={word(1000)}
-        as="p"
-        className="mt-2 max-w-[17rem] text-balance font-sans text-[14.5px] leading-relaxed text-slate"
-      >
-        {copy.request}
-      </Reveal>
-      <OrnamentDivider show={text} delay={word(1150)} className="mt-4" />
-      {date && (
-        <Reveal show={text} delay={word(1300)} className="mt-2">
-          <p className="font-sans text-[10.5px] font-medium uppercase tracking-eyebrow text-gold-ink">{date.weekday}</p>
-          <p className="font-display text-[25px] font-semibold leading-tight text-gold-ink">
-            {date.day} {date.month} {date.year}
-          </p>
-        </Reveal>
-      )}
-
-      {/* ── Shiv and Parvati, painted in at the foot of the screen ── */}
-      <div className="mt-auto w-[min(60vw,270px)] pt-4 [mask-image:linear-gradient(#000_80%,transparent)] [-webkit-mask-image:linear-gradient(#000_80%,transparent)]">
-        <div
-          className="watercolor-reveal"
-          style={{ ...watercolour, "--watercolor-mask": `url(${assets.watercolorMask})` } as CSSProperties}
-        >
-          <img
-            src={assets.divineCouple}
-            alt="Shiva and Parvati seated together"
-            className="block h-auto w-full"
-            draggable={false}
-          />
-        </div>
-      </div>
+      {/* a short shower of red petals while the card writes itself in */}
+      {reached("art") && !still && !skipped && <PetalShower />}
 
       {/* Skip: always there while the opening plays */}
       {locked && (
@@ -343,61 +381,8 @@ export function Invitation() {
   );
 }
 
-/** The invitation's words come in gently from above. */
-function FromAbove({
-  show,
-  delay,
-  className = "",
-  children,
-}: {
-  show: boolean;
-  delay: number;
-  className?: string;
-  children: ReactNode;
-}) {
-  return (
-    <div
-      className={`relative ${className}`}
-      style={{
-        opacity: show ? 1 : 0,
-        transform: show ? "none" : "translateY(-16px)",
-        transition: `opacity 900ms ${EASE.silk} ${delay}ms, transform 1000ms ${EASE.silk} ${delay}ms`,
-      }}
-    >
-      {children}
-    </div>
-  );
-}
-
-/** Ganpati inside a fine gold double ring; the ring opens, then he draws himself. */
-function Medallion({ show, still }: { show: boolean; still: boolean }) {
-  const dots = [0, 90, 180, 270].map((deg) => {
-    const rad = (deg * Math.PI) / 180;
-    return [50 + 46 * Math.sin(rad), 50 - 46 * Math.cos(rad)];
-  });
-  return (
-    <div className="relative h-[92px] w-[92px] shrink-0">
-      <svg
-        viewBox="0 0 100 100"
-        className="absolute inset-0 h-full w-full"
-        style={{
-          transform: show || still ? "scale(1)" : "scale(0.6)",
-          transition: `transform 1000ms ${EASE.silk}`,
-        }}
-      >
-        <circle cx="50" cy="50" r="40" fill="rgb(var(--ivory) / 0.7)" />
-        <circle cx="50" cy="50" r="46" fill="none" stroke="rgb(var(--gold))" strokeWidth="0.9" />
-        <circle cx="50" cy="50" r="40" fill="none" stroke="rgb(var(--gold))" strokeWidth="0.5" opacity="0.7" />
-        {dots.map(([x, y]) => (
-          <circle key={`${x}-${y}`} cx={x} cy={y} r="1.4" fill="rgb(var(--gold))" />
-        ))}
-      </svg>
-      <Ganpati
-        drawn={show}
-        still={still}
-        delay={still ? 0 : 250}
-        className="absolute left-1/2 top-1/2 w-[64px] -translate-x-1/2 -translate-y-[52%]"
-      />
-    </div>
-  );
+/** 1 → "st", 2 → "nd", 12 → "th", 23 → "rd". */
+function ordinal(n: number): string {
+  if (n % 100 >= 11 && n % 100 <= 13) return "th";
+  return ["th", "st", "nd", "rd"][n % 10] ?? "th";
 }

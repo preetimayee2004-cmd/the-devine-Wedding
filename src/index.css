@@ -218,22 +218,58 @@
     }
   }
 
+  /* Save the Date: a short shower of red petals (each falls once). */
+  .petal {
+    position: absolute;
+    top: -24px;
+    border-radius: 70% 0 70% 0;
+    background: radial-gradient(circle at 30% 30%, #e25a52, #a3191e 72%);
+    opacity: 0;
+    animation-name: petal-fall;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+  }
+  @keyframes petal-fall {
+    0% {
+      opacity: 0;
+      transform: translate3d(0, 0, 0) rotate(0deg);
+    }
+    8% {
+      opacity: 0.95;
+    }
+    50% {
+      transform: translate3d(var(--sway), 52vh, 0) rotate(calc(var(--spin) * 0.5));
+    }
+    88% {
+      opacity: 0.85;
+    }
+    100% {
+      opacity: 0;
+      transform: translate3d(calc(var(--sway) * -0.4), 106vh, 0) rotate(var(--spin));
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .petal {
+      display: none;
+    }
+  }
+
   /* ── Opening ── */
 
   /* The hands' artboard (792 × 581, both hands on one board so they meet
-     exactly), part of the invitation's flow. Wider than the screen, so each
-     arm arrives from beyond its own edge; shifted so the point where the
-     fingertips meet (52.8% across) sits on the centre line; the empty sky
-     above and below the hands is trimmed away. */
+     exactly), floating over the first screen. Wider than the screen, so each
+     arm arrives from beyond its own edge; the point where the fingertips meet
+     (52.8%, 46.6% of the board) sits at the screen's centre. */
   .opening-stage {
     --stage-w: clamp(400px, 106vw, 760px);
-    position: relative;
-    flex-shrink: 0;
+    position: absolute;
+    z-index: 5;
     width: var(--stage-w);
     aspect-ratio: 792 / 581;
-    left: calc(var(--stage-w) * -0.028);
-    margin-top: calc(var(--stage-w) * -0.06);
-    margin-bottom: calc(var(--stage-w) * -0.19);
+    left: calc(50% - var(--stage-w) * 0.528);
+    top: calc(46vh - var(--stage-w) * 0.3418);
+    top: calc(46dvh - var(--stage-w) * 0.3418);
+    pointer-events: none;
   }
 
   .opening-layer {

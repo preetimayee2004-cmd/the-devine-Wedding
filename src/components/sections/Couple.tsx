@@ -1,15 +1,18 @@
 import { useMemo, useRef, type CSSProperties } from "react";
 import { wedding } from "@/config/wedding";
+import { useGuest } from "@/context/GuestContext";
 import { useInView } from "@/hooks/useInView";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
 import { EASE } from "@/lib/motion";
 import { formatVenueDate, parseVenueDateTime, venueInstant, zoneLabel } from "@/lib/venueTime";
+import { GaneshaMedallion } from "@/components/ui/GaneshaMedallion";
 import { Reveal } from "@/components/ui/Reveal";
 
 /**
  * Section 02 — a sacred beginning (PRD §4).
  *
- * The invitation's gold thread arrives from above. The couple at the
+ * Ganpati's blessing comes first — he draws himself in a gold ring, with the
+ * mantra — then the guest's own welcome. The couple at the
  * Shivling paints itself in like a watercolour (a bloom that spreads while
  * the colour deepens), settling into soft clouds; the names, the promise
  * and the ceremony details follow. It plays once — scrolling away and back
@@ -20,6 +23,7 @@ export function Couple() {
   const seen = useInView(ref, { threshold: 0.15 });
   const reduced = usePrefersReducedMotion();
   const at = (ms: number) => (reduced ? 0 : ms);
+  const { guestName } = useGuest();
 
   const { hero, couple, venue, assets } = wedding;
 
@@ -40,10 +44,10 @@ export function Couple() {
         WebkitMaskSize: seen ? "320% 320%" : "30% 30%",
         filter: seen ? "saturate(1) brightness(1)" : "saturate(0.3) brightness(1.1)",
         transition: [
-          `opacity 700ms ease-out 150ms`,
-          `mask-size 2400ms ${EASE.silk} 150ms`,
-          `-webkit-mask-size 2400ms ${EASE.silk} 150ms`,
-          `filter 2600ms ${EASE.silk} 350ms`,
+          `opacity 700ms ease-out 700ms`,
+          `mask-size 2400ms ${EASE.silk} 700ms`,
+          `-webkit-mask-size 2400ms ${EASE.silk} 700ms`,
+          `filter 2600ms ${EASE.silk} 900ms`,
         ].join(", "),
       };
 
@@ -54,24 +58,23 @@ export function Couple() {
       aria-labelledby="couple-heading"
       className="relative flex flex-col items-center px-[var(--gutter)] pb-12 text-center"
     >
-      {/* The invitation's gold thread, continuing down */}
-      <span
-        aria-hidden
-        className="block h-14 w-px bg-gradient-to-b from-gold to-gold-ink/60"
-        style={{
-          transformOrigin: "top",
-          transform: seen ? "scaleY(1)" : "scaleY(0)",
-          transition: `transform 900ms ${EASE.silk}`,
-        }}
-      />
-
+      {/* Ganpati's blessing first, then the guest's own welcome */}
+      <div className="mt-10">
+        <GaneshaMedallion show={seen} still={reduced} />
+      </div>
+      <Reveal show={seen} delay={at(500)} as="p" className="mt-2 font-deva text-[20px] leading-snug text-gold-ink">
+        <span lang="sa">{hero.mantra}</span>
+      </Reveal>
       <Reveal
         show={seen}
-        delay={at(250)}
+        delay={at(650)}
         as="p"
-        className="mt-3 font-sans text-[11px] font-medium uppercase tracking-eyebrow text-slate"
+        className="mt-1 font-sans text-[10.5px] font-medium uppercase tracking-eyebrow text-slate"
       >
-        {hero.welcome}
+        {hero.blessing}
+      </Reveal>
+      <Reveal show={seen} delay={at(850)} as="p" className="mt-4 font-display text-[24px] font-medium italic text-navy">
+        {hero.welcome.replace("{guest}", guestName)}
       </Reveal>
 
       <figure className="relative mt-3 w-[min(86vw,370px)]">

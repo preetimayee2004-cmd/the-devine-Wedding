@@ -25,6 +25,7 @@ Everything a family changes lives in **`src/config/wedding.ts`**. Every value ma
 | `wishes.samples` | The starting wishes. Remove them once real wishes arrive. |
 | `travel` | Verified stations, pickup plan, travel contacts with phone numbers, and the actual hotels with phone numbers or booking links. |
 | `meta.siteUrl` | The deployed address. WhatsApp needs it to show the preview image. |
+| `assets.saveTheDateArt` | The Save the Date's illustration. The stand-in is small; a large Shiv–Parvati illustration (1500 px+ wide, transparent background) makes the close-up sharp. |
 
 Call, WhatsApp and Book buttons appear only when a number or link is filled in. Nothing is invented for the guest.
 
@@ -109,9 +110,9 @@ Each section has its own composition, and each hands over to the next.
 
 | | Section | What happens |
 | --- | --- | --- |
-| 00 | Opening | Shiva's hand glides in slowly from the left and Parvati's from the right; their fingertips meet in a gold glow; a glowing gold line draws around both hands and the couple's names are written beneath; then the painted hands fade, leaving them as gold line art on the sky. Skip is always shown, a reload gets a quicker version, and `?opening=full` replays the full one. |
-| 01 | Invitation | The opening becomes the invitation: Shiv–Parvati paint in at the foot of the screen like watercolour, then the words arrive from above (Ganpati drawing himself in a gold ring, mantra, blessing, "Dear {guest}"), with the request and date beneath the names. After 5 s of reading it glides to the couple (`invitation.autoAdvanceMs`); any touch cancels this. |
-| 02 | Couple | The gold thread arrives; the couple at the Shivling paints in like watercolour and settles on a cloud; then names and the Lagna card. |
+| 00 | Opening | Shiva's hand glides in slowly from the left and Parvati's from the right; their fingertips meet in a gold glow; the hands turn to gold and dissolve into golden dust. Skip is always shown, a reload gets a quicker version, and `?opening=full` replays the full one. |
+| 01 | Save the Date | The opening becomes the first screen: Shiv–Parvati appear in close-up (painted in like watercolour) as red petals begin to fall, then the view draws back and they settle before Kailash and a still lake; "Save the Date", the blessing, the names, the date and the city write themselves in. After 5 s of reading it glides to the couple (`invitation.autoAdvanceMs`); any touch cancels this. |
+| 02 | Couple | Ganpati draws himself in a gold ring with ॐ गं गणपतये नमः and "Welcome, Dear {guest}"; then the couple at the Shivling paints in like watercolour and settles on a cloud; then names and the Lagna card. |
 | 03 | Countdown | The cloud parts; a gold temple arch draws down from Shiva's crescent; live time to the muhurat at the venue. On the day it reads "Today Is the Day", afterwards "Happily Married". |
 | 04 | Our Story | A golden path winds between the moments and draws with the scroll, ending in a kalash. |
 | 05 | Events | The kalash ties on a twisted gold "sacred thread"; each ceremony hangs from it as a medallion, grouped by day. |
