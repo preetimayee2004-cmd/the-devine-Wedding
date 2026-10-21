@@ -1,3 +1,15 @@
+/* The ice burst's two radii (registered so they can animate). */
+@property --burst {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: -15%;
+}
+@property --hole {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: -20%;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -252,6 +264,25 @@
     .petal {
       display: none;
     }
+  }
+
+  /* The ice burst: frost that spreads out from where the fingertips met
+     (--burst grows), covers the screen, then melts open from the centre
+     (--hole grows). Without @property support it simply fades in and out. */
+  .ice-burst {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    pointer-events: none;
+    background: #dcf0fa url("/art/frost.jpg") center 46% / cover no-repeat;
+    -webkit-mask-image:
+      radial-gradient(circle at 50% 46%, #000 var(--burst), transparent calc(var(--burst) + 14%)),
+      radial-gradient(circle at 50% 46%, transparent var(--hole), #000 calc(var(--hole) + 18%));
+    mask-image:
+      radial-gradient(circle at 50% 46%, #000 var(--burst), transparent calc(var(--burst) + 14%)),
+      radial-gradient(circle at 50% 46%, transparent var(--hole), #000 calc(var(--hole) + 18%));
+    -webkit-mask-composite: source-in;
+    mask-composite: intersect;
   }
 
   /* ── Opening ── */

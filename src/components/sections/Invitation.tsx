@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { wedding } from "@/config/wedding";
 import { REDUCED_MOTION_QUERY } from "@/hooks/useMediaQuery";
 import { dissolveToDust } from "@/lib/goldDust";
@@ -17,12 +17,10 @@ import { PetalShower } from "@/components/ui/PetalShower";
  *           from the bottom-right (the board is turned 45°, as in the reference)
  *   meet    their fingertips meet and rest a moment in a soft golden light
  *   dust    the hands turn to gold and dissolve into golden dust
- *   art     Shiv and Parvati appear in close-up, painted in like watercolour;
- *           red petals begin to fall
- *   zoom    the view draws back: they settle at the foot of the screen, before
- *           Kailash and a still lake
- *   text    "Save the Date", the blessing, the names, the date and the city
- *           write themselves in at the top
+ *   burst   an ice burst spreads from where they met and frosts the screen
+ *   reveal  behind the frost, the whole Save the Date is put in place
+ *   melt    the frost melts away from the centre: the complete card — words,
+ *           Shiv and Parvati before Kailash — is there at once; petals fall
  *
  * Never a gate: Skip is always there, a guest who already watched it this
  * visit gets a quicker version, and reduced motion shows the finished card.
@@ -32,7 +30,7 @@ import { PetalShower } from "@/components/ui/PetalShower";
 const SEEN_KEY = "dw:opening-seen";
 
 /** The beats, in order, and when each begins (ms, full version). */
-const BEATS = { arrive: 0, meet: 3300, dust: 4700, art: 5600, zoom: 7900, text: 9100, done: 12300 } as const;
+const BEATS = { arrive: 0, meet: 3300, dust: 4700, burst: 4900, reveal: 6000, melt: 6150, done: 7700 } as const;
 type Beat = keyof typeof BEATS;
 const ORDER = Object.keys(BEATS) as Beat[];
 
@@ -63,17 +61,10 @@ export function Invitation() {
   const stage = useRef<HTMLDivElement>(null);
   const shiva = useRef<HTMLImageElement>(null);
   const parvati = useRef<HTMLImageElement>(null);
-  const art = useRef<HTMLDivElement>(null);
-  const [closeUp, setCloseUp] = useState("none");
-  const measureRef = useRef<() => void>(() => {});
 
   const still = mode === "still";
   const pace = mode === "short" ? 0.6 : 1;
   const reached = (b: Beat) => beat >= ORDER.indexOf(b);
-  /** Transition length: quicker on a repeat visit, brief after Skip, a plain fade for reduced motion. */
-  const dur = (ms: number) => (skipped ? 350 : still ? 500 : ms * (mode === "short" ? 0.6 : 1));
-  /** The words' stagger once they begin. */
-  const word = (ms: number) => (still || skipped ? 0 : ms * pace);
 
   // ── the timeline ──
   useEffect(() => {
@@ -85,13 +76,14 @@ export function Invitation() {
         Promise.all(hands.map((img) => img.decode().catch(() => undefined))),
         new Promise((r) => setTimeout(r, MAX_ART_WAIT)),
       ]);
+      // make sure the hands' starting place (off to each side) has been painted before they move,
+      // so the glide can't be skipped when the artwork is already cached
       await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
       stage.current?.getBoundingClientRect();
       if (cancelled) return;
       writeSessionFlag(SEEN_KEY);
       if (mode === "still") {
-        setBeat(ORDER.indexOf("text"));
-        timers.push(window.setTimeout(() => setBeat(ORDER.length - 1), 900));
+        setBeat(ORDER.length - 1);
         return;
       }
       ORDER.forEach((b, i) =>
@@ -104,45 +96,16 @@ export function Invitation() {
     };
   }, [mode, pace]);
 
-  // The close-up: where the illustration must sit (centre of the screen, filling
-  // its width) relative to its final place at the foot of the screen.
-  useLayoutEffect(() => {
-    const measure = (measureRef.current = () => {
-      const el = art.current;
-      if (!el) return;
-      // measure where it rests, not where the close-up has put it
-      const previous = el.style.transform;
-      el.style.transform = "none";
-      const r = el.getBoundingClientRect();
-      el.style.transform = previous;
-      const top = r.top + window.scrollY;
-      const scale = Math.min(1.75, (window.innerWidth * 1.04) / r.width);
-      const dx = window.innerWidth / 2 - (r.left + r.width / 2);
-      const dy = window.innerHeight * 0.47 - (top + r.height / 2);
-      setCloseUp(`translate(${dx}px, ${dy}px) scale(${scale})`);
-    });
-    measure();
-    const img = art.current?.querySelector("img");
-    img?.addEventListener("load", measure);
-    void document.fonts?.ready.then(measure);
-    window.addEventListener("resize", measure);
-    return () => {
-      img?.removeEventListener("load", measure);
-      window.removeEventListener("resize", measure);
-    };
-  }, []);
-
-  // The hands turn to golden dust (and the close-up is lined up, now that everything has its size).
+  // The hands turn to golden dust.
   const dustTime = reached("dust") && !skipped && !still;
   useEffect(() => {
     if (!dustTime || dusted) return;
-    measureRef.current();
     const t = window.setTimeout(() => {
       const el = stage.current;
       const imgs = [shiva.current, parvati.current].filter((i): i is HTMLImageElement => i !== null);
       if (el) void dissolveToDust(el, imgs, MEET, 2200 * pace, STAGE_TURN, HAND_FADES);
       setDusted(true);
-    }, 450 * pace);
+    }, 300 * pace);
     return () => clearTimeout(t);
   }, [dustTime, dusted, pace]);
 
@@ -151,8 +114,8 @@ export function Invitation() {
     setBeat(ORDER.length - 1);
   };
 
-  // No scrolling until the view has drawn back and the words begin.
-  const locked = !reached("text");
+  // No scrolling until the card is fully revealed.
+  const locked = !reached("done");
   useEffect(() => {
     if (!locked) return;
     const html = document.documentElement;
@@ -193,10 +156,16 @@ export function Invitation() {
   }, []);
 
   const { invitation: copy, couple, venue, assets } = wedding;
-  const text = reached("text");
 
   // ── styles for each beat ──
-  const handsGone = still || skipped || dusted;
+  // the whole card appears at once — hidden behind the frost, or plainly for reduced motion / Skip
+  const card = reached("reveal");
+  const shown: CSSProperties = {
+    opacity: card ? 1 : 0,
+    transition: still || skipped ? "opacity 450ms ease-out" : "none",
+  };
+
+  const handsGone = still || skipped || dusted || card;
   const arrive = (from: string): CSSProperties =>
     !still && !skipped
       ? {
@@ -204,73 +173,45 @@ export function Invitation() {
           transform: reached("arrive") ? "translateX(0)" : `translateX(${from})`,
           transition: `transform ${3600 * pace}ms ${EASE.glide}, opacity ${handsGone ? 120 : 1400 * pace}ms ease-out`,
         }
-      : {
-          opacity: reached("arrive") && !handsGone ? 1 : 0,
-          transition: `opacity ${handsGone ? 120 : dur(600)}ms ease-out`,
-        };
+      : { opacity: 0 };
   // just before they dissolve, the hands turn to gold
   const gilt: CSSProperties = {
     filter: reached("dust") ? "sepia(0.85) saturate(1.6) hue-rotate(-12deg) brightness(1.12)" : "none",
-    transition: `filter ${450 * pace}ms ease-in`,
+    transition: `filter ${300 * pace}ms ease-in`,
   };
-  const glow: CSSProperties = reached("dust")
+  const glow: CSSProperties = reached("burst")
     ? {
-        transform: "scale(0.4)",
+        transform: "scale(2.2)",
         opacity: 0,
-        transition: `transform ${dur(1600)}ms ${EASE.breath}, opacity ${dur(1600)}ms ease`,
+        transition: `transform ${700 * pace}ms ease-out, opacity ${700 * pace}ms ease-out`,
       }
     : reached("meet")
       ? {
           transform: "scale(1.4)",
           opacity: 1,
-          transition: `transform ${dur(800)}ms ${EASE.breath}, opacity ${dur(600)}ms ease`,
+          transition: `transform ${800 * pace}ms ${EASE.breath}, opacity ${600 * pace}ms ease`,
         }
       : { transform: "scale(0.25)", opacity: beat < 0 ? 0.45 : 0.4 };
 
-  const zoomed = reached("zoom") || still || skipped;
-  const camera: CSSProperties = {
-    transform: zoomed ? "none" : closeUp,
-    transition: zoomed ? `transform ${dur(1800)}ms ${EASE.drift}` : "none",
-  };
-  const paint: CSSProperties = still
-    ? {
-        opacity: reached("art") ? 1 : 0,
-        maskSize: "320% 320%",
-        WebkitMaskSize: "320% 320%",
-        transition: "opacity 500ms linear",
-      }
-    : {
-        opacity: reached("art") ? 1 : 0,
-        maskSize: reached("art") ? "320% 320%" : "30% 30%",
-        WebkitMaskSize: reached("art") ? "320% 320%" : "30% 30%",
-        filter: reached("art") ? "saturate(1)" : "saturate(0.3) brightness(1.1)",
-        transition: [
-          `opacity ${dur(900)}ms ease-out`,
-          `mask-size ${dur(2200)}ms ${EASE.silk}`,
-          `-webkit-mask-size ${dur(2200)}ms ${EASE.silk}`,
-          `filter ${dur(2400)}ms ${EASE.silk}`,
-        ].join(", "),
-      };
-  const landscape: CSSProperties = {
-    opacity: zoomed ? 1 : 0,
-    transform: zoomed ? "none" : "translateY(24px)",
-    transition: `opacity ${dur(1600)}ms ease-out ${word(300)}ms, transform ${dur(1800)}ms ${EASE.silk} ${word(300)}ms`,
-  };
-
-  /** Handwriting: the line is uncovered from left to right. */
-  const write = (delay: number, ms: number): CSSProperties =>
-    still
-      ? { opacity: text ? 1 : 0, transition: "opacity 500ms linear" }
-      : {
-          opacity: text ? 1 : 0,
-          clipPath: text ? "inset(-30% -8% -30% -8%)" : "inset(-30% 108% -30% -8%)",
-          transition: `clip-path ${dur(ms)}ms ${EASE.drift} ${delay}ms, opacity 300ms ease-out ${delay}ms`,
-        };
-  const fade = (delay: number): CSSProperties => ({
-    opacity: text ? 1 : 0,
-    transform: text || still ? "none" : "translateY(8px)",
-    transition: `opacity ${dur(900)}ms ${EASE.silk} ${delay}ms, transform ${dur(900)}ms ${EASE.silk} ${delay}ms`,
-  });
+  // the ice burst: spreads from where the fingertips met, frosts the screen, then melts from the centre
+  const frost: CSSProperties | null =
+    still || skipped
+      ? null
+      : reached("melt")
+        ? ({
+            "--burst": "170%",
+            "--hole": "190%",
+            opacity: 0,
+            transition: `--hole ${1400 * pace}ms ease-in, opacity ${1300 * pace}ms ease-in ${250 * pace}ms`,
+          } as CSSProperties)
+        : reached("burst")
+          ? ({
+              "--burst": "170%",
+              "--hole": "-20%",
+              opacity: 1,
+              transition: `--burst ${1250 * pace}ms cubic-bezier(0.3, 0.6, 0.3, 1), opacity ${250 * pace}ms ease-out`,
+            } as CSSProperties)
+          : ({ "--burst": "-15%", "--hole": "-20%", opacity: 0 } as CSSProperties);
 
   return (
     <section
@@ -279,31 +220,31 @@ export function Invitation() {
       className="relative flex min-h-[100dvh] flex-col items-center overflow-x-clip px-[var(--gutter)] text-center"
       style={{ paddingTop: "calc(var(--status-bar) + 26px)" }}
     >
+      {/* light gathered behind the words, so gold reads on the bright upper sky */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 h-[60%]"
         style={{
           background:
             "radial-gradient(ellipse 85% 62% at 50% 34%, rgb(var(--ivory) / 0.8) 0%, rgb(var(--ivory) / 0.45) 52%, rgb(var(--ivory) / 0) 82%)",
-          opacity: text ? 1 : 0,
-          transition: `opacity ${dur(1400)}ms ${EASE.silk}`,
+          ...shown,
         }}
       />
 
-      {/* ── the words, written in at the top ── */}
-      <p className="relative font-script text-[48px] leading-none text-gold-ink" style={write(word(0), 1500)}>
+      {/* ── the card's words ── */}
+      <p className="relative font-script text-[48px] leading-none text-gold-ink" style={shown}>
         {copy.title}
       </p>
       <p
         className="relative mt-3 max-w-[18rem] text-balance font-display text-[16px] font-medium italic leading-snug text-slate"
-        style={fade(word(1000))}
+        style={shown}
       >
         {copy.blessing}
       </p>
       <h1
         id="invitation-names"
         className="relative mt-3 font-display text-[clamp(34px,10.4vw,44px)] font-semibold italic leading-tight text-navy"
-        style={write(word(1500), 1500)}
+        style={shown}
       >
         <span className="text-balance">
           {couple.bride.displayName} <span className="font-medium text-gold-ink">&amp;</span> {couple.groom.displayName}
@@ -311,12 +252,12 @@ export function Invitation() {
       </h1>
       <p
         className="relative mt-1 max-w-[18rem] text-balance font-display text-[15px] italic leading-snug text-slate"
-        style={fade(word(2600))}
+        style={shown}
       >
         {copy.request}
       </p>
       {date && (
-        <div className="relative mt-4 flex flex-col items-center" style={fade(word(3000))}>
+        <div className="relative mt-4 flex flex-col items-center" style={shown}>
           <p className="font-sans text-[11px] font-medium uppercase tracking-eyebrow text-gold-ink">{date.month}</p>
           <p className="flex items-start font-display font-semibold leading-none text-navy">
             <span className="text-[58px] leading-[0.9]">{date.day}</span>
@@ -328,35 +269,28 @@ export function Invitation() {
       {venue.city && (
         <p
           className="relative mt-2 flex items-center gap-1 font-sans text-[11px] font-medium uppercase tracking-eyebrow text-navy"
-          style={fade(word(3400))}
+          style={shown}
         >
           <Icon name="pin" className="h-4 w-4 text-gold-ink" /> {venue.city}
         </p>
       )}
 
       {/* ── Shiv and Parvati before Kailash, at the foot of the screen ── */}
-      <div className="relative mt-auto w-full pt-6">
+      <div className="relative mt-auto w-full pt-6" style={shown}>
         <div
           aria-hidden
           className="absolute bottom-0 h-[min(105vw,480px)] w-screen"
-          style={{ left: "calc(50% - 50vw)", ...landscape }}
+          style={{ left: "calc(50% - 50vw)" }}
         >
           <Kailash className="h-full w-full" />
         </div>
-        <div ref={art} className="relative z-[1] mx-auto w-[min(78vw,350px)]" style={camera}>
-          <div className="[-webkit-mask-image:linear-gradient(#000_82%,transparent)] [mask-image:linear-gradient(#000_82%,transparent)]">
-            <div
-              className="watercolor-reveal"
-              style={{ ...paint, "--watercolor-mask": `url(${assets.watercolorMask})` } as CSSProperties}
-            >
-              <img
-                src={assets.saveTheDateArt}
-                alt="Shiva and Parvati together"
-                className="block h-auto w-full"
-                draggable={false}
-              />
-            </div>
-          </div>
+        <div className="relative z-[1] mx-auto w-[min(78vw,350px)] [-webkit-mask-image:linear-gradient(#000_82%,transparent)] [mask-image:linear-gradient(#000_82%,transparent)]">
+          <img
+            src={assets.saveTheDateArt}
+            alt="Shiva and Parvati together"
+            className="block h-auto w-full"
+            draggable={false}
+          />
         </div>
       </div>
 
@@ -378,8 +312,11 @@ export function Invitation() {
         <div className="opening-glow" data-waiting={beat < 0 || undefined} style={glow} />
       </div>
 
-      {/* a short shower of red petals while the card writes itself in */}
-      {reached("art") && !still && !skipped && <PetalShower />}
+      {/* the ice burst */}
+      {frost && <div aria-hidden className="ice-burst" style={frost} />}
+
+      {/* a short shower of red petals once the card is revealed */}
+      {reached("melt") && !still && !skipped && <PetalShower />}
 
       {/* Skip: always there while the opening plays */}
       {locked && (
