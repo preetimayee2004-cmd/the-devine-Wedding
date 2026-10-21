@@ -68,7 +68,7 @@ export function Invitation() {
   const measureRef = useRef<() => void>(() => {});
 
   const still = mode === "still";
-  const pace = mode === "short" ? 0.45 : 1;
+  const pace = mode === "short" ? 0.6 : 1;
   const reached = (b: Beat) => beat >= ORDER.indexOf(b);
   /** Transition length: quicker on a repeat visit, brief after Skip, a plain fade for reduced motion. */
   const dur = (ms: number) => (skipped ? 350 : still ? 500 : ms * (mode === "short" ? 0.6 : 1));
@@ -85,6 +85,8 @@ export function Invitation() {
         Promise.all(hands.map((img) => img.decode().catch(() => undefined))),
         new Promise((r) => setTimeout(r, MAX_ART_WAIT)),
       ]);
+      await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+      stage.current?.getBoundingClientRect();
       if (cancelled) return;
       writeSessionFlag(SEEN_KEY);
       if (mode === "still") {
@@ -196,11 +198,11 @@ export function Invitation() {
   // ── styles for each beat ──
   const handsGone = still || skipped || dusted;
   const arrive = (from: string): CSSProperties =>
-    mode === "full" && !skipped
+    !still && !skipped
       ? {
           opacity: reached("arrive") && !handsGone ? 1 : 0,
           transform: reached("arrive") ? "translateX(0)" : `translateX(${from})`,
-          transition: `transform 3600ms ${EASE.glide}, opacity ${handsGone ? 120 : 1400}ms ease-out`,
+          transition: `transform ${3600 * pace}ms ${EASE.glide}, opacity ${handsGone ? 120 : 1400 * pace}ms ease-out`,
         }
       : {
           opacity: reached("arrive") && !handsGone ? 1 : 0,
