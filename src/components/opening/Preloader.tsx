@@ -27,9 +27,11 @@ const PULLBACK = { scale: 0.7, clampY: 0.4 };
 
 type Mode = "full" | "short" | "still";
 
-function pickMode(forceFull: boolean): Mode {
+function pickMode(): Mode {
   if (window.matchMedia(REDUCED_MOTION_QUERY).matches) return "still";
-  if (!forceFull && wedding.opening.shortOnRepeatVisit && readSessionFlag(SEEN_KEY)) return "short";
+  // ?opening=full plays the whole opening even on a reload (handy when reviewing).
+  if (new URLSearchParams(window.location.search).get("opening") === "full") return "full";
+  if (wedding.opening.shortOnRepeatVisit && readSessionFlag(SEEN_KEY)) return "short";
   return "full";
 }
 
@@ -38,11 +40,9 @@ interface PreloaderProps {
   onReveal: () => void;
   /** The overlay is gone. */
   onDone: () => void;
-  /** Play the full opening even on a repeat visit (the "replay" link). */
-  forceFull?: boolean;
 }
 
-export function Preloader({ onReveal, onDone, forceFull = false }: PreloaderProps) {
+export function Preloader({ onReveal, onDone }: PreloaderProps) {
   const root = useRef<HTMLDivElement>(null);
   const stage = useRef<HTMLDivElement>(null);
   const shiva = useRef<HTMLImageElement>(null);
@@ -70,7 +70,7 @@ export function Preloader({ onReveal, onDone, forceFull = false }: PreloaderProp
       couple: couple.current!,
       emblem: emblem.current!,
     };
-    const mode = pickMode(forceFull);
+    const mode = pickMode();
     const running: Animation[] = [];
     const timers: number[] = [];
     let cancelled = false;
@@ -284,7 +284,7 @@ export function Preloader({ onReveal, onDone, forceFull = false }: PreloaderProp
       running.forEach((a) => a.cancel());
       restoreScroll();
     };
-  }, [forceFull]);
+  }, []);
 
   const { opening, watercolorMask } = wedding.assets;
 

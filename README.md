@@ -58,14 +58,26 @@ It runs for about 4.5 seconds and never blocks the guest:
 - **Skip** is always there.
 - A reload in the same visit gets a short version.
 - `prefers-reduced-motion` shows a still frame.
+- Add `?opening=full` to the link to watch the whole opening again after a reload (handy when reviewing).
 
 The hand layers in `public/art/opening/` were cut from `art-source/hands-night-ArtistAdarsh.webp`. That's the full painting with its night sky removed so the hands sit on the sky, Shiva's forearm traced back in, and a petal painted out. The painting is marked "ArtistAdarsh — All Rights Reserved", so the opening shows a credit (`credits.openingHands`). Please get the artist's permission before sharing the site publicly.
+
+## The invitation (Section 01)
+
+`src/components/sections/Invitation.tsx`:
+
+1. The opening's gold emblem lands in the medallion and opens into its gold ring.
+2. Ganpati, a gold line drawing (`src/components/art/Ganpati.tsx`), draws himself inside the ring. He carries Shiva's tripundra on his brow.
+3. The mantra, the blessing, the quote, the guest's greeting ("Dear Ananya,"), the couple's names and the date follow in a gentle stagger.
+4. A gold thread leads down to the next section.
+
+The words live in `invitation` in `src/config/wedding.ts`.
 
 ## Build phases
 
 - [x] 1. Global shell: fonts, tokens, guest context, breakpoints, desktop phone mockup
 - [x] 2. Opening animation + Skip
-- [ ] 3. Invitation
+- [x] 3. Invitation
 - [ ] 4. Couple / Hero
 - [ ] 5. Countdown
 - [ ] 6. Our Story

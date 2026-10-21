@@ -81,6 +81,23 @@
     background-repeat: no-repeat;
   }
 
+  /* The couple's names, stacked (Invitation). */
+  .names-display {
+    display: block;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(46px, 13.5vw, 60px);
+    line-height: 1.02;
+    letter-spacing: 0.01em;
+    color: rgb(var(--navy));
+  }
+
+  @media (max-height: 700px) {
+    .names-display {
+      font-size: clamp(40px, 12vw, 50px);
+    }
+  }
+
   /* ── Opening ── */
 
   /* The hands' artboard (9:16) covers the screen, like the original painting. */

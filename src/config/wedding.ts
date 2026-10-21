@@ -23,6 +23,18 @@ export const wedding = {
     city: "Varanasi",
   },
 
+  /**
+   * Section 01 — the invitation's words. The guest's name is added to
+   * `greeting`; a "\n" in the quote is where its line breaks.
+   */
+  invitation: {
+    mantra: "ॐ गं गणपतये नमः",
+    blessing: "With the blessings of Lord Ganesha",
+    quote: "Two hearts, one sacred journey,\nblessed by the divine.",
+    greeting: "Dear {guest},",
+    request: "request the honour of your presence at their wedding",
+  },
+
   /** Personalised links: ?guest=Ananya (also ?to= or ?name=). */
   guest: {
     queryKeys: ["guest", "to", "name"],
