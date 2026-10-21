@@ -86,13 +86,24 @@ It plays once; scrolling away and back doesn't repaint it.
 
 The illustration's cut edges (his shoulder, the petals) were feathered into a white watercolour vignette, and small holes in the original cut-out were mended. The clouds (`public/art/clouds.webp`) are generated, and they will part for the countdown.
 
+## The countdown (Section 03)
+
+`src/components/sections/Countdown.tsx`:
+
+1. The clouds under the couple part.
+2. A gold temple-arch frame draws itself down from Shiva's crescent at the apex to a lotus at its base.
+3. Inside, शुभ मुहूर्त and "Counting the Moments" appear with the date, then live days, hours, minutes and seconds. The numbers roll as they change.
+4. A gold line runs from the lotus on to the story.
+
+The count runs to `wedding.dateTime` at the venue (`wedding.timeZone`), so it's correct for guests anywhere. On the wedding day, after the muhurat, it shows "Today Is the Day"; after that, "Happily Married". Both lines are in `countdown` in the config.
+
 ## Build phases
 
 - [x] 1. Global shell: fonts, tokens, guest context, breakpoints, desktop phone mockup
 - [x] 2. Opening animation + Skip
 - [x] 3. Invitation
 - [x] 4. Couple / Hero
-- [ ] 5. Countdown
+- [x] 5. Countdown
 - [ ] 6. Our Story
 - [ ] 7. Events
 - [ ] 8. Family

@@ -49,6 +49,16 @@ export const wedding = {
     illustrationAlt: "The couple offering water to the Shivling together",
   },
 
+  /** Section 03 — the celestial calendar. Counts to wedding.dateTime in wedding.timeZone. */
+  countdown: {
+    eyebrow: "शुभ मुहूर्त",
+    title: "Counting the Moments",
+    /** Shown on the wedding day itself (at the venue), instead of the numbers. */
+    today: { title: "Today Is the Day", line: "Today, two hearts become one." },
+    /** Shown once the wedding day has passed. */
+    after: { title: "Happily Married", line: "With the blessings of Mahadev and Maa Parvati." },
+  },
+
   /** Personalised links: ?guest=Ananya (also ?to= or ?name=). */
   guest: {
     queryKeys: ["guest", "to", "name"],
