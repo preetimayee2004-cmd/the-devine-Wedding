@@ -257,11 +257,12 @@
   /* ── Opening ── */
 
   /* The hands' artboard (792 × 581, both hands on one board so they meet
-     exactly), floating over the first screen. Wider than the screen, so each
-     arm arrives from beyond its own edge; the point where the fingertips meet
-     (52.8%, 46.6% of the board) sits at the screen's centre. */
+     exactly), floating over the first screen. Large, and turned 45° about the
+     point where the fingertips meet (52.8%, 46.6% of the board) — which sits
+     at the screen's centre — so Shiva's hand comes down from the top-left and
+     Parvati's rises from the bottom-right, as in the reference. */
   .opening-stage {
-    --stage-w: clamp(400px, 106vw, 760px);
+    --stage-w: clamp(520px, 150vw, 1000px);
     position: absolute;
     z-index: 5;
     width: var(--stage-w);
@@ -269,6 +270,8 @@
     left: calc(50% - var(--stage-w) * 0.528);
     top: calc(46vh - var(--stage-w) * 0.3418);
     top: calc(46dvh - var(--stage-w) * 0.3418);
+    transform: rotate(45deg);
+    transform-origin: 52.8% 46.6%;
     pointer-events: none;
   }
 

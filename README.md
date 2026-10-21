@@ -110,7 +110,7 @@ Each section has its own composition, and each hands over to the next.
 
 | | Section | What happens |
 | --- | --- | --- |
-| 00 | Opening | Shiva's hand glides in slowly from the left and Parvati's from the right; their fingertips meet in a gold glow; the hands turn to gold and dissolve into golden dust. Skip is always shown, a reload gets a quicker version, and `?opening=full` replays the full one. |
+| 00 | Opening | As in the reference video, Shiva's hand comes down slowly from the top-left and Parvati's rises from the bottom-right; their fingertips meet and rest in a gold glow; the hands turn to gold and dissolve into golden dust. Skip is always shown, a reload gets a quicker version, and `?opening=full` replays the full one. |
 | 01 | Save the Date | The opening becomes the first screen: Shiv–Parvati appear in close-up (painted in like watercolour) as red petals begin to fall, then the view draws back and they settle before Kailash and a still lake; "Save the Date", the blessing, the names, the date and the city write themselves in. After 5 s of reading it glides to the couple (`invitation.autoAdvanceMs`); any touch cancels this. |
 | 02 | Couple | Ganpati draws himself in a gold ring with ॐ गं गणपतये नमः and "Welcome, Dear {guest}"; then the couple at the Shivling paints in like watercolour and settles on a cloud; then names and the Lagna card. |
 | 03 | Countdown | The cloud parts; a gold temple arch draws down from Shiva's crescent; live time to the muhurat at the venue. On the day it reads "Today Is the Day", afterwards "Happily Married". |

@@ -23,10 +23,13 @@ export function dissolveToDust(
   /** The point the dust spreads out from (fractions of the stage). */
   origin: { x: number; y: number },
   duration = 2200,
+  /** How far the stage is turned (deg), so the dust still drifts up the screen. */
+  turn = 0,
 ): Promise<void> {
-  const rect = stage.getBoundingClientRect();
-  const w = Math.round(rect.width);
-  const h = Math.round(rect.height);
+  const w = stage.offsetWidth;
+  const h = stage.offsetHeight;
+  const rad = (turn * Math.PI) / 180;
+  const up = { x: -Math.sin(rad), y: -Math.cos(rad) };
   if (!w || !h) return Promise.resolve();
 
   // the hands as they are now, at the stage's size
@@ -66,8 +69,8 @@ export function dissolveToDust(
         x,
         y,
         // drift outward from the meeting point and upward, with a little scatter
-        vx: (dx / d) * away + (Math.random() - 0.5) * 0.5,
-        vy: (dy / d) * away * 0.5 - (0.35 + Math.random() * 0.55),
+        vx: (dx / d) * away + (Math.random() - 0.5) * 0.5 + up.x * (0.35 + Math.random() * 0.55),
+        vy: (dy / d) * away * 0.5 + up.y * (0.35 + Math.random() * 0.55),
         delay: (d / reach) * duration * 0.5 + Math.random() * duration * 0.12,
         life: duration * (0.32 + Math.random() * 0.22),
         size: step * (0.9 + Math.random() * 0.5),

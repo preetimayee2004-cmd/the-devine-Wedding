@@ -13,8 +13,9 @@ import { PetalShower } from "@/components/ui/PetalShower";
 /**
  * Sections 00 + 01 — the opening, which becomes the Save the Date.
  *
- *   arrive  Shiva's hand glides in slowly from the left, Parvati's from the right
- *   meet    their fingertips meet in a soft golden light
+ *   arrive  Shiva's hand comes down slowly from the top-left, Parvati's rises
+ *           from the bottom-right (the board is turned 45°, as in the reference)
+ *   meet    their fingertips meet and rest a moment in a soft golden light
  *   dust    the hands turn to gold and dissolve into golden dust
  *   art     Shiv and Parvati appear in close-up, painted in like watercolour;
  *           red petals begin to fall
@@ -31,12 +32,14 @@ import { PetalShower } from "@/components/ui/PetalShower";
 const SEEN_KEY = "dw:opening-seen";
 
 /** The beats, in order, and when each begins (ms, full version). */
-const BEATS = { arrive: 0, meet: 2300, dust: 3000, art: 3900, zoom: 6200, text: 7400, done: 10600 } as const;
+const BEATS = { arrive: 0, meet: 3300, dust: 4700, art: 5600, zoom: 7900, text: 9100, done: 12300 } as const;
 type Beat = keyof typeof BEATS;
 const ORDER = Object.keys(BEATS) as Beat[];
 
 /** Where the fingertips meet on the hands' board (fractions). */
 const MEET = { x: 0.528, y: 0.466 };
+/** How far the board is turned (matches .opening-stage in index.css). */
+const STAGE_TURN = 45;
 
 type Mode = "full" | "short" | "still";
 
@@ -132,7 +135,7 @@ export function Invitation() {
     const t = window.setTimeout(() => {
       const el = stage.current;
       const imgs = [shiva.current, parvati.current].filter((i): i is HTMLImageElement => i !== null);
-      if (el) void dissolveToDust(el, imgs, MEET, 2200 * pace);
+      if (el) void dissolveToDust(el, imgs, MEET, 2200 * pace, STAGE_TURN);
       setDusted(true);
     }, 450 * pace);
     return () => clearTimeout(t);
@@ -194,7 +197,7 @@ export function Invitation() {
       ? {
           opacity: reached("arrive") && !handsGone ? 1 : 0,
           transform: reached("arrive") ? "translateX(0)" : `translateX(${from})`,
-          transition: `transform 2600ms ${EASE.glide}, opacity ${handsGone ? 120 : 1000}ms ease-out`,
+          transition: `transform 3600ms ${EASE.glide}, opacity ${handsGone ? 120 : 1400}ms ease-out`,
         }
       : {
           opacity: reached("arrive") && !handsGone ? 1 : 0,
@@ -354,10 +357,17 @@ export function Invitation() {
 
       {/* ── the two hands, meeting, then turning to golden dust ── */}
       <div ref={stage} aria-hidden className="opening-stage">
-        <div className="opening-layer" style={arrive("-46%")}>
+        {/* the far ends of the arm and the sleeve melt into the sky, so no edge of the board ever shows */}
+        <div
+          className="opening-layer [-webkit-mask-image:linear-gradient(to_right,transparent,#000_9%)] [mask-image:linear-gradient(to_right,transparent,#000_9%)]"
+          style={arrive("-46%")}
+        >
           <img ref={shiva} src={assets.opening.shivaHand} alt="" className="opening-layer" style={gilt} />
         </div>
-        <div className="opening-layer" style={arrive("46%")}>
+        <div
+          className="opening-layer [-webkit-mask-image:linear-gradient(#000_72%,transparent_96%)] [mask-image:linear-gradient(#000_72%,transparent_96%)]"
+          style={arrive("46%")}
+        >
           <img ref={parvati} src={assets.opening.parvatiHand} alt="" className="opening-layer" style={gilt} />
         </div>
         <div className="opening-glow" data-waiting={beat < 0 || undefined} style={glow} />
