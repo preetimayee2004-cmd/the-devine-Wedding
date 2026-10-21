@@ -126,8 +126,7 @@ export function Preloader({ onReveal, onDone }: PreloaderProps) {
       const to = emblemTarget();
       els.emblem.style.left = `${to.x}px`;
       els.emblem.style.top = `${to.y}px`;
-      const at = (x: number, y: number, s: number) =>
-        `translate(-50%, -50%) translate(${x}px, ${y}px) scale(${s})`;
+      const at = (x: number, y: number, s: number) => `translate(-50%, -50%) translate(${x}px, ${y}px) scale(${s})`;
       return play(
         els.emblem,
         [
@@ -150,10 +149,17 @@ export function Preloader({ onReveal, onDone }: PreloaderProps) {
         ],
         { duration: duration * 1.1, easing: EASE.breath },
       );
-      play(els.joined, [{ opacity: 1, filter: "blur(0px)" }, { opacity: 0, filter: "blur(6px)" }], {
-        duration: duration * 0.75,
-        easing: "ease-in",
-      });
+      play(
+        els.joined,
+        [
+          { opacity: 1, filter: "blur(0px)" },
+          { opacity: 0, filter: "blur(6px)" },
+        ],
+        {
+          duration: duration * 0.75,
+          easing: "ease-in",
+        },
+      );
       play(els.couple, [{ opacity: 1 }, { opacity: 0 }], {
         delay: duration * 0.2,
         duration: duration * 0.8,

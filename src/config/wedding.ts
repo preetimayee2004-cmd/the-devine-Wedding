@@ -5,6 +5,18 @@
  *  Values marked SAMPLE are stand-ins until the family confirms them.
  * ─────────────────────────────────────────────────────────────────────────
  */
+import {
+  list,
+  type Contact,
+  type FamilySide,
+  type Photo,
+  type Stay,
+  type StoryMoment,
+  type TravelPoint,
+  type WeddingEvent,
+  type Wish,
+} from "./types";
+
 export const wedding = {
   couple: {
     bride: { displayName: "Preeti" },
@@ -20,7 +32,10 @@ export const wedding = {
   // SAMPLE: replace with the confirmed venue.
   venue: {
     name: "Kailash Vatika",
+    address: "Sarnath Road, Varanasi, Uttar Pradesh",
     city: "Varanasi",
+    /** A Google Maps link to the exact spot; when null, directions search for name + address. */
+    mapsUrl: null as string | null,
   },
 
   /**
@@ -57,6 +72,260 @@ export const wedding = {
     today: { title: "Today Is the Day", line: "Today, two hearts become one." },
     /** Shown once the wedding day has passed. */
     after: { title: "Happily Married", line: "With the blessings of Mahadev and Maa Parvati." },
+  },
+
+  /** Section 04 — our story. SAMPLE: the couple's own moments, words and photos go here. */
+  story: {
+    eyebrow: "Our Story",
+    title: "A Journey Written in the Stars",
+    moments: list<StoryMoment>([
+      {
+        title: "The First Hello",
+        when: "Spring 2021",
+        text: "A friend's Diwali gathering, one plate of jalebis, and a conversation that refused to end. Neither of us knew it then, but the story had already begun.",
+        photo: { src: null, alt: "Preeti and Shivashish when they first met" },
+      },
+      {
+        title: "Long Calls & Chai",
+        when: "2022 – 2024",
+        text: "Different cities, the same sunsets. Evenings of video calls over cutting chai turned miles into minutes, and friendship into something more.",
+        photo: { src: null, alt: "Preeti and Shivashish on a video call" },
+      },
+      {
+        title: "A Promise at the Ghats",
+        when: "December 2025",
+        text: "As the evening aarti lit up the Ganga, Shivashish asked the question — and Preeti said yes before he could finish it.",
+        photo: { src: null, alt: "The proposal at the ghats" },
+        motif: "diya",
+      },
+      {
+        title: "Forever Begins",
+        when: "February 2027",
+        text: "With our families' blessings and Mahadev's grace, we begin our forever — and we would love you beside us.",
+        photo: null,
+        motif: "lotus",
+      },
+    ]),
+  },
+
+  /** Section 05 — the ceremonies, in order. SAMPLE: the final schedule replaces this. */
+  events: {
+    eyebrow: "The Wedding Ceremonies",
+    title: "Sacred Celebrations",
+    intro: "Every ritual, a blessing; every moment, a memory we hope to share with you.",
+    list: list<WeddingEvent>([
+      {
+        id: "mehendi",
+        name: "Mehendi",
+        icon: "mehendi",
+        when: "2027-02-10T16:00",
+        about: "Henna, music and laughter as the bride's hands bloom with colour.",
+      },
+      {
+        id: "sangeet",
+        name: "Sangeet",
+        icon: "sangeet",
+        when: "2027-02-10T20:00",
+        about: "An evening of song and dance with both families.",
+        venue: "The Lawn, Kailash Vatika",
+      },
+      {
+        id: "mangana",
+        name: "Mangana",
+        icon: "haldi",
+        when: "2027-02-11T10:00",
+        about: "Turmeric and blessings for the bride and groom.",
+      },
+      {
+        id: "barajatri",
+        name: "Barajatri",
+        icon: "baraat",
+        when: "2027-02-12T18:00",
+        about: "The groom's procession sets out with drums and dancing.",
+      },
+      {
+        id: "batabarana",
+        name: "Batabarana",
+        icon: "welcome",
+        when: "2027-02-12T19:00",
+        about: "The bride's family welcomes the baraat with aarti.",
+      },
+      {
+        id: "hasta-ganthi",
+        name: "Hasta Ganthi",
+        icon: "knot",
+        when: "2027-02-12T19:30",
+        about: "The couple's hands are tied together in the sacred knot.",
+      },
+      {
+        id: "sindoor-daan",
+        name: "Sindoor Daan",
+        icon: "sindoor",
+        when: "2027-02-12T23:00",
+        about: "The vermilion that seals a lifetime's promise.",
+      },
+      {
+        id: "bidaai",
+        name: "Bidaai",
+        icon: "bidaai",
+        when: "2027-02-13T06:00",
+        about: "A tearful, joyful farewell as the bride begins her new home.",
+      },
+      {
+        id: "reception",
+        name: "Reception",
+        icon: "reception",
+        when: "2027-02-14T19:30",
+        about: "Dinner and celebration with everyone we love.",
+        venue: "The Grand Pavilion, Varanasi",
+      },
+    ]),
+  },
+
+  /** Section 06 — two families. SAMPLE: real names and photos replace these. */
+  family: {
+    eyebrow: "Two Families, One Celebration",
+    title: "With Their Blessings",
+    intro: "With the blessings of our elders and the love of our families, two homes become one.",
+    sides: list<FamilySide>([
+      {
+        title: "The Bride's Family",
+        photo: { src: null, alt: "Preeti's family" },
+        members: [
+          { relation: "Parents", name: "Smt. Sunita & Shri Rakesh Kumar" },
+          { relation: "Grandparents", name: "Smt. Kamla Devi & Shri Harinarayan" },
+          { relation: "Brother", name: "Ankit" },
+        ],
+      },
+      {
+        title: "The Groom's Family",
+        photo: { src: null, alt: "Shivashish's family" },
+        members: [
+          { relation: "Parents", name: "Smt. Meera & Shri Prakash Chandra" },
+          { relation: "Grandmother", name: "Smt. Savitri Devi" },
+          { relation: "Sister", name: "Shreya" },
+        ],
+      },
+    ]),
+  },
+
+  /** Section 07 — the gallery. The first photo is the large one. SAMPLE: add the couple's photos. */
+  gallery: {
+    eyebrow: "Moments to Remember",
+    title: "Our Gallery",
+    photos: list<Photo>([
+      { src: "/art/couple-shivling.webp", alt: "Preeti and Shivashish at the Shivling", caption: "Blessed beginnings" },
+      { src: "/art/shiva-parvati-seated.webp", alt: "Shiva and Parvati seated together", caption: "Shiv & Shakti" },
+      { src: null, alt: "Engagement", caption: "Engagement" },
+      { src: null, alt: "Pre-wedding", caption: "Pre-wedding" },
+      { src: null, alt: "With family", caption: "With family" },
+    ]),
+  },
+
+  /** Section 08 — one-tap acceptance (no form). */
+  rsvp: {
+    eyebrow: "You Are Cordially Invited",
+    title: "Will You Join Our Celebration?",
+    message: "Your presence will make our special day even more beautiful.",
+    button: "Accept with Joy",
+    welcome: "Dear {guest}, we can't wait to celebrate with you!",
+    blessing: "Your presence is a blessing, your smiles a treasured gift.",
+    quote: "We look forward to celebrating this beautiful beginning with you.",
+    /**
+     * SAMPLE: the family's WhatsApp number ("919876543210"). Without a
+     * database (see README), acceptance stays on the guest's phone, and this
+     * lets them tell the family in one tap.
+     */
+    whatsapp: null as string | null,
+  },
+
+  /** Section 09 — the blessing wall. Sample wishes show until real ones arrive. */
+  wishes: {
+    eyebrow: "With Love and Blessings",
+    title: "Blessing Wall",
+    quote: "May your hearts always find their way home to each other.",
+    placeholder: "Write a heartfelt wish for the couple…",
+    maxLength: 280,
+    samples: list<Wish>([
+      {
+        id: "s1",
+        name: "Family & Friends",
+        message: "May your life together be filled with love, laughter and divine blessings.",
+      },
+      { id: "s2", name: "Mausi & Mausa", message: "Wishing you a lifetime of beautiful memories." },
+      { id: "s3", name: "Nani", message: "May Mahadev bless your journey together." },
+      {
+        id: "s4",
+        name: "College friends",
+        message: "Can't wait to dance at your Sangeet! Two wonderful people, one beautiful story.",
+      },
+      { id: "s5", name: "Aditi", message: "May every sunrise bring you closer, and every evening find you laughing." },
+    ]),
+  },
+
+  /** Section 10 — practical details. SAMPLE: only verified places, numbers and links belong here. */
+  travel: {
+    eyebrow: "Venue & Guest Arrangements",
+    title: "Finding Your Way",
+    points: list<TravelPoint>([
+      {
+        kind: "air",
+        label: "Nearest airport",
+        name: "Lal Bahadur Shastri International Airport (VNS)",
+        note: "Babatpur, about 25 km from the city",
+      },
+      {
+        kind: "rail",
+        label: "Railway station",
+        name: "Varanasi Junction (BSB)",
+        note: "Cantonment, in the city centre",
+      },
+      { kind: "bus", label: "Bus stand", name: "Varanasi Cantt Bus Station", note: "Opposite Varanasi Junction" },
+      {
+        kind: "local",
+        label: "Getting around",
+        name: "Autos, e-rickshaws and app cabs",
+        note: "Available across the city",
+      },
+    ]),
+    pickup:
+      "We'll arrange pickups from the airport and Varanasi Junction on 11 and 12 February. Just share your arrival time.",
+    contacts: list<Contact>([{ name: "Rohan", role: "Travel help", phone: null }]),
+    stayNote: "Rooms are reserved for our outstation guests. Let us know your dates and we'll take care of the rest.",
+    stays: list<Stay>([
+      {
+        name: "Riverside Guest House",
+        distance: "2 km from the venue",
+        note: "Reserved for the bride's guests",
+        phone: null,
+        bookingUrl: null,
+      },
+      {
+        name: "Sarnath Residency",
+        distance: "3.5 km from the venue",
+        note: "Reserved for the groom's guests",
+        phone: null,
+        bookingUrl: null,
+      },
+    ]),
+  },
+
+  /** Section 11 — thank you. */
+  thankYou: {
+    eyebrow: "With hearts full of gratitude",
+    title: "Thank You",
+    message:
+      "Thank you for being a part of our beautiful beginning. May the blessings of Mahadev always guide our journey.",
+    mantra: "ॐ नमः शिवाय",
+  },
+
+  /** Section 12 — a last little note. */
+  loveNote: {
+    eyebrow: "A Little Note from the Couple",
+    title: "Before You Go…",
+    message: "Our story is made more beautiful by the people who share it with us. Thank you for being part of ours.",
+    signoff: "With love,",
+    closing: "Har Har Mahadev",
   },
 
   /** Personalised links: ?guest=Ananya (also ?to= or ?name=). */

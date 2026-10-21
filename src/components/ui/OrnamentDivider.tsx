@@ -1,7 +1,15 @@
 import { EASE } from "@/lib/motion";
 
 /** Small gold divider: two fine lines drawing outward from a lotus bud. */
-export function OrnamentDivider({ show, delay = 0, className = "" }: { show: boolean; delay?: number; className?: string }) {
+export function OrnamentDivider({
+  show,
+  delay = 0,
+  className = "",
+}: {
+  show: boolean;
+  delay?: number;
+  className?: string;
+}) {
   const line = (origin: "left" | "right") => ({
     transformOrigin: origin,
     transform: show ? "scaleX(1)" : "scaleX(0)",

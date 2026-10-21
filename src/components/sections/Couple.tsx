@@ -33,7 +33,7 @@ export function Couple() {
   }, []);
 
   const paint: CSSProperties = reduced
-    ? { opacity: seen ? 1 : 0, transition: "opacity 500ms linear" }
+    ? { opacity: seen ? 1 : 0, maskSize: "320% 320%", WebkitMaskSize: "320% 320%", transition: "opacity 500ms linear" }
     : {
         opacity: seen ? 1 : 0,
         maskSize: seen ? "320% 320%" : "30% 30%",
