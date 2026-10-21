@@ -40,6 +40,9 @@ const ORDER = Object.keys(BEATS) as Beat[];
 const MEET = { x: 0.528, y: 0.466 };
 /** How far the board is turned (matches .opening-stage in index.css). */
 const STAGE_TURN = 45;
+const ramp = (e0: number, e1: number, x: number) => Math.min(1, Math.max(0, (x - e0) / (e1 - e0)));
+/** The soft ends of Shiva's arm and Parvati's sleeve (match the masks on their layers), for the dust too. */
+const HAND_FADES = [(u: number) => ramp(0, 0.09, u), (_u: number, v: number) => 1 - ramp(0.72, 0.96, v)];
 
 type Mode = "full" | "short" | "still";
 
@@ -135,7 +138,7 @@ export function Invitation() {
     const t = window.setTimeout(() => {
       const el = stage.current;
       const imgs = [shiva.current, parvati.current].filter((i): i is HTMLImageElement => i !== null);
-      if (el) void dissolveToDust(el, imgs, MEET, 2200 * pace, STAGE_TURN);
+      if (el) void dissolveToDust(el, imgs, MEET, 2200 * pace, STAGE_TURN, HAND_FADES);
       setDusted(true);
     }, 450 * pace);
     return () => clearTimeout(t);

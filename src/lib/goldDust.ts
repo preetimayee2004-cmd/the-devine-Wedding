@@ -13,6 +13,8 @@ interface Grain {
   life: number;
   size: number;
   color: string;
+  /** How solid the grain starts: grains near a soft edge are fainter, so the edge stays soft as dust. */
+  base: number;
 }
 
 const GOLD = [214, 174, 104];
@@ -25,6 +27,8 @@ export function dissolveToDust(
   duration = 2200,
   /** How far the stage is turned (deg), so the dust still drifts up the screen. */
   turn = 0,
+  /** Per image: how much of it shows at (u, v) on the board (0–1), matching any soft edge it has on screen. */
+  fades: Array<((u: number, v: number) => number) | null> = [],
 ): Promise<void> {
   const w = stage.offsetWidth;
   const h = stage.offsetHeight;
@@ -32,16 +36,20 @@ export function dissolveToDust(
   const up = { x: -Math.sin(rad), y: -Math.cos(rad) };
   if (!w || !h) return Promise.resolve();
 
-  // the hands as they are now, at the stage's size
+  // the hands as they are now, at the stage's size — each read on its own, so its soft edge can apply
   const src = document.createElement("canvas");
   src.width = w;
   src.height = h;
   const sctx = src.getContext("2d", { willReadFrequently: true });
   if (!sctx) return Promise.resolve();
-  for (const img of images) if (img.complete && img.naturalWidth) sctx.drawImage(img, 0, 0, w, h);
-  let pixels: Uint8ClampedArray;
+  const layers: Array<{ pixels: Uint8ClampedArray; fade: ((u: number, v: number) => number) | null }> = [];
   try {
-    pixels = sctx.getImageData(0, 0, w, h).data;
+    images.forEach((img, i) => {
+      if (!img.complete || !img.naturalWidth) return;
+      sctx.clearRect(0, 0, w, h);
+      sctx.drawImage(img, 0, 0, w, h);
+      layers.push({ pixels: sctx.getImageData(0, 0, w, h).data, fade: fades[i] ?? null });
+    });
   } catch {
     return Promise.resolve();
   }
@@ -52,31 +60,34 @@ export function dissolveToDust(
   const oy = origin.y * h;
   const reach = Math.hypot(Math.max(ox, w - ox), Math.max(oy, h - oy));
   const grains: Grain[] = [];
-  for (let y = 0; y < h; y += step)
-    for (let x = 0; x < w; x += step) {
-      const i = (y * w + x) * 4;
-      if (pixels[i + 3] < 110) continue;
-      const lum = (pixels[i] * 0.3 + pixels[i + 1] * 0.55 + pixels[i + 2] * 0.15) / 255;
-      const tint = 0.55 + lum * 0.65;
-      const r = Math.min(255, Math.round(GOLD[0] * tint * 0.7 + pixels[i] * 0.3));
-      const g = Math.min(255, Math.round(GOLD[1] * tint * 0.7 + pixels[i + 1] * 0.3));
-      const b = Math.min(255, Math.round(GOLD[2] * tint * 0.75 + pixels[i + 2] * 0.25));
-      const dx = x - ox;
-      const dy = y - oy;
-      const d = Math.hypot(dx, dy) || 1;
-      const away = 0.25 + Math.random() * 0.45;
-      grains.push({
-        x,
-        y,
-        // drift outward from the meeting point and upward, with a little scatter
-        vx: (dx / d) * away + (Math.random() - 0.5) * 0.5 + up.x * (0.35 + Math.random() * 0.55),
-        vy: (dy / d) * away * 0.5 + up.y * (0.35 + Math.random() * 0.55),
-        delay: (d / reach) * duration * 0.5 + Math.random() * duration * 0.12,
-        life: duration * (0.32 + Math.random() * 0.22),
-        size: step * (0.9 + Math.random() * 0.5),
-        color: `rgb(${r},${g},${b})`,
-      });
-    }
+  for (const { pixels, fade } of layers)
+    for (let y = 0; y < h; y += step)
+      for (let x = 0; x < w; x += step) {
+        const i = (y * w + x) * 4;
+        const base = (fade ? fade(x / w, y / h) : 1) * Math.min(1, pixels[i + 3] / 200);
+        if (pixels[i + 3] < 110 || base < 0.04) continue;
+        const lum = (pixels[i] * 0.3 + pixels[i + 1] * 0.55 + pixels[i + 2] * 0.15) / 255;
+        const tint = 0.55 + lum * 0.65;
+        const r = Math.min(255, Math.round(GOLD[0] * tint * 0.7 + pixels[i] * 0.3));
+        const g = Math.min(255, Math.round(GOLD[1] * tint * 0.7 + pixels[i + 1] * 0.3));
+        const b = Math.min(255, Math.round(GOLD[2] * tint * 0.75 + pixels[i + 2] * 0.25));
+        const dx = x - ox;
+        const dy = y - oy;
+        const d = Math.hypot(dx, dy) || 1;
+        const away = 0.25 + Math.random() * 0.45;
+        grains.push({
+          x,
+          y,
+          // drift outward from the meeting point and upward, with a little scatter
+          vx: (dx / d) * away + (Math.random() - 0.5) * 0.5 + up.x * (0.35 + Math.random() * 0.55),
+          vy: (dy / d) * away * 0.5 + up.y * (0.35 + Math.random() * 0.55),
+          delay: (d / reach) * duration * 0.5 + Math.random() * duration * 0.12,
+          life: duration * (0.32 + Math.random() * 0.22),
+          size: step * (0.9 + Math.random() * 0.5),
+          color: `rgb(${r},${g},${b})`,
+          base,
+        });
+      }
 
   const canvas = document.createElement("canvas");
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -116,7 +127,7 @@ export function dissolveToDust(
           alpha = 1 - k * k;
           size *= 1 - k * 0.6;
         }
-        ctx.globalAlpha = alpha;
+        ctx.globalAlpha = alpha * p.base;
         ctx.fillStyle = p.color;
         ctx.fillRect(x, y, size, size);
       }
