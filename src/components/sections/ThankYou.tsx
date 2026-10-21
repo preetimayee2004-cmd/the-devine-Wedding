@@ -107,7 +107,7 @@ export function ThankYou() {
             style={{ ...paint, "--watercolor-mask": `url(${assets.watercolorMask})` } as CSSProperties}
           >
             <img
-              src={assets.opening.divineCouple}
+              src={assets.divineCouple}
               alt="Shiva and Parvati seated together"
               loading="lazy"
               decoding="async"

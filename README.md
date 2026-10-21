@@ -109,7 +109,7 @@ Each section has its own composition, and each hands over to the next.
 
 | | Section | What happens |
 | --- | --- | --- |
-| 00 | Opening | Shiva's and Parvati's hands meet in a gold glow; Shiv–Parvati paint in; the glow becomes the Om emblem. Skip is always shown, a reload gets a short version, and `?opening=full` replays the full one. |
+| 00 | Opening | Shiva's hand glides in slowly from the left and Parvati's from the right; their fingertips meet in a gold glow, which becomes the Om emblem. Skip is always shown, a reload gets a short version, and `?opening=full` replays the full one. |
 | 01 | Invitation | The emblem opens into a ring where Ganpati draws himself; mantra, blessing, "Dear {guest}", names and date follow. After 5 s of reading it glides to the couple (`invitation.autoAdvanceMs`); any touch cancels this. |
 | 02 | Couple | The gold thread arrives; the couple at the Shivling paints in like watercolour and settles on a cloud; then names and the Lagna card. |
 | 03 | Countdown | The cloud parts; a gold temple arch draws down from Shiva's crescent; live time to the muhurat at the venue. On the day it reads "Today Is the Day", afterwards "Happily Married". |
@@ -125,7 +125,7 @@ Each section has its own composition, and each hands over to the next.
 
 ## Artwork and credits
 
-- **Opening hands** (`public/art/opening/`): cut from the supplied painting `art-source/hands-night-ArtistAdarsh.webp`. Its night sky was removed so the hands sit on the sky, Shiva's forearm was traced back in, and a petal was painted out. The painting is marked "ArtistAdarsh — All Rights Reserved", so a credit is shown (`credits.openingHands`). Please get the artist's permission before sharing publicly.
+- **Opening hands** (`public/art/opening/`): cut from the supplied painting `art-source/hands-reaching.webp`. Its black background was removed so the hands sit on the sky, and the two hands were separated so each can arrive from its own side. If the painting is someone's artwork, add their credit in `credits.openingHands`; it shows at the end of the page.
 - **Your two illustrations** (`art-source/`): the couple at the Shivling and Shiv–Parvati seated. They are small (245×435), so larger originals would look sharper on phones. The couple illustration's cut edges were feathered into a white watercolour vignette.
 - **Generated art:** the Ganpati line drawing, the countdown arch, all gold icons, the clouds and the watercolour mask were all made for this site.
 

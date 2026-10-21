@@ -348,13 +348,13 @@ export const wedding = {
   assets: {
     /** The sky behind every section (supplied reference image). */
     sky: "/art/sky.jpg",
+    /** The opening's two hands, reaching from either side (same artboard, so they meet exactly). */
     opening: {
       shivaHand: "/art/opening/hand-shiva.webp",
       parvatiHand: "/art/opening/hand-parvati.webp",
-      joinedHands: "/art/opening/hands-joined.webp",
-      /** Shiv–Parvati seated, revealed beneath the joined hands. */
-      divineCouple: "/art/shiva-parvati-seated.webp",
     },
+    /** Shiv–Parvati seated together (Thank You, gallery). */
+    divineCouple: "/art/shiva-parvati-seated.webp",
     /** Soft-edged bloom used for every watercolour reveal. */
     watercolorMask: "/art/watercolor-mask.png",
     /** Couple at the Shivling — the hero illustration. */
@@ -363,9 +363,9 @@ export const wedding = {
     clouds: "/art/clouds.webp",
   },
 
-  /** Artwork credits shown on the site. */
+  /** An artwork credit shown at the very end, e.g. "Hands artwork © Artist name". Null shows none. */
   credits: {
-    openingHands: "Hands artwork © ArtistAdarsh",
+    openingHands: null as string | null,
   },
 
   meta: {

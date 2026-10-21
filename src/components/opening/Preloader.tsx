@@ -8,22 +8,19 @@ import { Emblem } from "@/components/ui/Emblem";
 /**
  * Section 00 — the divine union (PRD §4).
  *
- *   0.0–1.2 s  arrival     Shiva's and Parvati's hands glide in from opposite corners
- *   1.2–2.0 s  union       they clasp; a restrained golden glow blooms at the meeting point
- *   2.0–3.2 s  reveal      the view pulls back; Shiv–Parvati, seated, paint in beneath
- *   3.2–4.0 s  transition  the hands soften into the sky, the glow condenses into the
- *                          gold emblem, which settles where the invitation wears it
+ *   0.0–2.8 s  arrival     Shiva's hand glides in slowly from the left, Parvati's
+ *                          from the right, on the sky
+ *   2.4–3.6 s  union       their fingertips meet; a restrained golden glow
+ *                          blooms in the space between them
+ *   3.7–4.8 s  transition  the hands soften into the sky and the glow gathers
+ *                          into the gold emblem, which settles where the
+ *                          invitation wears it
  *
  * Never a gate: Skip is always there, a guest who already watched it this
  * visit gets a short version, and reduced-motion shows a still frame.
  */
 
 const SEEN_KEY = "dw:opening-seen";
-
-/** Where the clasp sits on the 9:16 artboard (fractions of width / height). */
-const CLASP = { x: 0.489, y: 0.6 };
-/** The pull-back: how small the hands become, and where the clasp ends up. */
-const PULLBACK = { scale: 0.7, clampY: 0.4 };
 
 type Mode = "full" | "short" | "still";
 
@@ -47,9 +44,7 @@ export function Preloader({ onReveal, onDone }: PreloaderProps) {
   const stage = useRef<HTMLDivElement>(null);
   const shiva = useRef<HTMLImageElement>(null);
   const parvati = useRef<HTMLImageElement>(null);
-  const joined = useRef<HTMLImageElement>(null);
   const glow = useRef<HTMLDivElement>(null);
-  const couple = useRef<HTMLDivElement>(null);
   const emblem = useRef<HTMLDivElement>(null);
   const skip = useRef<() => void>(() => {});
   const [waiting, setWaiting] = useState(true);
@@ -65,9 +60,7 @@ export function Preloader({ onReveal, onDone }: PreloaderProps) {
       stage: stage.current!,
       shiva: shiva.current!,
       parvati: parvati.current!,
-      joined: joined.current!,
       glow: glow.current!,
-      couple: couple.current!,
       emblem: emblem.current!,
     };
     const mode = pickMode();
@@ -108,17 +101,6 @@ export function Preloader({ onReveal, onDone }: PreloaderProps) {
 
     // ── shared pieces of the timeline ──
 
-    /** Stage transform that puts the clasp at the pull-back position. */
-    const pullbackTransform = () => {
-      const r = els.stage.getBoundingClientRect();
-      const clasp = { x: r.left + r.width * CLASP.x, y: r.top + r.height * CLASP.y };
-      const dx = window.innerWidth / 2 - clasp.x;
-      const dy = window.innerHeight * PULLBACK.clampY - clasp.y;
-      return `translate(${dx}px, ${dy}px) scale(${PULLBACK.scale})`;
-    };
-
-    const maskSize = (size: string) => ({ maskSize: size, webkitMaskSize: size });
-
     /** The gold emblem, starting at the glow and settling on the invitation's emblem. */
     const emblemJourney = (duration: number) => {
       const g = els.glow.getBoundingClientRect();
@@ -138,33 +120,29 @@ export function Preloader({ onReveal, onDone }: PreloaderProps) {
       );
     };
 
-    /** Hands soften into the sky; the glow gathers itself into the emblem. */
+    /** The hands soften into the sky; the glow gathers itself into the emblem. */
     const transition = async (duration: number) => {
       play(
         els.glow,
         [
-          { transform: "scale(1.05)", opacity: 0.55 },
-          { transform: "scale(0.25)", opacity: 0.95, offset: 0.4 },
+          { transform: "scale(1)", opacity: 0.7 },
+          { transform: "scale(0.28)", opacity: 0.95, offset: 0.4 },
           { transform: "scale(0.2)", opacity: 0 },
         ],
         { duration: duration * 1.1, easing: EASE.breath },
       );
-      play(
-        els.joined,
-        [
-          { opacity: 1, filter: "blur(0px)" },
-          { opacity: 0, filter: "blur(6px)" },
-        ],
-        {
-          duration: duration * 0.75,
-          easing: "ease-in",
-        },
-      );
-      play(els.couple, [{ opacity: 1 }, { opacity: 0 }], {
-        delay: duration * 0.2,
-        duration: duration * 0.8,
-        easing: "ease-in",
-      });
+      for (const hand of [els.shiva, els.parvati])
+        play(
+          hand,
+          [
+            { opacity: 1, filter: "blur(0px)" },
+            { opacity: 0, filter: "blur(5px)" },
+          ],
+          {
+            duration: duration * 0.8,
+            easing: "ease-in",
+          },
+        );
       await wait(duration * 0.3);
       await emblemJourney(duration).finished;
     };
@@ -172,109 +150,69 @@ export function Preloader({ onReveal, onDone }: PreloaderProps) {
     // ── the three versions ──
 
     const runFull = async () => {
-      // 0–1.2 s · arrival
-      const glide = { duration: 1250, easing: EASE.glide };
+      // 0–2.8 s · arrival: slowly, each from its own side
+      const glide = { duration: 2800, easing: EASE.glide };
       play(
         els.shiva,
         [
-          { opacity: 0, transform: "translate(-40%, -34%) rotate(-4deg)" },
+          { opacity: 0, transform: "translateX(-46%)" },
           { opacity: 1, offset: 0.35 },
-          { opacity: 1, transform: "translate(0, 0) rotate(0deg)" },
+          { opacity: 1, transform: "translateX(0)" },
         ],
         glide,
       );
       play(
         els.parvati,
         [
-          { opacity: 0, transform: "translate(38%, 34%) rotate(4deg)" },
+          { opacity: 0, transform: "translateX(46%)" },
           { opacity: 1, offset: 0.35 },
-          { opacity: 1, transform: "translate(0, 0) rotate(0deg)" },
+          { opacity: 1, transform: "translateX(0)" },
         ],
         glide,
       );
-      // the seed of light gathers, blooms as they meet, then settles
+      // the seed of light waits between them, then blooms as the fingertips meet
       play(
         els.glow,
         [
-          { transform: "scale(0.22)", opacity: 0.45, easing: EASE.breath },
-          { transform: "scale(0.42)", opacity: 0.65, offset: 0.45, easing: EASE.breath },
-          { transform: "scale(1.55)", opacity: 1, offset: 0.68, easing: EASE.breath },
-          { transform: "scale(1.05)", opacity: 0.55 },
+          { transform: "scale(0.25)", opacity: 0.4, easing: EASE.breath },
+          { transform: "scale(0.4)", opacity: 0.6, offset: 0.62, easing: EASE.breath },
+          { transform: "scale(1.5)", opacity: 1, offset: 0.8, easing: EASE.breath },
+          { transform: "scale(1)", opacity: 0.7 },
         ],
-        { duration: 2100 },
+        { duration: 3600 },
       );
-
-      // 1.2–2.0 s · union: the clasped painting takes over from the two hands
-      play(els.joined, [{ opacity: 0 }, { opacity: 1 }], { delay: 1150, duration: 450, easing: "ease-out" });
-      for (const hand of [els.shiva, els.parvati])
-        play(hand, [{ opacity: 1 }, { opacity: 0 }], { delay: 1650, duration: 200 });
-      await wait(2000);
+      await wait(3700);
       if (cancelled) return;
-
-      // 2.0–3.2 s · reveal: pull back; the arms melt into the sky; Shiv–Parvati paint in
-      play(els.stage, [{ transform: "translate(0, 0) scale(1)" }, { transform: pullbackTransform() }], {
-        duration: 1200,
-        easing: EASE.drift,
-      });
-      // the fade tightens ahead of the move, so no artboard edge ever shows
-      play(els.stage, [maskSize("320% 320%"), maskSize("100% 100%")], { duration: 750, easing: EASE.silk });
-      play(
-        els.couple,
-        [
-          { opacity: 0, transform: "translate(-50%, 14px)", ...maskSize("45% 45%") },
-          { opacity: 0.85, offset: 0.45 },
-          { opacity: 1, transform: "translate(-50%, 0)", ...maskSize("320% 320%") },
-        ],
-        { delay: 500, duration: 1100, easing: EASE.silk },
-      );
-      await wait(1250);
-      if (cancelled) return;
-
-      // 3.2–4.0 s · transition
-      await transition(800);
+      // 3.7–4.8 s · transition
+      await transition(900);
     };
 
     const runShort = async () => {
-      els.stage.style.transform = pullbackTransform();
-      Object.assign(els.stage.style, maskSize("100% 100%"));
-      play(els.joined, [{ opacity: 0 }, { opacity: 1 }], { duration: 500, easing: "ease-out" });
+      for (const hand of [els.shiva, els.parvati])
+        play(hand, [{ opacity: 0 }, { opacity: 1 }], { duration: 600, easing: "ease-out" });
       play(
         els.glow,
         [
           { transform: "scale(0.3)", opacity: 0.4 },
-          { transform: "scale(1.4)", opacity: 0.95, offset: 0.55 },
-          { transform: "scale(1.05)", opacity: 0.55 },
+          { transform: "scale(1.4)", opacity: 0.95, offset: 0.6 },
+          { transform: "scale(1)", opacity: 0.7 },
         ],
-        { duration: 900, easing: EASE.breath },
+        { duration: 1000, easing: EASE.breath },
       );
-      play(
-        els.couple,
-        [
-          { opacity: 0, transform: "translate(-50%, 0)", ...maskSize("0% 0%") },
-          { opacity: 1, transform: "translate(-50%, 0)", ...maskSize("320% 320%") },
-        ],
-        { delay: 150, duration: 800, easing: EASE.silk },
-      );
-      await wait(950);
+      await wait(1050);
       if (cancelled) return;
       await transition(750);
     };
 
     const runStill = async () => {
-      els.stage.style.transform = pullbackTransform();
-      Object.assign(els.stage.style, maskSize("100% 100%"));
-      for (const el of [els.joined, els.couple]) el.style.opacity = "1";
-      Object.assign(els.couple.style, maskSize("320% 320%"));
-      els.glow.style.transform = "scale(1.05)";
-      els.glow.style.opacity = "0.55";
-      await wait(2600);
+      for (const hand of [els.shiva, els.parvati]) hand.style.opacity = "1";
+      els.glow.style.transform = "scale(1)";
+      els.glow.style.opacity = "0.7";
+      await wait(2400);
     };
 
     (async () => {
-      await artReady(
-        [els.shiva, els.parvati, els.joined, els.couple.querySelector("img")!],
-        wedding.opening.maxAssetWaitMs,
-      );
+      await artReady([els.shiva, els.parvati], wedding.opening.maxAssetWaitMs);
       if (cancelled) return;
       setWaiting(false);
       timers.push(window.setTimeout(() => setSkipVisible(true), mode === "full" ? 700 : 0));
@@ -292,45 +230,17 @@ export function Preloader({ onReveal, onDone }: PreloaderProps) {
     };
   }, []);
 
-  const { opening, watercolorMask } = wedding.assets;
+  const { opening } = wedding.assets;
+  const hand: CSSProperties = { opacity: 0 };
 
   return (
     <div ref={root} className="fixed inset-0 z-50 overflow-hidden" role="presentation">
-      <p className="sr-only">The hands of Shiva and Parvati meet. The invitation opens in a moment.</p>
+      <p className="sr-only">The hands of Shiva and Parvati reach for each other. The invitation opens in a moment.</p>
 
       <div ref={stage} className="opening-stage">
-        <img ref={joined} src={opening.joinedHands} alt="" className="opening-layer" style={{ opacity: 0 }} />
-        <img
-          ref={shiva}
-          src={opening.shivaHand}
-          alt=""
-          className="opening-layer"
-          style={{ opacity: 0, transformOrigin: "0% 25%" }}
-        />
-        <img
-          ref={parvati}
-          src={opening.parvatiHand}
-          alt=""
-          className="opening-layer"
-          style={{ opacity: 0, transformOrigin: "85% 100%" }}
-        />
+        <img ref={shiva} src={opening.shivaHand} alt="" className="opening-layer" style={hand} />
+        <img ref={parvati} src={opening.parvatiHand} alt="" className="opening-layer" style={hand} />
         <div ref={glow} className="opening-glow" data-waiting={waiting || undefined} />
-      </div>
-
-      {/* Shiv–Parvati, seated beneath the joined hands */}
-      <div
-        ref={couple}
-        className="watercolor-reveal absolute left-1/2 w-[min(62vw,270px)]"
-        style={
-          {
-            bottom: 0,
-            opacity: 0,
-            transform: "translate(-50%, 0)",
-            "--watercolor-mask": `url(${watercolorMask})`,
-          } as CSSProperties
-        }
-      >
-        <img src={opening.divineCouple} alt="" className="block h-auto w-full" draggable={false} />
       </div>
 
       <div ref={emblem} className="pointer-events-none fixed left-1/2 top-0 opacity-0">

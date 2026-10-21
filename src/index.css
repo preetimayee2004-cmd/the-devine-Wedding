@@ -220,28 +220,16 @@
 
   /* ── Opening ── */
 
-  /* The hands' artboard (9:16) covers the screen, like the original painting. */
+  /* The hands' artboard (792 × 581, both hands on one board so they meet
+     exactly). Wider than the screen, so each arm arrives from beyond its own
+     edge; the point where the fingertips meet sits at the centre. */
   .opening-stage {
-    --stage-w: max(100vw, calc(100vh * 9 / 16));
-    --stage-w: max(100vw, calc(100dvh * 9 / 16));
+    --stage-w: clamp(420px, 108vw, 1000px);
     position: absolute;
     width: var(--stage-w);
-    height: calc(var(--stage-w) * 16 / 9);
-    left: calc(50% - var(--stage-w) / 2);
-    top: calc(50% - var(--stage-w) * 8 / 9);
-    /* Pivot on the clasp, so the pull-back keeps it in view. */
-    transform-origin: 48.9% 60%;
-    will-change: transform, opacity;
-    /* The arms melt into the sky where the artboard ends. Starts enormous
-       (no visible fade) and tightens during the pull-back. */
-    -webkit-mask-image: radial-gradient(ellipse 70% 52% at 48.9% 58%, #000 50%, transparent 94%);
-    mask-image: radial-gradient(ellipse 70% 52% at 48.9% 58%, #000 50%, transparent 94%);
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    -webkit-mask-position: 48.9% 58%;
-    mask-position: 48.9% 58%;
-    -webkit-mask-size: 320% 320%;
-    mask-size: 320% 320%;
+    aspect-ratio: 792 / 581;
+    left: calc(50% - var(--stage-w) * 0.528);
+    top: calc(46% - var(--stage-w) * 0.3418);
   }
 
   .opening-layer {
@@ -255,14 +243,14 @@
     will-change: transform, opacity;
   }
 
-  /* The light where the hands meet. */
+  /* The light where the fingertips meet. */
   .opening-glow {
     position: absolute;
-    left: 48.9%;
-    top: 60%;
-    width: 46%;
+    left: 52.8%;
+    top: 46.6%;
+    width: 30%;
     aspect-ratio: 1;
-    margin: -23% 0 0 -23%;
+    margin: -15% 0 0 -15%;
     border-radius: 9999px;
     pointer-events: none;
     background: radial-gradient(

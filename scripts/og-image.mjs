@@ -36,33 +36,31 @@ const html = `<!doctype html><html><head><meta charset="utf-8">
 <style>
   html,body{margin:0;width:1200px;height:630px;overflow:hidden}
   body{background:#8fd8fb url("${asset(wedding.assets.sky.replace(/^\//, ""))}") center/cover}
-  .hands{position:absolute;left:-68px;top:-250px;width:620px;height:1102px;
-    background:url("${asset(wedding.assets.opening.joinedHands.replace(/^\//, ""))}") center/contain no-repeat;
-    -webkit-mask-image:radial-gradient(ellipse 52% 42% at 49% 58%,#000 55%,transparent 92%)}
-  .glow{position:absolute;left:0;top:0;width:620px;height:630px;background:radial-gradient(circle at 235px 411px,rgba(255,244,214,.7),transparent 160px)}
-  .veil{position:absolute;right:0;top:0;width:760px;height:630px;background:radial-gradient(ellipse 70% 75% at 60% 50%,rgba(255,249,239,.82),rgba(255,249,239,.35) 60%,transparent 85%)}
+  .veil{position:absolute;left:0;right:0;top:0;height:330px;background:radial-gradient(ellipse 52% 90% at 50% 18%,rgba(255,249,239,.85),rgba(255,249,239,.35) 60%,transparent 85%)}
+  .fade{position:absolute;inset:0;-webkit-mask-image:linear-gradient(to right,#000 76%,transparent 84%)}
+  .hands{position:absolute;left:146px;top:196px;width:860px;aspect-ratio:792/581;
+    -webkit-mask-image:radial-gradient(ellipse 60% 64% at 52.8% 46.6%,#000 62%,transparent 100%)}
+  .hands img{position:absolute;inset:0;width:100%;height:100%}
+  .glow{position:absolute;left:600px;top:490px;width:240px;height:240px;margin:-120px 0 0 -120px;border-radius:50%;
+    background:radial-gradient(circle,rgba(255,248,228,.95) 0,rgba(250,226,168,.7) 20%,rgba(232,198,128,.3) 42%,transparent 70%)}
   .frame{position:absolute;inset:24px;border:1.5px solid #D0AF72;border-radius:18px}
   .frame2{position:absolute;inset:32px;border:1px solid rgba(208,175,114,.5);border-radius:12px}
-  .wrap{position:absolute;left:470px;right:40px;top:0;bottom:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
-  .om{font-family:"Tiro Devanagari Sanskrit",serif;font-size:40px;color:#8A642F;line-height:1}
-  .eyebrow{font-family:Jost,sans-serif;font-weight:500;font-size:17px;letter-spacing:.34em;text-transform:uppercase;color:#3D5A73;margin-top:14px}
-  .names{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:96px;line-height:.98;color:#173B56;margin-top:16px}
-  .and{display:block;font-style:italic;font-weight:500;font-size:58px;color:#8A642F;line-height:1.05}
-  .rule{display:flex;align-items:center;gap:14px;margin-top:22px}
-  .rule span{display:block;width:110px;height:1px;background:#D0AF72}
-  .rule i{display:block;width:9px;height:9px;border:1px solid #D0AF72;transform:rotate(45deg)}
-  .date{font-family:Jost,sans-serif;font-weight:500;font-size:21px;letter-spacing:.2em;text-transform:uppercase;color:#8A642F;margin-top:18px}
-  .place{font-family:Jost,sans-serif;font-size:18px;letter-spacing:.14em;color:#3D5A73;margin-top:6px}
+  .wrap{position:absolute;left:0;right:0;top:46px;display:flex;flex-direction:column;align-items:center;text-align:center}
+  .om{font-family:"Tiro Devanagari Sanskrit",serif;font-size:34px;color:#8A642F;line-height:1}
+  .eyebrow{font-family:Jost,sans-serif;font-weight:500;font-size:15px;letter-spacing:.34em;text-transform:uppercase;color:#3D5A73;margin-top:10px}
+  .names{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:76px;line-height:1.05;color:#173B56;margin-top:6px}
+  .and{font-style:italic;font-weight:500;color:#8A642F;margin:0 14px}
+  .date{font-family:Jost,sans-serif;font-weight:500;font-size:17px;letter-spacing:.2em;text-transform:uppercase;color:#8A642F;margin-top:6px}
 </style></head><body>
-<div class="glow"></div><div class="hands"></div><div class="veil"></div>
+<div class="veil"></div>
+<div class="fade"><div class="hands"><img src="${asset(wedding.assets.opening.shivaHand.slice(1))}"><img src="${asset(wedding.assets.opening.parvatiHand.slice(1))}"></div></div>
+<div class="glow"></div>
 <div class="frame"></div><div class="frame2"></div>
 <div class="wrap">
   <div class="om">ॐ</div>
   <div class="eyebrow">Wedding Invitation</div>
   <div class="names">${esc(wedding.couple.bride.displayName)}<span class="and">&amp;</span>${esc(wedding.couple.groom.displayName)}</div>
-  <div class="rule"><span></span><i></i><span></span></div>
-  ${dateLine ? `<div class="date">${esc(dateLine)}</div>` : ""}
-  ${wedding.venue.city ? `<div class="place">${esc(wedding.venue.city)}</div>` : ""}
+  ${dateLine ? `<div class="date">${esc([dateLine, wedding.venue.city].filter(Boolean).join(" · "))}</div>` : ""}
 </div>
 </body></html>`;
 
