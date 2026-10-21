@@ -33,6 +33,20 @@ export const wedding = {
     quote: "Two hearts, one sacred journey,\nblessed by the divine.",
     greeting: "Dear {guest},",
     request: "request the honour of your presence at their wedding",
+    /**
+     * Once the invitation has been on screen this long (ms) and the guest
+     * hasn't touched anything, it glides up to reveal the couple. 0 = never.
+     */
+    autoAdvanceMs: 5000,
+  },
+
+  /** Section 02 — the couple, at the Shivling. */
+  hero: {
+    welcome: "Welcome, Dear Guests",
+    tagline: "are beginning their forever",
+    ceremonyLabel: "लग्न",
+    ceremony: "Wedding Ceremony",
+    illustrationAlt: "The couple offering water to the Shivling together",
   },
 
   /** Personalised links: ?guest=Ananya (also ?to= or ?name=). */
@@ -64,8 +78,10 @@ export const wedding = {
     },
     /** Soft-edged bloom used for every watercolour reveal. */
     watercolorMask: "/art/watercolor-mask.png",
-    /** Couple at the Shivling — the hero illustration (Phase 4). */
+    /** Couple at the Shivling — the hero illustration. */
     heroCouple: "/art/couple-shivling.webp",
+    /** Soft cloud bank the hero settles into (it parts for the countdown). */
+    clouds: "/art/clouds.webp",
   },
 
   /** Artwork credits shown on the site. */

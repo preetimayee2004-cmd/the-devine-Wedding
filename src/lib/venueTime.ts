@@ -30,6 +30,7 @@ export interface FormattedVenueDate {
   weekday: string; // "Sunday"
   day: string; // "14"
   month: string; // "February"
+  monthShort: string; // "Feb"
   year: string; // "2027"
   time: string | null; // "7:30 PM"
 }
@@ -43,6 +44,7 @@ export function formatVenueDate(p: VenueDateTime, locale = "en-IN"): FormattedVe
     weekday: fmt({ weekday: "long" }),
     day: String(p.day),
     month: fmt({ month: "long" }),
+    monthShort: fmt({ month: "short" }),
     year: String(p.year),
     time: p.hour === null ? null : fmt({ hour: "numeric", minute: "2-digit", hour12: true }).toUpperCase(),
   };

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Preloader } from "@/components/opening/Preloader";
 import { Invitation } from "@/components/sections/Invitation";
+import { Couple } from "@/components/sections/Couple";
 
 type OpeningState = "playing" | "revealing" | "done";
 
@@ -11,9 +12,8 @@ export function Experience() {
   return (
     <>
       <Invitation revealed={opening !== "playing"} />
-      {opening !== "done" && (
-        <Preloader onReveal={() => setOpening("revealing")} onDone={() => setOpening("done")} />
-      )}
+      <Couple />
+      {opening !== "done" && <Preloader onReveal={() => setOpening("revealing")} onDone={() => setOpening("done")} />}
     </>
   );
 }

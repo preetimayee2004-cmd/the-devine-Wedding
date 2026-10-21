@@ -70,15 +70,28 @@ The hand layers in `public/art/opening/` were cut from `art-source/hands-night-A
 2. Ganpati, a gold line drawing (`src/components/art/Ganpati.tsx`), draws himself inside the ring. He carries Shiva's tripundra on his brow.
 3. The mantra, the blessing, the quote, the guest's greeting ("Dear Ananya,"), the couple's names and the date follow in a gentle stagger.
 4. A gold thread leads down to the next section.
+5. After the guest has had time to read it (`invitation.autoAdvanceMs`, 5 s), the page glides up to the couple. Any touch or scroll cancels the glide; set it to `0` to switch it off.
 
 The words live in `invitation` in `src/config/wedding.ts`.
+
+## The couple (Section 02)
+
+`src/components/sections/Couple.tsx`:
+
+1. The gold thread arrives from above.
+2. The couple at the Shivling paints itself in like a watercolour: a bloom spreads while the colour deepens.
+3. The painting settles into soft clouds, and the names, "are beginning their forever" and the Lagna / Wedding Ceremony card (date, time, venue) follow.
+
+It plays once; scrolling away and back doesn't repaint it.
+
+The illustration's cut edges (his shoulder, the petals) were feathered into a white watercolour vignette, and small holes in the original cut-out were mended. The clouds (`public/art/clouds.webp`) are generated, and they will part for the countdown.
 
 ## Build phases
 
 - [x] 1. Global shell: fonts, tokens, guest context, breakpoints, desktop phone mockup
 - [x] 2. Opening animation + Skip
 - [x] 3. Invitation
-- [ ] 4. Couple / Hero
+- [x] 4. Couple / Hero
 - [ ] 5. Countdown
 - [ ] 6. Our Story
 - [ ] 7. Events

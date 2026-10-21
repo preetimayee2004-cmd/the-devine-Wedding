@@ -3,6 +3,7 @@ import { wedding } from "@/config/wedding";
 import { useGuest } from "@/context/GuestContext";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
 import { EASE } from "@/lib/motion";
+import { glideTo, USER_INPUT_EVENTS } from "@/lib/scroll";
 import { formatVenueDate, parseVenueDateTime } from "@/lib/venueTime";
 import { Ganpati } from "@/components/art/Ganpati";
 import { Emblem } from "@/components/ui/Emblem";
@@ -16,6 +17,7 @@ import { Reveal } from "@/components/ui/Reveal";
  * a ring, and Ganpati draws himself inside it. Then the mantra, the
  * blessing, the quote, the guest's greeting and the couple's names arrive
  * in a gentle stagger, closed by the date and a gold thread leading down.
+ * Once it has been read, it glides up and the couple's section rises in.
  */
 
 type Phase = "hidden" | "emblem" | "open";
@@ -24,6 +26,8 @@ type Phase = "hidden" | "emblem" | "open";
 const RING_SCALE = 0.469;
 /** How long the landed emblem rests before opening. */
 const EMBLEM_REST_MS = 560;
+/** From the medallion opening until the whole invitation is on screen. */
+const STAGGER_MS = 2800;
 
 export function Invitation({ revealed }: { revealed: boolean }) {
   const { guestName } = useGuest();
@@ -45,6 +49,30 @@ export function Invitation({ revealed }: { revealed: boolean }) {
   }, [revealed, reduced]);
 
   const open = phase === "open";
+
+  // Invitation → Hero (PRD §5): after reading time, glide up to the couple —
+  // unless the guest has already touched, scrolled or pressed anything.
+  useEffect(() => {
+    const readingMs = wedding.invitation.autoAdvanceMs;
+    if (!open || reduced || !readingMs) return;
+    let touched = false;
+    const onInput = () => {
+      touched = true;
+    };
+    USER_INPUT_EVENTS.forEach((type) => window.addEventListener(type, onInput, { passive: true }));
+    let stopGlide = () => {};
+    const timer = window.setTimeout(() => {
+      const next = document.getElementById("couple");
+      if (touched || !next || window.scrollY > 40) return;
+      stopGlide = glideTo(next.getBoundingClientRect().top + window.scrollY, 1600);
+    }, STAGGER_MS + readingMs);
+    return () => {
+      clearTimeout(timer);
+      stopGlide();
+      USER_INPUT_EVENTS.forEach((type) => window.removeEventListener(type, onInput));
+    };
+  }, [open, reduced]);
+
   // The stagger, in ms after the medallion opens (all at once with reduced motion).
   const at = (ms: number) => (reduced ? 0 : ms);
 
