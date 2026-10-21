@@ -1,0 +1,170 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* ── Colours (RGB channels for Tailwind alpha support) ── */
+    --sky: 32 181 235; /* #20B5EB — upper sky */
+    --sky-pale: 168 227 247; /* #A8E3F7 — lower sky */
+    --navy: 23 59 86; /* #173B56 — headings and names, ~8:1 on the pale sky */
+    --navy-deep: 15 42 62; /* #0F2A3E — pressed buttons */
+    --slate: 61 90 115; /* #3D5A73 — body text, ~5.5:1 on the pale sky */
+    --gold-ink: 138 100 47; /* #8A642F — gold text: mantra, date, labels */
+    --gold: 208 175 114; /* #D0AF72 — fine lines and ornaments only */
+    --ivory: 255 249 239; /* #FFF9EF — cards, button text */
+
+    /* ── Typography: change fonts here ── */
+    --font-display: "Cormorant Garamond", Georgia, serif;
+    --font-body: "Jost", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-deva: "Tiro Devanagari Sanskrit", "Noto Serif Devanagari", serif;
+    --font-script: "Pinyon Script", cursive;
+
+    /* Space above content that hugs the top: the phone's notch / status bar.
+       Inside the desktop mockup this becomes the mockup's status bar (src/lib/viewMode.ts). */
+    --status-bar: env(safe-area-inset-top, 0px);
+    --gutter: 1.5rem;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    /* The page never pans sideways on a phone. */
+    overflow-x: hidden;
+    overscroll-behavior-x: none;
+  }
+
+  body {
+    @apply antialiased;
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    color: rgb(var(--slate));
+    overflow-wrap: break-word;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display font-semibold text-navy;
+    line-height: 1.15;
+  }
+
+  ::selection {
+    @apply bg-navy/15 text-navy;
+  }
+
+  :focus-visible {
+    @apply outline outline-2 outline-offset-2 outline-navy;
+  }
+}
+
+@layer components {
+  /* ── The sky: one continuous backdrop behind every section ──
+     A fixed layer (not background-attachment: fixed, which iOS ignores),
+     sized to the large viewport so it never jumps as Safari's toolbars move. */
+  .sky-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    height: 100lvh;
+    z-index: -1;
+    pointer-events: none;
+    background-color: #8fd8fb;
+    background-image: var(--sky-image), linear-gradient(#2ebdfe, #69cefe 25%, #ace4ff 50%, #b8ecfe 76%, #c0eafe);
+    background-size: cover, 100% 100%;
+    background-position: center top;
+    background-repeat: no-repeat;
+  }
+
+  /* ── Opening ── */
+
+  /* The hands' artboard (9:16) covers the screen, like the original painting. */
+  .opening-stage {
+    --stage-w: max(100vw, calc(100vh * 9 / 16));
+    --stage-w: max(100vw, calc(100dvh * 9 / 16));
+    position: absolute;
+    width: var(--stage-w);
+    height: calc(var(--stage-w) * 16 / 9);
+    left: calc(50% - var(--stage-w) / 2);
+    top: calc(50% - var(--stage-w) * 8 / 9);
+    /* Pivot on the clasp, so the pull-back keeps it in view. */
+    transform-origin: 48.9% 60%;
+    will-change: transform, opacity;
+    /* The arms melt into the sky where the artboard ends. Starts enormous
+       (no visible fade) and tightens during the pull-back. */
+    -webkit-mask-image: radial-gradient(ellipse 70% 52% at 48.9% 58%, #000 50%, transparent 94%);
+    mask-image: radial-gradient(ellipse 70% 52% at 48.9% 58%, #000 50%, transparent 94%);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: 48.9% 58%;
+    mask-position: 48.9% 58%;
+    -webkit-mask-size: 320% 320%;
+    mask-size: 320% 320%;
+  }
+
+  .opening-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: none;
+    will-change: transform, opacity;
+  }
+
+  /* The light where the hands meet. */
+  .opening-glow {
+    position: absolute;
+    left: 48.9%;
+    top: 60%;
+    width: 46%;
+    aspect-ratio: 1;
+    margin: -23% 0 0 -23%;
+    border-radius: 9999px;
+    pointer-events: none;
+    background: radial-gradient(
+      circle,
+      rgb(255 248 228 / 0.95) 0%,
+      rgb(250 226 168 / 0.75) 18%,
+      rgb(232 198 128 / 0.38) 38%,
+      rgb(208 175 114 / 0.12) 56%,
+      transparent 70%
+    );
+    will-change: transform, opacity;
+  }
+
+  /* Before the artwork is ready: a seed of light breathing at the meeting point. */
+  .opening-glow[data-waiting] {
+    animation: seed-breathe 1.8s ease-in-out infinite;
+  }
+
+  @keyframes seed-breathe {
+    0%,
+    100% {
+      transform: scale(0.22);
+      opacity: 0.45;
+    }
+    50% {
+      transform: scale(0.3);
+      opacity: 0.7;
+    }
+  }
+
+  /* Painted in through a watercolour bloom (it must grow past 300% to cover the corners). */
+  .watercolor-reveal {
+    -webkit-mask-image: var(--watercolor-mask);
+    mask-image: var(--watercolor-mask);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: 50% 60%;
+    mask-position: 50% 60%;
+    -webkit-mask-size: 0% 0%;
+    mask-size: 0% 0%;
+  }
+}
