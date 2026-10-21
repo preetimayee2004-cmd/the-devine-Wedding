@@ -1,49 +1,52 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { wedding } from "@/config/wedding";
 import { REDUCED_MOTION_QUERY } from "@/hooks/useMediaQuery";
-import { dissolveToDust } from "@/lib/goldDust";
-import { iceBurst } from "@/lib/iceBurst";
-import { EASE } from "@/lib/motion";
+import { EASE, MOTION } from "@/lib/motion";
 import { glideTo, USER_INPUT_EVENTS } from "@/lib/scroll";
 import { readSessionFlag, writeSessionFlag } from "@/lib/session";
 import { formatVenueDate, parseVenueDateTime } from "@/lib/venueTime";
 import { Icon } from "@/components/art/Icons";
 import { Kailash } from "@/components/art/Kailash";
+import { GoldMotes } from "@/components/ui/GoldMotes";
 import { PetalShower } from "@/components/ui/PetalShower";
 
 /**
- * Sections 00 + 01 — the opening, which becomes the Save the Date.
+ * Sections 00 + 01 — the opening, which becomes the Save the Date. One
+ * continuous, quiet moment:
  *
- *   arrive  Shiva's hand comes down slowly from the top-left, Parvati's rises
- *           from the bottom-right (the board is turned 45°, as in the reference)
- *   meet    their fingertips meet and rest a moment in a soft golden light
- *   dust    the hands turn to gold and dissolve into golden dust
- *   burst   an ice burst from where they met: a white flash, shards shooting
- *           out, frost and cracks spreading over the whole screen
- *   reveal  behind the ice, the whole Save the Date is put in place
- *   melt    the ice breaks up, centre first, and its flakes drift away: the
- *           complete card — words, Shiv and Parvati before Kailash — is there
- *           at once; petals fall
+ *   arrive   both hands begin partly off the screen — Shiva's at the upper
+ *            left, palm down; the bride's at the lower right, palm up — and
+ *            glide slowly toward the centre
+ *   meet     Shiva's hand settles over the bride's open hand and they rest
+ *            there, a soft shadow where they touch, a warm gold glow between
+ *   release  the glow widens and fades, a few gold motes drift outward, and
+ *            the hands fade gently into the sky
+ *   reveal   the card's words rise in one after another, then Shiv and
+ *            Parvati before Kailash; a few petals fall
  *
- * Never a gate: Skip is always there, a guest who already watched it this
- * visit gets a quicker version, and reduced motion shows the finished card.
- * Once read, the page glides on to the couple.
+ * The hands are the painted artwork, only moved and faded — never stretched
+ * or redrawn. Never a gate: Skip is always there, a guest who already watched
+ * it this visit gets a quicker version, and reduced motion shows the finished
+ * card. Once read, the page glides on to the couple.
  */
 
 const SEEN_KEY = "dw:opening-seen";
 
 /** The beats, in order, and when each begins (ms, full version). */
-const BEATS = { arrive: 0, meet: 3300, dust: 4700, burst: 4900, reveal: 6200, melt: 6500, done: 8100 } as const;
+const BEATS = { arrive: 0, meet: 3900, release: 5200, reveal: 6000, done: 8100 } as const;
 type Beat = keyof typeof BEATS;
 const ORDER = Object.keys(BEATS) as Beat[];
 
-/** Where the fingertips meet on the hands' board (fractions). */
-const MEET = { x: 0.528, y: 0.466 };
-/** How far the board is turned (matches .opening-stage in index.css). */
-const STAGE_TURN = 45;
-const ramp = (e0: number, e1: number, x: number) => Math.min(1, Math.max(0, (x - e0) / (e1 - e0)));
-/** The soft ends of Shiva's arm and Parvati's sleeve (match the masks on their layers), for the dust too. */
-const HAND_FADES = [(u: number) => ramp(0, 0.09, u), (_u: number, v: number) => 1 - ramp(0.72, 0.96, v)];
+/** How far out along its side each hand starts (% of the board): partly off the screen. */
+const START = 40;
+/**
+ * Where each hand comes to rest (% of the board). Together they put Shiva's
+ * hand 13.6% right and 4.8% lower than in the painting, so it lies over the
+ * bride's open hand instead of touching fingertips. Hers travels the most,
+ * which keeps the cut end of his forearm off the screen.
+ */
+const REST = { shiva: { x: 2.8, y: 1 }, bride: { x: -10.8, y: -3.8 } };
+const GLIDE_MS = 3800;
 
 type Mode = "full" | "short" | "still";
 
@@ -55,20 +58,17 @@ function pickMode(): Mode {
 }
 
 const MAX_ART_WAIT = 3500;
-const FROST = "/art/frost.jpg";
 
 export function Invitation() {
   const [mode] = useState<Mode>(pickMode);
   const [beat, setBeat] = useState(-1); // index into ORDER; -1 = waiting for the artwork
   const [skipped, setSkipped] = useState(false);
-  const [dusted, setDusted] = useState(false);
   const stage = useRef<HTMLDivElement>(null);
   const shiva = useRef<HTMLImageElement>(null);
   const parvati = useRef<HTMLImageElement>(null);
-  const section = useRef<HTMLElement>(null);
-  const glowEl = useRef<HTMLDivElement>(null);
 
   const still = mode === "still";
+  const quiet = still || skipped;
   const pace = mode === "short" ? 0.6 : 1;
   const reached = (b: Beat) => beat >= ORDER.indexOf(b);
 
@@ -101,41 +101,6 @@ export function Invitation() {
       timers.forEach(clearTimeout);
     };
   }, [mode, pace]);
-
-  // The hands turn to golden dust.
-  const dustTime = reached("dust") && !skipped && !still;
-  useEffect(() => {
-    if (!dustTime || dusted) return;
-    const t = window.setTimeout(() => {
-      const el = stage.current;
-      const imgs = [shiva.current, parvati.current].filter((i): i is HTMLImageElement => i !== null);
-      if (el) void dissolveToDust(el, imgs, MEET, 2200 * pace, STAGE_TURN, HAND_FADES);
-      setDusted(true);
-    }, 300 * pace);
-    return () => clearTimeout(t);
-  }, [dustTime, dusted, pace]);
-
-  // The ice burst, from where the fingertips met (the centre of the glow). The card
-  // is put in place as soon as the ice covers the screen; Skip clears the ice at once.
-  const burstTime = reached("burst") && !skipped && !still;
-  useEffect(() => {
-    const host = section.current;
-    if (!burstTime || !host) return;
-    const box = glowEl.current?.getBoundingClientRect();
-    const origin = box
-      ? { x: box.left + box.width / 2, y: box.top + box.height / 2 }
-      : { x: window.innerWidth / 2, y: window.innerHeight * 0.46 };
-    const stop = new AbortController();
-    void iceBurst({
-      host,
-      origin,
-      frost: FROST,
-      pace,
-      signal: stop.signal,
-      onCovered: () => setBeat((cur) => Math.max(cur, ORDER.indexOf("reveal"))),
-    });
-    return () => stop.abort();
-  }, [burstTime, pace]);
 
   const skip = () => {
     setSkipped(true);
@@ -186,44 +151,61 @@ export function Invitation() {
   const { invitation: copy, couple, venue, assets } = wedding;
 
   // ── styles for each beat ──
-  // the whole card appears at once — hidden behind the frost, or plainly for reduced motion / Skip
+  // the card rises in piece by piece, top to bottom (opacity and transform only, so nothing shifts);
+  // for reduced motion and Skip it simply fades in whole
   const card = reached("reveal");
-  const shown: CSSProperties = {
-    opacity: card ? 1 : 0,
-    transition: still || skipped ? "opacity 450ms ease-out" : "none",
+  const rise = (step: number, travel: number = MOTION.rise, ms: number = MOTION.revealMs): CSSProperties => {
+    if (quiet) return { opacity: card ? 1 : 0, transition: "opacity 450ms ease-out" };
+    const timing = `${ms * pace}ms ${EASE.silk} ${step * MOTION.staggerMs * pace}ms`;
+    return {
+      opacity: card ? 1 : 0,
+      transform: card ? "none" : `translateY(${travel}px)`,
+      transition: `opacity ${timing}, transform ${timing}`,
+    };
   };
 
-  const handsGone = still || skipped || dusted || card;
-  const arrive = (from: string): CSSProperties =>
-    !still && !skipped
-      ? {
-          opacity: reached("arrive") && !handsGone ? 1 : 0,
-          transform: reached("arrive") ? "translateX(0)" : `translateX(${from})`,
-          transition: `transform ${3600 * pace}ms ${EASE.glide}, opacity ${handsGone ? 120 : 1400 * pace}ms ease-out`,
-        }
-      : { opacity: 0 };
-  // just before they dissolve, the hands turn to gold
-  const gilt: CSSProperties = {
-    filter: reached("dust") ? "sepia(0.85) saturate(1.6) hue-rotate(-12deg) brightness(1.12)" : "none",
-    transition: `filter ${300 * pace}ms ease-in`,
+  // Shiva's hand comes from the upper left, the bride's from the lower right
+  const hand = (who: keyof typeof REST): CSSProperties => {
+    if (quiet) return { opacity: 0 };
+    const moving = reached("arrive");
+    const rest = REST[who];
+    return {
+      opacity: moving ? 1 : 0,
+      transform: moving ? `translate(${rest.x}%, ${rest.y}%)` : `translate(${who === "shiva" ? -START : START}%, 0)`,
+      transition: `transform ${GLIDE_MS * pace}ms ${EASE.glide}, opacity ${700 * pace}ms ${EASE.breath}`,
+    };
   };
-  const glow: CSSProperties = reached("burst")
+  // ...and they fade away together, as one picture, so neither shows through the other
+  const handsOut = quiet || reached("release");
+  const together: CSSProperties = {
+    opacity: handsOut ? 0 : 1,
+    transition: `opacity ${(quiet ? 300 : 1100 * pace)}ms ${EASE.breath}`,
+  };
+  // where Shiva's hand rests on hers, a soft shadow (it falls only on her hand)
+  const touch: CSSProperties = {
+    WebkitMaskImage: `url(${assets.opening.parvatiHand})`,
+    maskImage: `url(${assets.opening.parvatiHand})`,
+    WebkitMaskSize: "100% 100%",
+    maskSize: "100% 100%",
+    opacity: reached("meet") ? 0.3 : 0,
+    transition: `opacity ${900 * pace}ms ease`,
+  };
+  const glow: CSSProperties = reached("release")
     ? {
-        transform: "scale(2.2)",
+        transform: "scale(1.9)",
         opacity: 0,
-        transition: `transform ${700 * pace}ms ease-out, opacity ${700 * pace}ms ease-out`,
+        transition: `transform ${1600 * pace}ms ${EASE.silk}, opacity ${1500 * pace}ms ${EASE.breath}`,
       }
     : reached("meet")
       ? {
-          transform: "scale(1.4)",
-          opacity: 1,
-          transition: `transform ${800 * pace}ms ${EASE.breath}, opacity ${600 * pace}ms ease`,
+          transform: "scale(1.2)",
+          opacity: 0.9,
+          transition: `transform ${1400 * pace}ms ${EASE.breath}, opacity ${1100 * pace}ms ease`,
         }
       : { transform: "scale(0.25)", opacity: beat < 0 ? 0.45 : 0.4 };
 
   return (
     <section
-      ref={section}
       id="invitation"
       aria-labelledby="invitation-names"
       className="relative flex min-h-[100dvh] flex-col items-center overflow-x-clip px-[var(--gutter)] text-center"
@@ -236,24 +218,24 @@ export function Invitation() {
         style={{
           background:
             "radial-gradient(ellipse 85% 62% at 50% 34%, rgb(var(--ivory) / 0.8) 0%, rgb(var(--ivory) / 0.45) 52%, rgb(var(--ivory) / 0) 82%)",
-          ...shown,
+          ...rise(0, 0, 1400),
         }}
       />
 
       {/* ── the card's words ── */}
-      <p className="relative font-script text-[48px] leading-none text-gold-ink" style={shown}>
+      <p className="relative font-script text-[48px] leading-none text-gold-ink" style={rise(0)}>
         {copy.title}
       </p>
       <p
         className="relative mt-3 max-w-[18rem] text-balance font-display text-[16px] font-medium italic leading-snug text-slate"
-        style={shown}
+        style={rise(1)}
       >
         {copy.blessing}
       </p>
       <h1
         id="invitation-names"
         className="relative mt-3 font-display text-[clamp(34px,10.4vw,44px)] font-semibold italic leading-tight text-navy"
-        style={shown}
+        style={rise(2)}
       >
         <span className="text-balance">
           {couple.bride.displayName} <span className="font-medium text-gold-ink">&amp;</span> {couple.groom.displayName}
@@ -261,12 +243,12 @@ export function Invitation() {
       </h1>
       <p
         className="relative mt-1 max-w-[18rem] text-balance font-display text-[15px] italic leading-snug text-slate"
-        style={shown}
+        style={rise(3)}
       >
         {copy.request}
       </p>
       {date && (
-        <div className="relative mt-4 flex flex-col items-center" style={shown}>
+        <div className="relative mt-4 flex flex-col items-center" style={rise(4)}>
           <p className="font-sans text-[11px] font-medium uppercase tracking-eyebrow text-gold-ink">{date.month}</p>
           <p className="flex items-start font-display font-semibold leading-none text-navy">
             <span className="text-[58px] leading-[0.9]">{date.day}</span>
@@ -278,14 +260,14 @@ export function Invitation() {
       {venue.city && (
         <p
           className="relative mt-2 flex items-center gap-1 font-sans text-[11px] font-medium uppercase tracking-eyebrow text-navy"
-          style={shown}
+          style={rise(5)}
         >
           <Icon name="pin" className="h-4 w-4 text-gold-ink" /> {venue.city}
         </p>
       )}
 
-      {/* ── Shiv and Parvati before Kailash, at the foot of the screen ── */}
-      <div className="relative mt-auto w-full pt-6" style={shown}>
+      {/* ── Shiv and Parvati before Kailash, at the foot of the screen — last to rise in ── */}
+      <div className="relative mt-auto w-full pt-6" style={rise(6, 28, 1300)}>
         <div
           aria-hidden
           className="absolute bottom-0 h-[min(105vw,480px)] w-screen"
@@ -303,31 +285,41 @@ export function Invitation() {
         </div>
       </div>
 
-      {/* ── the two hands, meeting, then turning to golden dust ── */}
+      {/* ── the two hands: they glide in, Shiva's settles over the bride's, then both fade into the sky ── */}
       <div
         ref={stage}
         aria-hidden
         className="opening-stage"
         style={skipped ? { opacity: 0, transition: "opacity 300ms ease-out" } : undefined}
       >
-        {/* the far ends of the arm and the sleeve melt into the sky, so no edge of the board ever shows */}
-        <div
-          className="opening-layer [-webkit-mask-image:linear-gradient(to_right,transparent,#000_9%)] [mask-image:linear-gradient(to_right,transparent,#000_9%)]"
-          style={arrive("-46%")}
-        >
-          <img ref={shiva} src={assets.opening.shivaHand} alt="" className="opening-layer" style={gilt} />
+        <div className="opening-layer" style={together}>
+          <div className="opening-layer opening-fade-bride" style={hand("bride")}>
+            <img ref={parvati} src={assets.opening.parvatiHand} alt="" className="opening-layer" />
+            <div className="opening-layer" style={touch}>
+              <img
+                src={assets.opening.shivaHand}
+                alt=""
+                className="opening-layer"
+                style={{
+                  transform: `translate(${REST.shiva.x - REST.bride.x + 0.6}%, ${REST.shiva.y - REST.bride.y + 1.5}%)`,
+                  filter: "brightness(0) blur(4px)",
+                }}
+              />
+            </div>
+          </div>
+          {/* Shiva's hand lies over hers, so it comes second */}
+          <div className="opening-layer opening-fade-shiva" style={hand("shiva")}>
+            <img ref={shiva} src={assets.opening.shivaHand} alt="" className="opening-layer" />
+          </div>
         </div>
-        <div
-          className="opening-layer [-webkit-mask-image:linear-gradient(#000_72%,transparent_96%)] [mask-image:linear-gradient(#000_72%,transparent_96%)]"
-          style={arrive("46%")}
-        >
-          <img ref={parvati} src={assets.opening.parvatiHand} alt="" className="opening-layer" style={gilt} />
-        </div>
-        <div ref={glowEl} className="opening-glow" data-waiting={beat < 0 || undefined} style={glow} />
+        <div className="opening-glow" data-waiting={beat < 0 || undefined} style={glow} />
       </div>
 
+      {/* as the hands let go: a few gold motes drift outward from where they touched */}
+      {reached("release") && !quiet && <GoldMotes pace={pace} />}
+
       {/* a short shower of red petals once the card is revealed */}
-      {reached("melt") && !still && !skipped && <PetalShower />}
+      {card && !quiet && <PetalShower />}
 
       {/* Skip: always there while the opening plays */}
       {locked && (

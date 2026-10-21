@@ -254,7 +254,7 @@
     }
   }
 
-  /* ── Opening ── (the ice burst itself is drawn on canvases: lib/iceBurst.ts) */
+  /* ── Opening ── */
 
   /* The hands' artboard (792 × 581, both hands on one board so they meet
      exactly), floating over the first screen. Large, and turned 45° about the
@@ -275,6 +275,23 @@
     pointer-events: none;
   }
 
+  /* The far ends of the arm and the sleeve melt into the sky, so no cut edge
+     of the artwork ever shows — the bride's sleeve is cut on two sides. */
+  .opening-fade-shiva {
+    -webkit-mask-image: linear-gradient(to right, transparent 1%, rgb(0 0 0 / 0.55) 9%, #000 16%);
+    mask-image: linear-gradient(to right, transparent 1%, rgb(0 0 0 / 0.55) 9%, #000 16%);
+  }
+  .opening-fade-bride {
+    -webkit-mask-image:
+      linear-gradient(#000 72%, transparent 96%),
+      linear-gradient(to left, transparent, #000 10%);
+    -webkit-mask-composite: source-in;
+    mask-image:
+      linear-gradient(#000 72%, transparent 96%),
+      linear-gradient(to left, transparent, #000 10%);
+    mask-composite: intersect;
+  }
+
   .opening-layer {
     position: absolute;
     inset: 0;
@@ -286,7 +303,7 @@
     will-change: transform, opacity;
   }
 
-  /* The light where the fingertips meet. */
+  /* The light where the hands touch: warm and soft, never a flash. */
   .opening-glow {
     position: absolute;
     left: 52.8%;
@@ -298,13 +315,40 @@
     pointer-events: none;
     background: radial-gradient(
       circle,
-      rgb(255 248 228 / 0.95) 0%,
-      rgb(250 226 168 / 0.75) 18%,
-      rgb(232 198 128 / 0.38) 38%,
-      rgb(208 175 114 / 0.12) 56%,
+      rgb(255 241 208 / 0.6) 0%,
+      rgb(246 216 152 / 0.42) 20%,
+      rgb(226 190 122 / 0.2) 42%,
+      rgb(208 175 114 / 0.06) 58%,
       transparent 70%
     );
     will-change: transform, opacity;
+  }
+
+  /* The few gold motes that drift outward as the hands let go. */
+  .mote {
+    position: absolute;
+    left: 0;
+    top: 0;
+    border-radius: 9999px;
+    background: radial-gradient(circle, #fff6de 0%, #ecd08f 45%, rgb(208 175 114 / 0) 75%);
+    box-shadow: 0 0 6px 1px rgb(232 198 128 / 0.5);
+    opacity: 0;
+    animation-name: mote-drift;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    animation-fill-mode: forwards;
+  }
+  @keyframes mote-drift {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.6);
+    }
+    18% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1);
+    }
   }
 
   /* Before the artwork is ready: a seed of light breathing at the meeting point. */
