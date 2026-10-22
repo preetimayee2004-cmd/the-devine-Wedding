@@ -378,6 +378,9 @@ export const wedding = {
     /** The toran (mango leaves, marigold strings, jasmine garlands) at the top of section 02 — 850 × 980. */
     toran: "/art/toran.webp",
     toranSize: { width: 850, height: 980 },
+    /** The couple offering water to the Shivling, at the foot of section 02, inside the toran — 717 × 864. */
+    coupleAbhishek: "/art/couple-abhishek.webp",
+    coupleAbhishekSize: { width: 717, height: 864 },
     /** Soft cloud bank (it parts for the countdown, and drifts over the Save the Date's peaks). */
     clouds: "/art/clouds.webp",
   },
