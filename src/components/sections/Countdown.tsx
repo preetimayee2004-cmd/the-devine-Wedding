@@ -9,12 +9,13 @@ import { Reveal } from "@/components/ui/Reveal";
 import { RollingNumber } from "@/components/ui/RollingNumber";
 
 /**
- * Section 03 — the celestial calendar (PRD §4).
+ * Section 03 — the celestial calendar, inside the couple's wreath.
  *
- * The couple's clouds part, and a gold temple-arch frame draws itself down
- * from the crescent at its apex to the lotus at its base. Inside: the
- * auspicious moment and a live count of days, hours, minutes and seconds to
- * the wedding at the venue's time. From the lotus a gold line leads on.
+ * The couple's clouds part, and the wreath appears: flowering vines threaded
+ * with their little things, a watercolour mountain and the joined hands at
+ * its foot, a faint dashed gold arch with Shiva's crescent behind the words.
+ * Inside: the auspicious moment and a live count of days, hours, minutes and
+ * seconds to the wedding at the venue's time. A small gold fleuron closes it.
  */
 export function Countdown() {
   const ref = useRef<HTMLElement>(null);
@@ -45,35 +46,58 @@ export function Countdown() {
       aria-labelledby="countdown-heading"
       className="relative flex flex-col items-center px-[var(--gutter)] pt-4 text-center"
     >
-      <div className="relative w-full max-w-[23rem] [container-type:inline-size]">
-        <div className="relative aspect-[360/340]">
-          <CalendarFrame drawn={seen} reduced={reduced} />
+      <div className="relative w-full max-w-[24rem] [container-type:inline-size]">
+        <div className="relative" style={{ aspectRatio: `${assets.countdownWreathSize.width} / ${assets.countdownWreathSize.height}` }}>
+          {/* the wreath, the mountain and the joined hands */}
+          <img
+            src={assets.countdownWreath}
+            alt="A wreath of flowering vines with the couple's little things, a mountain, and two joined hands"
+            width={assets.countdownWreathSize.width}
+            height={assets.countdownWreathSize.height}
+            loading="lazy"
+            decoding="async"
+            draggable={false}
+            className="pointer-events-none absolute inset-0 h-full w-full select-none"
+            style={{
+              opacity: seen ? 1 : 0,
+              transition: reduced ? "opacity 400ms linear" : `opacity 1400ms ${EASE.silk} ${at(500)}ms`,
+            }}
+          />
+          <ArchCrown shown={seen} reduced={reduced} />
 
-          <div className="absolute inset-x-[8%] top-[25.5%] flex flex-col items-center">
+          <div className="absolute inset-x-[9%] top-[19.5%] flex flex-col items-center">
             <Reveal show={seen} delay={at(900)} as="p" className="font-deva text-[15px] leading-none text-gold-ink">
+              <span aria-hidden className="mr-1.5 text-[10px]">✦</span>
               <span lang="sa">{copy.eyebrow}</span>
+              <span aria-hidden className="ml-1.5 text-[10px]">✦</span>
             </Reveal>
             <Reveal show={seen} delay={at(1050)}>
               <h2
                 id="countdown-heading"
-                className="mt-[2.4cqw] text-[27px] leading-tight [font-size:clamp(24px,7.6cqw,29px)]"
+                className="mt-[2.6cqw] text-[27px] leading-tight [font-size:clamp(24px,7.6cqw,29px)]"
               >
                 {message ? message.title : copy.title}
               </h2>
+            </Reveal>
+            {/* a fine gold line with a diamond */}
+            <Reveal show={seen} delay={at(1150)} className="mt-[2.4cqw] flex w-full items-center gap-2">
+              <span aria-hidden className="h-px flex-1 bg-gradient-to-r from-transparent to-gold" />
+              <span aria-hidden className="h-2 w-2 rotate-45 border border-gold bg-ivory" />
+              <span aria-hidden className="h-px flex-1 bg-gradient-to-l from-transparent to-gold" />
             </Reveal>
             {dateLine && (
               <Reveal
                 show={seen}
                 delay={at(1200)}
                 as="p"
-                className="mt-[1.6cqw] font-sans text-[10px] font-medium uppercase tracking-[0.16em] text-gold-ink [font-size:clamp(9.5px,2.9cqw,11px)]"
+                className="mt-[2.2cqw] font-sans text-[10px] font-medium uppercase tracking-[0.16em] text-gold-ink [font-size:clamp(9.5px,2.9cqw,11px)]"
               >
                 {dateLine}
               </Reveal>
             )}
           </div>
 
-          <div className="absolute inset-x-[7%] top-[62%]">
+          <div className="absolute inset-x-[9%] top-[48.5%]">
             {message ? (
               <Reveal
                 show={seen}
@@ -135,16 +159,14 @@ export function Countdown() {
         </div>
       </div>
 
-      {/* A gold line leads on to the story */}
-      <span
-        aria-hidden
-        className="-mt-px block h-16 w-px bg-gradient-to-b from-gold to-gold-ink/60"
-        style={{
-          transformOrigin: "top",
-          transform: seen ? "scaleY(1)" : "scaleY(0)",
-          transition: `transform 1200ms ${EASE.silk} ${at(1900)}ms`,
-        }}
-      />
+      {/* a small gold fleuron closes it */}
+      <Reveal show={seen} delay={at(1700)} className="mt-3 flex items-center gap-2.5">
+        <span aria-hidden className="h-px w-16 bg-gradient-to-r from-transparent to-gold" />
+        <span aria-hidden className="text-[17px] leading-none text-gold-ink">
+          ❦
+        </span>
+        <span aria-hidden className="h-px w-16 bg-gradient-to-l from-transparent to-gold" />
+      </Reveal>
     </section>
   );
 }
@@ -165,68 +187,39 @@ function part(side: "left" | "right", open: boolean, reduced: boolean): CSSPrope
 }
 
 /**
- * The gold temple arch. Its two halves draw down together from the apex
- * and meet at the lotus; the crescent, shoulders and divider then appear.
+ * The faint gold arch behind the words, as in the couple's design: a dashed
+ * outer line and a fine inner one rise to a point with Shiva's crescent and
+ * bindu under it, and fade away above the numbers. Drawn on the wreath's own
+ * 572 × 636 grid.
  */
-function CalendarFrame({ drawn, reduced }: { drawn: boolean; reduced: boolean }) {
-  const line = (delay: number, duration = 1800): CSSProperties =>
-    reduced
-      ? { opacity: drawn ? 1 : 0, transition: "opacity 500ms linear" }
-      : {
-          strokeDasharray: "1 1",
-          strokeDashoffset: drawn ? 0 : 1,
-          transition: `stroke-dashoffset ${duration}ms ${EASE.silk} ${delay}ms`,
-        };
+function ArchCrown({ shown, reduced }: { shown: boolean; reduced: boolean }) {
   const appear = (delay: number): CSSProperties => ({
-    opacity: drawn ? 1 : 0,
-    transition: reduced ? "opacity 500ms linear" : `opacity 700ms ease-out ${delay}ms`,
+    opacity: shown ? 1 : 0,
+    transition: reduced ? "opacity 500ms linear" : `opacity 900ms ease-out ${delay}ms`,
   });
-
+  const fade = "linear-gradient(#000 20%, transparent 56%)";
   return (
-    <svg viewBox="0 0 360 340" className="absolute inset-0 h-full w-full overflow-visible" aria-hidden>
+    <svg
+      viewBox="0 0 572 636"
+      className="pointer-events-none absolute inset-0 h-full w-full"
+      style={{ WebkitMaskImage: fade, maskImage: fade }}
+      aria-hidden
+    >
       <g fill="none" stroke="rgb(var(--gold))" strokeLinecap="round" strokeLinejoin="round">
-        {/* outer arch, both halves from the apex down to the lotus */}
-        <g strokeWidth="1.3">
-          <path
-            pathLength={1}
-            style={line(200)}
-            d="M180 14C175 24 170 31 162 38C104 82 14 100 14 160V322Q14 336 28 336H180"
-          />
-          <path
-            pathLength={1}
-            style={line(200)}
-            d="M180 14C185 24 190 31 198 38C256 82 346 100 346 160V322Q346 336 332 336H180"
-          />
+        {/* outer, dashed */}
+        <g strokeWidth="1.5" strokeDasharray="5 6" opacity="0.8" style={appear(700)}>
+          <path d="M286 42C272 68 232 96 190 120C160 138 146 168 144 208V360" />
+          <path d="M286 42C300 68 340 96 382 120C412 138 426 168 428 208V360" />
         </g>
-        {/* inner line */}
-        <g strokeWidth="0.7" opacity="0.75">
-          <path
-            pathLength={1}
-            style={line(420)}
-            d="M180 30C177 37 172 43 166 48C108 90 22 106 22 162V320Q22 328 30 328H180"
-          />
-          <path
-            pathLength={1}
-            style={line(420)}
-            d="M180 30C183 37 188 43 194 48C252 90 338 106 338 162V320Q338 328 330 328H180"
-          />
+        {/* inner, fine */}
+        <g strokeWidth="1" opacity="0.55" style={appear(850)}>
+          <path d="M286 60C275 82 244 106 210 128C188 142 178 166 176 200V360" />
+          <path d="M286 60C297 82 328 106 362 128C384 142 394 166 396 200V360" />
         </g>
-
-        {/* Shiva's crescent with a bindu, under the apex */}
-        <g style={appear(700)}>
-          <path strokeWidth="1" fill="rgb(var(--gold) / 0.3)" d="M169 55a11 11 0 0 0 22 0a13 13 0 0 1-22 0Z" />
-          <circle cx="180" cy="46" r="1.8" fill="rgb(var(--gold))" stroke="none" />
-        </g>
-        {/* shoulders, and the divider above the numbers */}
-        <g style={appear(1100)} strokeWidth="1">
-          <path d="M14 154l-4 6 4 6 4-6ZM346 154l-4 6 4 6 4-6Z" fill="rgb(var(--ivory))" />
-          <path strokeWidth="0.7" d="M70 196H162M198 196H290" />
-          <path strokeWidth="0.9" d="M180 190l-5 6 5 6 5-6Z" />
-        </g>
-        {/* the lotus where the two halves meet */}
-        <g style={appear(1700)} transform="translate(168 325)" strokeWidth="0.9" fill="rgb(var(--ivory))">
-          <path d="M12 12.5C9.6 10.6 9.4 6 12 2.5c2.6 3.5 2.4 8.1 0 10Z" />
-          <path d="M11.4 12.5C7.6 12.6 4.6 10.2 4 6.6c3.5.2 6.4 2.6 7.4 5.9ZM12.6 12.5c3.8.1 6.8-2.3 7.4-5.9-3.5.2-6.4 2.6-7.4 5.9Z" />
+        {/* Shiva's crescent with a bindu, under the point */}
+        <g style={appear(1000)}>
+          <path strokeWidth="1.3" fill="rgb(var(--gold) / 0.35)" d="M272 66a14 14 0 0 0 28 0a17 17 0 0 1-28 0Z" />
+          <circle cx="286" cy="54" r="2.4" fill="rgb(var(--gold))" stroke="none" />
         </g>
       </g>
     </svg>
