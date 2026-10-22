@@ -99,7 +99,16 @@ export const wedding = {
   /** Section 03 — the celestial calendar. Counts to wedding.dateTime in wedding.timeZone. */
   countdown: {
     eyebrow: "शुभ मुहूर्त",
-    title: "Counting the Moments",
+    title: "Countdown Begins",
+    labels: { days: "Days", hours: "Hours", minutes: "Minutes", seconds: "Seconds" },
+    /** Read out for the wedding's date in the little calendar. */
+    weddingDay: "wedding day",
+    /** With the EN / हिं switch on हिं (the date and the calendar's month and days come from the date). */
+    hindi: {
+      title: "उल्टी गिनती शुरू",
+      labels: { days: "दिन", hours: "घंटे", minutes: "मिनट", seconds: "सेकंड" },
+      weddingDay: "विवाह का दिन",
+    },
     /** Shown on the wedding day itself (at the venue), instead of the numbers. */
     today: { title: "Today Is the Day", line: "Today, two hearts become one." },
     /** Shown once the wedding day has passed. */
@@ -468,6 +477,9 @@ export const wedding = {
      */
     countdownWreath: "/art/countdown-wreath.webp",
     countdownWreathSize: { width: 1324, height: 1324 },
+    /** The couple's watercolour lotus (cut out of its grey background), on the wedding's date. */
+    calendarLotus: "/art/lotus.webp",
+    calendarLotusSize: { width: 240, height: 186 },
     /** Soft cloud bank (it parts for the countdown, and drifts over the Save the Date's peaks). */
     clouds: "/art/clouds.webp",
   },
