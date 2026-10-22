@@ -1,38 +1,38 @@
 import { wedding } from "@/config/wedding";
 
 /**
- * Section 02 — one screen of the site's sky with a toran across its top:
- * mango leaves and marigold strings, jasmine garlands hanging down either
- * side, like a decorated doorway. At its foot, in the middle of the doorway,
- * the couple offer water to the Shivling. It keeps its id because "View the
- * Invitation" and the Save the Date's auto-glide land here.
+ * Section 02 — one screen, in the style of the couple's chosen painting, on
+ * the site's own sky: a carved arch with temple bells and jasmine strings
+ * across the top, and at the foot the couple offering water to the
+ * Shivling, by the river with a temple, a diya and lotuses. No text. It keeps
+ * its id because "View the Invitation" and the Save the Date's auto-glide
+ * land here.
  */
 export function Couple() {
-  const { toran, toranSize, coupleAbhishek, coupleAbhishekSize } = wedding.assets;
+  const { coupleArch, coupleArchSize, coupleScene, coupleSceneSize } = wedding.assets;
   return (
-    // the toran starts just below the status bar / notch, when there is one
-    <section id="couple" className="relative min-h-screen pt-[var(--status-bar)]">
+    // the arch starts just below the status bar / notch, when there is one
+    <section id="couple" className="couple-scene flex flex-col justify-between pt-[var(--status-bar)]">
       <img
-        src={toran}
+        src={coupleArch}
         alt=""
         aria-hidden
-        width={toranSize.width}
-        height={toranSize.height}
+        width={coupleArchSize.width}
+        height={coupleArchSize.height}
         loading="lazy"
         decoding="async"
         draggable={false}
         className="pointer-events-none block h-auto w-full select-none"
       />
-      {/* centred at the foot, sized to stand between the toran's two garlands */}
       <img
-        src={coupleAbhishek}
-        alt="The couple offering water to the Shivling together"
-        width={coupleAbhishekSize.width}
-        height={coupleAbhishekSize.height}
+        src={coupleScene}
+        alt="The couple offering water to the Shivling by the river, a temple behind them"
+        width={coupleSceneSize.width}
+        height={coupleSceneSize.height}
         loading="lazy"
         decoding="async"
         draggable={false}
-        className="pointer-events-none absolute bottom-4 left-1/2 h-auto w-[min(72vw,320px)] -translate-x-1/2 select-none"
+        className="couple-scene-foot pointer-events-none block h-auto w-full select-none"
       />
     </section>
   );

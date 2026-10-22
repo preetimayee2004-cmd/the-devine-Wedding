@@ -375,12 +375,16 @@ export const wedding = {
     divineCouple: "/art/shiva-parvati-seated.webp",
     /** Soft-edged bloom used for every watercolour reveal. */
     watercolorMask: "/art/watercolor-mask.png",
-    /** The toran (mango leaves, marigold strings, jasmine garlands) at the top of section 02 — 850 × 980. */
-    toran: "/art/toran.webp",
-    toranSize: { width: 850, height: 980 },
-    /** The couple offering water to the Shivling, at the foot of section 02, inside the toran — 717 × 864. */
-    coupleAbhishek: "/art/couple-abhishek.webp",
-    coupleAbhishekSize: { width: 717, height: 864 },
+    /**
+     * Section 02, made from one painting (its text and sky taken out, so the site's sky shows
+     * through): the carved arch with bells and jasmine strings across the top (1220 × 600), and
+     * the scene at the foot (1220 × 1448) — palms, petals, hills, a temple by the river, a diya,
+     * lotuses, and the couple offering water to the Shivling.
+     */
+    coupleArch: "/art/couple-arch.webp",
+    coupleArchSize: { width: 1220, height: 600 },
+    coupleScene: "/art/couple-scene.webp",
+    coupleSceneSize: { width: 1220, height: 1448 },
     /** Soft cloud bank (it parts for the countdown, and drifts over the Save the Date's peaks). */
     clouds: "/art/clouds.webp",
   },
