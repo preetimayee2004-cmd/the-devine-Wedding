@@ -6,6 +6,8 @@ export interface Photo {
   src: string | null;
   alt: string;
   caption?: string;
+  /** Which part stays in view when a frame crops it (CSS object-position), e.g. "50% 25%". */
+  focus?: string;
 }
 
 export type Motif = "lotus" | "diya" | "kalash" | "crescent" | "knot";

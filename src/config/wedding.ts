@@ -113,9 +113,9 @@ export const wedding = {
    * ▶ PLACEHOLDERS — fill in your own story here:
    *   - year:  the year of each milestone
    *   - line:  one short line (and its Hindi in `hindi.line`)
-   *   - photo: put a WebP in public/photos/ and set `src`, e.g. "/photos/story-1.webp"
-   *            (any size; it is shown 4:5, cropped to fit). Until then a soft watercolour
-   *            wash holds its place. Keep the `alt` describing the photo.
+   *   - photo: a WebP in public/photos/ (any size; it is shown 4:5, cropped to fit — `focus`
+   *            says which part stays in view). With `src: null` a soft watercolour wash holds
+   *            its place. Keep the `alt` describing the photo.
    */
   story: {
     eyebrow: "Under the same sky",
@@ -131,28 +131,44 @@ export const wedding = {
         title: "The First Spark",
         year: "2021", // PLACEHOLDER: your year
         line: "One coffee, one long conversation.", // PLACEHOLDER: your line
-        photo: { src: null, alt: "Preeti and Shivashish when they first met" }, // PLACEHOLDER: your photo
+        photo: {
+          src: "/photos/story-1.webp",
+          alt: "Illustration: he watches her from the balcony as she turns, a hand in her hair",
+          focus: "50% 24%",
+        },
         hindi: { title: "पहली चिंगारी", line: "एक कॉफ़ी, एक लंबी बात।" },
       },
       {
         title: "Growing Closer",
         year: "2023", // PLACEHOLDER: your year
         line: "Long calls and cutting chai turned miles into minutes.", // PLACEHOLDER: your line
-        photo: { src: null, alt: "Preeti and Shivashish growing closer" }, // PLACEHOLDER: your photo
+        photo: {
+          src: "/photos/story-2.webp",
+          alt: "Illustration: he kisses her cheek in the afternoon sun, she in a lavender saree",
+          focus: "50% 16%",
+        },
         hindi: { title: "और क़रीब", line: "लंबी बातें और कटिंग चाय — मीलों की दूरी पलों में बदल गई।" },
       },
       {
         title: "Our Promise",
         year: "2025", // PLACEHOLDER: your year
         line: "At the evening aarti by the Ganga, a question — and a yes.", // PLACEHOLDER: your line
-        photo: { src: null, alt: "The proposal by the Ganga" }, // PLACEHOLDER: your photo
+        photo: {
+          src: "/photos/story-3.webp",
+          alt: "Illustration: a warm embrace before a wall of soft lights, she in a red saree",
+          focus: "50% 40%",
+        },
         hindi: { title: "हमारा वादा", line: "गंगा किनारे संध्या आरती में, एक सवाल — और एक हाँ।" },
       },
       {
         title: "Written in the Stars",
         year: "2027", // PLACEHOLDER: your year
         line: "With Mahadev's blessings, our forever begins.", // PLACEHOLDER: your line
-        photo: { src: null, alt: "Preeti and Shivashish together" }, // PLACEHOLDER: your photo
+        photo: {
+          src: "/photos/story-4.webp",
+          alt: "Illustration: their hands joined and the gathbandhan knot tied, at the wedding fire",
+          focus: "50% 42%",
+        },
         hindi: { title: "सितारों में लिखा", line: "महादेव के आशीर्वाद से, हमारा सदा का साथ शुरू होता है।" },
       },
     ]),

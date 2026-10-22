@@ -76,9 +76,9 @@ export function Story() {
         stars = boxes.map((b, i) => ({ x: b.offsetLeft + b.offsetWidth / 2, y: below + (i === 1 || i === 2 ? 14 : 0) }));
         points = stars;
       } else {
-        // a star in the free strip beside each card (right of a left card, left of a right one),
+        // a star in the open sky beside each card (right of a left card, left of a right one),
         // the line coming down from the heading and going on to the foot
-        stars = boxes.map((b, i) => ({ x: i % 2 === 0 ? w * 0.89 : w * 0.11, y: b.offsetTop + b.offsetHeight * 0.38 }));
+        stars = boxes.map((b, i) => ({ x: i % 2 === 0 ? w * 0.72 : w * 0.28, y: b.offsetTop + b.offsetHeight * 0.38 }));
         points = [{ x: w / 2, y: 0 }, ...stars, { x: w / 2, y: h }];
       }
       const lengths = points.slice(1).map((p, i) => Math.hypot(p.x - points[i].x, p.y - points[i].y));
@@ -238,7 +238,7 @@ export function Story() {
             );
           })}
 
-          <ol className="story-cards relative z-[1] flex flex-col gap-12 md:grid md:grid-cols-4 md:gap-4 md:pb-16">
+          <ol className="story-cards relative z-[1] flex flex-col md:grid md:grid-cols-4 md:gap-4 md:pb-16">
             {story.moments.map((m, i) => (
               <Milestone
                 key={m.title}
@@ -303,7 +303,7 @@ function Milestone({
   return (
     <li
       ref={cardRef}
-      className={`story-card w-[78%] md:w-auto md:self-auto ${index % 2 ? "self-end" : "self-start"} ${index === 1 || index === 2 ? "md:mt-5" : ""}`}
+      className={`story-card w-[47%] md:w-auto md:self-auto ${index % 2 ? "self-end" : "self-start"} ${index ? "-mt-[88px]" : ""} ${index === 1 || index === 2 ? "md:mt-5" : "md:mt-0"}`}
       style={style}
       onTransitionEnd={(e) => {
         if (show && e.target === e.currentTarget && e.propertyName === "transform") setSettled(true);
@@ -315,12 +315,13 @@ function Milestone({
             <img
               src={moment.photo.src}
               alt={moment.photo.alt}
-              width={600}
+              width={480}
               height={600}
               loading="lazy"
               decoding="async"
               draggable={false}
               className="h-full w-full object-cover"
+              style={{ objectPosition: moment.photo.focus }}
             />
           ) : (
             <div
@@ -333,11 +334,11 @@ function Milestone({
             </div>
           )}
         </div>
-        <h3 className={`mt-3 text-[21px] leading-tight text-navy md:text-[18px] ${hindi ? "font-deva font-semibold" : "font-display font-semibold"}`}>
+        <h3 className={`mt-2.5 text-[18px] leading-tight text-navy ${hindi ? "font-deva font-semibold" : "font-display font-semibold"}`}>
           {title}
         </h3>
-        <p className="mt-1 font-sans text-[14px] font-medium tracking-[0.14em] text-gold-ink">{moment.year}</p>
-        <p className={`mt-1.5 text-[15px] leading-snug text-slate md:text-[14px] ${hindi ? "font-deva" : "font-display font-medium italic"}`}>
+        <p className="mt-1 font-sans text-[14px] font-medium tracking-[0.1em] text-gold-ink">{moment.year}</p>
+        <p className={`mt-1 text-[14px] leading-snug text-slate ${hindi ? "font-deva" : "font-display font-medium italic"}`}>
           {line}
         </p>
       </article>

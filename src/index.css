@@ -594,10 +594,10 @@
       opacity: 0.5;
     }
   }
-  /* the cream polaroid: a fine gold double frame; the photo square on a phone, 4:5 in the row */
+  /* the cream polaroid: a fine gold double frame around a 4:5 photo */
   .story-polaroid {
     position: relative;
-    padding: 10px 10px 14px;
+    padding: 8px 8px 12px;
     border: 1px solid rgb(var(--gold) / 0.75);
     border-radius: 6px;
     background: #fffaf0;
@@ -609,15 +609,10 @@
       0 2px 6px -2px rgb(18 41 74 / 0.12);
   }
   .story-photo {
-    aspect-ratio: 1;
+    aspect-ratio: 4 / 5;
     overflow: hidden;
     border-radius: 3px;
     border: 1px solid rgb(var(--gold) / 0.55);
-  }
-  @media (min-width: 768px) {
-    .story-photo {
-      aspect-ratio: 4 / 5;
-    }
   }
   /* soft clouds, drifting very slowly once the section has been reached */
   .story-cloud {
