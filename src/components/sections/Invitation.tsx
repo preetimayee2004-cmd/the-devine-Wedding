@@ -35,7 +35,7 @@ import { PetalShower } from "@/components/ui/PetalShower";
  * The hands are the painted artwork, only moved and faded — never stretched
  * or redrawn. Never a gate: Skip is always there, a guest who already watched
  * it this visit gets a quicker version, and reduced motion shows the finished
- * card. Once read, the page glides on to the couple.
+ * card. Once read, the page glides on to the next section.
  */
 
 const SEEN_KEY = "dw:opening-seen";
@@ -137,7 +137,7 @@ export function Invitation() {
     };
   }, [locked]);
 
-  // Save the Date → the couple: after reading time, glide on — unless the
+  // Save the Date → the next section: after reading time, glide on — unless the
   // guest has already touched, scrolled or pressed anything.
   const done = reached("done");
   useEffect(() => {

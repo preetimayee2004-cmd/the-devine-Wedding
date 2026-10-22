@@ -52,7 +52,7 @@ export const wedding = {
     viewInvitation: "View the Invitation",
     /**
      * Once the invitation has been on screen this long (ms) and the guest
-     * hasn't touched anything, it glides up to reveal the couple. 0 = never.
+     * hasn't touched anything, it glides on to the next section. 0 = never.
      */
     autoAdvanceMs: 5000,
     /**
@@ -67,18 +67,6 @@ export const wedding = {
       venue: "कैलाश वाटिका, वाराणसी",
       viewInvitation: "निमंत्रण देखें",
     },
-  },
-
-  /** Section 02 — the couple, at the Shivling, crowned by Ganpati's blessing and the guest's own welcome. */
-  hero: {
-    mantra: "ॐ गं गणपतये नमः",
-    blessing: "With the blessings of Lord Ganesha",
-    /** The guest's name from the link replaces {guest} ("Guest" without one). */
-    welcome: "Welcome, Dear {guest}",
-    tagline: "are beginning their forever",
-    ceremonyLabel: "लग्न",
-    ceremony: "Wedding Ceremony",
-    illustrationAlt: "The couple offering water to the Shivling together",
   },
 
   /** Section 03 — the celestial calendar. Counts to wedding.dateTime in wedding.timeZone. */
@@ -384,9 +372,7 @@ export const wedding = {
     divineCouple: "/art/shiva-parvati-seated.webp",
     /** Soft-edged bloom used for every watercolour reveal. */
     watercolorMask: "/art/watercolor-mask.png",
-    /** Couple at the Shivling — the hero illustration. */
-    heroCouple: "/art/couple-shivling.webp",
-    /** Soft cloud bank the hero settles into (it parts for the countdown). */
+    /** Soft cloud bank (it parts for the countdown, and drifts over the Save the Date's peaks). */
     clouds: "/art/clouds.webp",
   },
 
