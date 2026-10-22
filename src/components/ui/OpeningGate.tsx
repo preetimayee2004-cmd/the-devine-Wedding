@@ -56,7 +56,7 @@ const PETALS = [
 ] as const;
 
 /**
- * Before the opening, on a first visit: a soft sky with Mount Kailash faint
+ * Before the opening, every time the link opens: a soft sky with Mount Kailash faint
  * at its foot and clouds drifting slowly by; "You're invited"; the golden ॐ
  * wax seal, breathing, in a slowly turning gold mandala with a warm glow
  * behind it; the couple's names and the date; and "Touch to begin", with a

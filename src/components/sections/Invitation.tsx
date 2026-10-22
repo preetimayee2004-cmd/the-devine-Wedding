@@ -43,13 +43,6 @@ import { PetalShower } from "@/components/ui/PetalShower";
  */
 
 const SEEN_KEY = "dw:opening-seen";
-const GATE_KEY = "dw:gate-seen";
-
-/** The gate shows once per browser session (always with ?opening=full, for reviewing). */
-function showGate(): boolean {
-  if (new URLSearchParams(window.location.search).get("opening") === "full") return true;
-  return !readSessionFlag(GATE_KEY);
-}
 
 /** The beats, in order, and when each begins (ms, full version). */
 const BEATS = { arrive: 0, meet: 3900, release: 5200, reveal: 6000, done: 8100 } as const;
@@ -91,13 +84,11 @@ export function Invitation() {
   const pace = mode === "short" ? 0.6 : 1;
   const reached = (b: Beat) => beat >= ORDER.indexOf(b);
 
-  // ── the gate: the ॐ seal and "Touch to begin" come first, once a session; its tap starts the opening ──
-  const [gate, setGate] = useState<"show" | "leaving" | "gone">(() => (showGate() ? "show" : "gone"));
+  // ── the gate: the ॐ seal and "Touch to begin" come first, every time the link opens or reloads;
+  //    its tap starts the opening ──
+  const [gate, setGate] = useState<"show" | "leaving" | "gone">("show");
   const started = gate !== "show";
-  const leaveGate = () => {
-    writeSessionFlag(GATE_KEY);
-    setGate("leaving");
-  };
+  const leaveGate = () => setGate("leaving");
 
   // ── the timeline ──
   useEffect(() => {
@@ -412,7 +403,7 @@ export function Invitation() {
         />
       </div>
 
-      {/* before it all, on a first visit: "Touch to begin" */}
+      {/* before it all, every time: "Touch to begin" */}
       {gate !== "gone" && (
         <OpeningGate
           seal={assets.omSeal}

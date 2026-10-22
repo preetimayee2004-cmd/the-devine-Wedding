@@ -46,7 +46,7 @@ export const wedding = {
    */
   invitation: {
     /**
-     * The gate before the opening (first visit in a browser session): this line over the golden ॐ
+     * The gate before the opening (every time the link opens or reloads): this line over the golden ॐ
      * seal, the couple's names and the date under it, then "Touch to begin".
      */
     youreInvited: "You're invited",
