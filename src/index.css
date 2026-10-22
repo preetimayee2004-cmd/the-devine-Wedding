@@ -254,6 +254,30 @@
     }
   }
 
+  /* ── Save the Date ──
+     One vertical rhythm that breathes with the screen's height, so a short
+     phone stays compact and a tall one gains air evenly instead of one big gap. */
+  .save-the-date {
+    --std-top: clamp(20px, 5vh, 56px);
+    --std-gap: clamp(8px, 1.6vh, 16px);
+    --std-gap-sm: clamp(2px, 0.6vh, 8px);
+    --std-gap-lg: clamp(12px, 2.6vh, 28px);
+    /* how far the mountains rise behind the lower lines of text */
+    --std-rise: clamp(24px, 6vh, 72px);
+    /* Shiv–Parvati: a little smaller on short screens (--std-art-ratio = its height ÷ width, set inline) */
+    --std-art-w: min(74vw, calc(38vh / var(--std-art-ratio, 1)), 340px);
+  }
+  @supports (height: 1dvh) {
+    .save-the-date {
+      --std-top: clamp(20px, 5dvh, 56px);
+      --std-gap: clamp(8px, 1.6dvh, 16px);
+      --std-gap-sm: clamp(2px, 0.6dvh, 8px);
+      --std-gap-lg: clamp(12px, 2.6dvh, 28px);
+      --std-rise: clamp(24px, 6dvh, 72px);
+      --std-art-w: min(74vw, calc(38dvh / var(--std-art-ratio, 1)), 340px);
+    }
+  }
+
   /* ── Opening ── */
 
   /* The hands' artboard (792 × 581, both hands on one board so they meet

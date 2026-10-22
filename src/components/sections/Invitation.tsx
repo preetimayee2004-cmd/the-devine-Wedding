@@ -208,8 +208,13 @@ export function Invitation() {
     <section
       id="invitation"
       aria-labelledby="invitation-names"
-      className="relative flex min-h-[100dvh] flex-col items-center overflow-x-clip px-[var(--gutter)] text-center"
-      style={{ paddingTop: "calc(var(--status-bar) + 26px)" }}
+      className="save-the-date relative flex min-h-[100dvh] flex-col items-center overflow-x-clip px-[var(--gutter)] text-center"
+      style={
+        {
+          paddingTop: "calc(var(--status-bar) + var(--std-top))",
+          "--std-art-ratio": assets.saveTheDateArtSize.height / assets.saveTheDateArtSize.width,
+        } as CSSProperties
+      }
     >
       {/* light gathered behind the words, so gold reads on the bright upper sky */}
       <div
@@ -217,68 +222,79 @@ export function Invitation() {
         className="pointer-events-none absolute inset-x-0 top-0 h-[60%]"
         style={{
           background:
-            "radial-gradient(ellipse 85% 62% at 50% 34%, rgb(var(--ivory) / 0.8) 0%, rgb(var(--ivory) / 0.45) 52%, rgb(var(--ivory) / 0) 82%)",
+            "radial-gradient(ellipse 85% 62% at 50% 34%, rgb(var(--ivory) / 0.86) 0%, rgb(var(--ivory) / 0.52) 52%, rgb(var(--ivory) / 0) 82%)",
           ...rise(0, 0, 1400),
         }}
       />
 
-      {/* ── the card's words ── */}
-      <p className="relative font-script text-[48px] leading-none text-gold-ink" style={rise(0)}>
-        {copy.title}
-      </p>
-      <p
-        className="relative mt-3 max-w-[18rem] text-balance font-display text-[16px] font-medium italic leading-snug text-slate"
-        style={rise(1)}
-      >
-        {copy.blessing}
-      </p>
-      <h1
-        id="invitation-names"
-        className="relative mt-3 font-display text-[clamp(34px,10.4vw,44px)] font-semibold italic leading-tight text-navy"
-        style={rise(2)}
-      >
-        <span className="text-balance">
-          {couple.bride.displayName} <span className="font-medium text-gold-ink">&amp;</span> {couple.groom.displayName}
-        </span>
-      </h1>
-      <p
-        className="relative mt-1 max-w-[18rem] text-balance font-display text-[15px] italic leading-snug text-slate"
-        style={rise(3)}
-      >
-        {copy.request}
-      </p>
-      {date && (
-        <div className="relative mt-4 flex flex-col items-center" style={rise(4)}>
-          <p className="font-sans text-[11px] font-medium uppercase tracking-eyebrow text-gold-ink">{date.month}</p>
-          <p className="flex items-start font-display font-semibold leading-none text-navy">
-            <span className="text-[58px] leading-[0.9]">{date.day}</span>
-            <span className="ml-0.5 mt-1 text-[22px] font-medium italic text-gold-ink">{date.ordinal}</span>
-          </p>
-          <p className="mt-1 font-sans text-[12px] font-medium tracking-[0.5em] text-gold-ink">{date.year}</p>
-        </div>
-      )}
-      {venue.city && (
-        <p
-          className="relative mt-2 flex items-center gap-1 font-sans text-[11px] font-medium uppercase tracking-eyebrow text-navy"
-          style={rise(5)}
-        >
-          <Icon name="pin" className="h-4 w-4 text-gold-ink" /> {venue.city}
+      {/* ── the card's words, layered above the illustration ── */}
+      <div className="relative z-[2] flex w-full flex-col items-center">
+        <p className="relative font-script text-[48px] leading-none text-gold-ink" style={rise(0)}>
+          {copy.title}
         </p>
-      )}
+        <p
+          className="relative mt-[var(--std-gap)] max-w-[18rem] text-balance font-display text-[16px] font-medium italic leading-snug text-slate"
+          style={rise(1)}
+        >
+          {copy.blessing}
+        </p>
+        <h1
+          id="invitation-names"
+          className="relative mt-[var(--std-gap)] font-display text-[clamp(34px,10.4vw,44px)] font-semibold italic leading-tight text-navy"
+          style={rise(2)}
+        >
+          <span className="text-balance">
+            {couple.bride.displayName} <span className="font-medium text-gold-ink">&amp;</span>{" "}
+            {couple.groom.displayName}
+          </span>
+        </h1>
+        <p
+          className="relative mt-[var(--std-gap-sm)] max-w-[18rem] text-balance font-display text-[15px] font-medium italic leading-snug text-slate"
+          style={rise(3)}
+        >
+          {copy.request}
+        </p>
+        {date && (
+          <div className="relative mt-[var(--std-gap-lg)] flex flex-col items-center" style={rise(4)}>
+            <p className="font-sans text-[11px] font-semibold uppercase tracking-eyebrow text-gold-ink">{date.month}</p>
+            <p className="flex items-start font-display font-semibold leading-none text-navy">
+              <span className="text-[58px] leading-[0.9]">{date.day}</span>
+              <span className="ml-0.5 mt-1 text-[22px] font-medium italic text-gold-ink">{date.ordinal}</span>
+            </p>
+            <p className="mt-1 font-sans text-[12px] font-semibold tracking-[0.5em] text-gold-ink">{date.year}</p>
+          </div>
+        )}
+        {venue.city && (
+          <p
+            className="relative mt-[var(--std-gap)] flex items-center gap-1 font-sans text-[11px] font-medium uppercase tracking-eyebrow text-navy"
+            style={rise(5)}
+          >
+            <Icon name="pin" className="h-4 w-4 text-gold-ink" /> {venue.city}
+          </p>
+        )}
+      </div>
 
-      {/* ── Shiv and Parvati before Kailash, at the foot of the screen — last to rise in ── */}
-      <div className="relative mt-auto w-full pt-6" style={rise(6, 28, 1300)}>
+      {/* ── Shiv and Parvati before Kailash — last to rise in. This block takes whatever height
+          is left, so the mountains rise to meet the words instead of leaving a gap; the couple
+          stays anchored at the foot, clear of the home indicator. ── */}
+      <div
+        className="relative mt-[var(--std-gap)] flex w-full flex-1 flex-col justify-end pb-[env(safe-area-inset-bottom,0px)]"
+        style={{ minHeight: "calc(var(--std-art-w) * var(--std-art-ratio) + var(--std-gap-lg))", ...rise(6, 28, 1300) }}
+      >
+        {/* distant mountains: from just behind the lowest lines of text down to the foot */}
         <div
           aria-hidden
-          className="absolute bottom-0 h-[min(105vw,480px)] w-screen"
-          style={{ left: "calc(50% - 50vw)" }}
+          className="absolute bottom-0 w-screen"
+          style={{ left: "calc(50% - 50vw)", height: "min(max(calc(100% + var(--std-rise)), 92vw), 150vw)" }}
         >
           <Kailash className="h-full w-full" />
         </div>
-        <div className="relative z-[1] mx-auto w-[min(78vw,350px)] [-webkit-mask-image:linear-gradient(#000_82%,transparent)] [mask-image:linear-gradient(#000_82%,transparent)]">
+        <div className="relative z-[1] mx-auto w-[var(--std-art-w)] [-webkit-mask-image:linear-gradient(#000_80%,transparent)] [mask-image:linear-gradient(#000_80%,transparent)]">
           <img
             src={assets.saveTheDateArt}
             alt="Shiva and Parvati together"
+            width={assets.saveTheDateArtSize.width}
+            height={assets.saveTheDateArtSize.height}
             className="block h-auto w-full"
             draggable={false}
           />

@@ -25,7 +25,7 @@ Everything a family changes lives in **`src/config/wedding.ts`**. Every value ma
 | `wishes.samples` | The starting wishes. Remove them once real wishes arrive. |
 | `travel` | Verified stations, pickup plan, travel contacts with phone numbers, and the actual hotels with phone numbers or booking links. |
 | `meta.siteUrl` | The deployed address. WhatsApp needs it to show the preview image. |
-| `assets.saveTheDateArt` | The Save the Date's illustration. The stand-in is small; a large Shiv–Parvati illustration (1500 px+ wide, transparent background) will look sharper. |
+| `assets.saveTheDateArt` | The Save the Date's illustration. The stand-in is small; a large Shiv–Parvati illustration (1500 px+ wide, transparent background) will look sharper. When you swap it, set `assets.saveTheDateArtSize` to its pixel size so the card keeps its proportions. |
 
 Call, WhatsApp and Book buttons appear only when a number or link is filled in. Nothing is invented for the guest.
 

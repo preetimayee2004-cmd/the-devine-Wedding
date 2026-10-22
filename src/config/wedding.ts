@@ -357,12 +357,13 @@ export const wedding = {
       parvatiHand: "/art/opening/hand-parvati.webp",
     },
     /**
-     * The Save the Date's illustration: seen in close-up, then settling before
-     * Kailash. STAND-IN: a large Shiv–Parvati illustration (1500 px+ wide,
-     * transparent background) makes the close-up sharp — put it in public/art/
-     * and point this at it.
+     * The Save the Date's illustration, at the foot of the card before
+     * Kailash. STAND-IN: a larger Shiv–Parvati illustration (transparent
+     * background) will look sharper — put it in public/art/, point this at it,
+     * and set its pixel size below so the layout keeps its proportions.
      */
     saveTheDateArt: "/art/shiva-parvati-seated.webp",
+    saveTheDateArtSize: { width: 380, height: 360 },
     /** Shiv–Parvati seated together (Thank You, gallery). */
     divineCouple: "/art/shiva-parvati-seated.webp",
     /** Soft-edged bloom used for every watercolour reveal. */

@@ -4,12 +4,14 @@ import { useId } from "react";
  * Soft watercolour Himalaya behind the couple, drawn tall so the peaks rise
  * above their shoulders: a far range, a snowy peak on the left, Kailash's
  * banded dome on the right, a small peak between, nearer snow hills, and a
- * still lake with lotuses. Fits its box's width, anchored to the bottom.
+ * still lake with lotuses. Fills its whole box, anchored to the bottom: in a
+ * tall box it grows and the outer slopes run off the sides, so the peaks
+ * rise higher instead of leaving empty sky above them.
  */
 export function Kailash({ className = "" }: { className?: string }) {
   const id = useId();
   return (
-    <svg viewBox="0 0 400 420" preserveAspectRatio="xMidYMax meet" className={className} aria-hidden>
+    <svg viewBox="0 0 400 420" preserveAspectRatio="xMidYMax slice" className={className} aria-hidden>
       <defs>
         <linearGradient id={`${id}far`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#d3e4f1" />
