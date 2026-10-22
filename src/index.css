@@ -263,8 +263,11 @@
     --std-gap: clamp(6px, 2.4vh - 7px, 18px);
     --std-gap-sm: clamp(2px, 0.6vh, 8px);
     --std-gap-lg: clamp(10px, 3.6vh - 11px, 30px);
-    --std-title: clamp(40px, 4vh + 18px, 48px);
-    --std-day: clamp(46px, 5vh + 20px, 58px);
+    /* hierarchy: the names lead, then the date, then the place; the title is a quiet script heading */
+    --std-names: clamp(36px, 10.8vw, 46px);
+    --std-title: clamp(32px, 3vh + 14px, 40px);
+    --std-title-deva: clamp(28px, 2.4vh + 12px, 34px);
+    --std-day: clamp(30px, 2.4vh + 14px, 36px);
     /*
      * The painting (Mahadev blessing Maa Parvati, 572 × 1024) spans the screen,
      * up to 600px. Measured in its width W: a pale sky band runs to about
@@ -286,8 +289,80 @@
       --std-gap: clamp(6px, 2.4dvh - 7px, 18px);
       --std-gap-sm: clamp(2px, 0.6dvh, 8px);
       --std-gap-lg: clamp(10px, 3.6dvh - 11px, 30px);
-      --std-title: clamp(40px, 4dvh + 18px, 48px);
-      --std-day: clamp(46px, 5dvh + 20px, 58px);
+      --std-title: clamp(32px, 3dvh + 14px, 40px);
+      --std-title-deva: clamp(28px, 2.4dvh + 12px, 34px);
+      --std-day: clamp(30px, 2.4dvh + 14px, 36px);
+    }
+  }
+
+  /* The crescent moon in Mahadev's hair (at 24.5%, 0.428 W of the painting), softly aglow. */
+  .std-moon {
+    position: absolute;
+    left: 24.5%;
+    top: calc(var(--std-paint-w) * 0.428);
+    width: calc(var(--std-paint-w) * 0.3);
+    aspect-ratio: 1;
+    translate: -50% -50%;
+    border-radius: 9999px;
+    pointer-events: none;
+    background: radial-gradient(
+      circle,
+      rgb(255 252 236 / 0.6) 0%,
+      rgb(255 244 214 / 0.28) 34%,
+      rgb(255 240 200 / 0) 66%
+    );
+    mix-blend-mode: screen;
+    animation: moon-glow 4.8s ease-in-out infinite;
+  }
+  @keyframes moon-glow {
+    0%,
+    100% {
+      opacity: 0.55;
+      scale: 0.94;
+    }
+    50% {
+      opacity: 1;
+      scale: 1.06;
+    }
+  }
+
+  /* Light clouds over the peaks (they part on scroll — see Invitation). */
+  .std-cloud {
+    position: absolute;
+    z-index: 1;
+    height: auto;
+    pointer-events: none;
+    user-select: none;
+    will-change: transform;
+  }
+
+  /* Behind "Swipe up": whatever runs under the foot of the screen fades softly away. */
+  .std-swipe-strip {
+    background: linear-gradient(to top, rgb(var(--sky-pale) / 0.95) 20%, rgb(var(--sky-pale) / 0));
+  }
+
+  /* "Swipe up": a short nudge (600ms), then a rest. */
+  .std-swipe {
+    animation: swipe-nudge 2.6s ease-in-out infinite;
+  }
+  @keyframes swipe-nudge {
+    0%,
+    24%,
+    100% {
+      transform: translateY(0);
+    }
+    12% {
+      transform: translateY(-4px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .std-moon,
+    .std-swipe {
+      animation: none;
+    }
+    .std-moon {
+      opacity: 0.8;
     }
   }
   .std-painting {

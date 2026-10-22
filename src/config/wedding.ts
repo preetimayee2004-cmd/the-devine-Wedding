@@ -48,11 +48,36 @@ export const wedding = {
     title: "Save the Date",
     blessing: "With the blessings of Mahadev and Maa Parvati, two hearts begin their sacred journey together.",
     request: "request the honour of your presence as they celebrate their union",
+    /** The two buttons at the foot of the card. */
+    open: "Open Invitation",
+    addToCalendar: "Add to Calendar",
+    /** The little countdown under the venue; {n} = days left at the venue. */
+    daysToGo: "{n} days to go",
+    oneDayToGo: "1 day to go",
+    today: "Today is the day",
+    swipeUp: "Swipe up",
     /**
      * Once the invitation has been on screen this long (ms) and the guest
      * hasn't touched anything, it glides up to reveal the couple. 0 = never.
      */
     autoAdvanceMs: 5000,
+    /**
+     * The same card in Hindi, for the EN / हिं switch (the month comes from the
+     * date). SAMPLE: have the family check the wording.
+     */
+    hindi: {
+      title: "शुभ विवाह",
+      blessing: "महादेव और माँ पार्वती के आशीर्वाद से, दो हृदय अपनी पवित्र यात्रा आरंभ कर रहे हैं।",
+      names: { bride: "प्रीति", groom: "शिवाशीष" },
+      request: "अपने विवाह के शुभ अवसर पर आपकी गरिमामयी उपस्थिति की कामना करते हैं",
+      venue: "कैलाश वाटिका, वाराणसी",
+      open: "निमंत्रण खोलें",
+      addToCalendar: "कैलेंडर में जोड़ें",
+      daysToGo: "विवाह में {n} दिन शेष",
+      oneDayToGo: "विवाह में 1 दिन शेष",
+      today: "आज शुभ विवाह का दिन है",
+      swipeUp: "ऊपर स्वाइप करें",
+    },
   },
 
   /** Section 02 — the couple, at the Shivling, crowned by Ganpati's blessing and the guest's own welcome. */

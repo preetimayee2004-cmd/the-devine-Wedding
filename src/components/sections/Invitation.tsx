@@ -1,13 +1,17 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { wedding } from "@/config/wedding";
 import { REDUCED_MOTION_QUERY } from "@/hooks/useMediaQuery";
+import { downloadIcs, googleCalendarUrl, weddingCalendarItem } from "@/lib/calendar";
+import { directionsUrl } from "@/lib/maps";
 import { EASE, MOTION } from "@/lib/motion";
 import { glideTo, USER_INPUT_EVENTS } from "@/lib/scroll";
 import { readSessionFlag, writeSessionFlag } from "@/lib/session";
-import { formatVenueDate, parseVenueDateTime } from "@/lib/venueTime";
+import { formatVenueDate, parseVenueDateTime, venueDateKey } from "@/lib/venueTime";
 import { Icon } from "@/components/art/Icons";
 import { GoldMotes } from "@/components/ui/GoldMotes";
+import { MusicToggle } from "@/components/ui/MusicToggle";
 import { PetalShower } from "@/components/ui/PetalShower";
+import { Sheet } from "@/components/ui/Sheet";
 
 /**
  * Sections 00 + 01 — the opening, which becomes the Save the Date. One
@@ -20,9 +24,15 @@ import { PetalShower } from "@/components/ui/PetalShower";
  *            there, a soft shadow where they touch, a warm gold glow between
  *   release  the glow widens and fades, a few gold motes drift outward, and
  *            the hands fade gently into the sky
- *   reveal   the card's words rise in one after another, then the painting
- *            of Mahadev blessing Maa Parvati before the Himalaya; a few
- *            petals fall
+ *   reveal   the card rises in, top to bottom: the names, the date, the
+ *            venue (a map link) and the days to go; then the painting of
+ *            Mahadev blessing Maa Parvati before the Himalaya, its blessing
+ *            line, and the two buttons — Open Invitation, Add to Calendar;
+ *            a few petals fall
+ *
+ * The card reads in English or Hindi (the EN / हिं switch), clouds part
+ * gently as the guest scrolls, the moon in Mahadev's hair glows softly, and
+ * the bell in the corner plays a soft temple dhun — only when tapped.
  *
  * The hands are the painted artwork, only moved and faded — never stretched
  * or redrawn. Never a gate: Skip is always there, a guest who already watched
@@ -58,6 +68,24 @@ function pickMode(): Mode {
 }
 
 const MAX_ART_WAIT = 3500;
+
+type Lang = "en" | "hi";
+const LANG_KEY = "dw:lang";
+function readLang(): Lang {
+  try {
+    return window.localStorage.getItem(LANG_KEY) === "hi" ? "hi" : "en";
+  } catch {
+    return "en";
+  }
+}
+
+/** Whole days from today (at the venue) to the wedding day; negative once it has passed. */
+function daysUntilWedding(): number | null {
+  const when = parseVenueDateTime(wedding.wedding.dateTime);
+  if (!when) return null;
+  const [y, m, d] = venueDateKey(Date.now(), wedding.wedding.timeZone).split("-").map(Number);
+  return Math.round((Date.UTC(when.year, when.month - 1, when.day) - Date.UTC(y, m - 1, d)) / 86_400_000);
+}
 
 export function Invitation() {
   const [mode] = useState<Mode>(pickMode);
@@ -143,12 +171,74 @@ export function Invitation() {
     };
   }, [done, still]);
 
+  // ── the card's language: English or Hindi, remembered on this phone ──
+  const [lang, setLang] = useState<Lang>(readLang);
+  const chooseLang = (next: Lang) => {
+    setLang(next);
+    try {
+      window.localStorage.setItem(LANG_KEY, next);
+    } catch {
+      // private mode: the choice simply isn't remembered
+    }
+  };
+  const hindi = lang === "hi";
+
   const date = useMemo(() => {
     const parts = parseVenueDateTime(wedding.wedding.dateTime);
-    return parts ? { ...formatVenueDate(parts), ordinal: ordinal(parts.day) } : null;
-  }, []);
+    return parts ? formatVenueDate(parts, hindi ? "hi-IN" : "en-IN") : null;
+  }, [hindi]);
+  const daysLeft = useMemo(daysUntilWedding, []);
+  const calendar = useMemo(() => weddingCalendarItem(), []);
+  const [calendarOpen, setCalendarOpen] = useState(false);
 
   const { invitation: copy, couple, venue, assets } = wedding;
+  const t = hindi
+    ? { ...copy.hindi, bride: copy.hindi.names.bride, groom: copy.hindi.names.groom }
+    : {
+        ...copy,
+        bride: couple.bride.displayName,
+        groom: couple.groom.displayName,
+        venue: [venue.name, venue.city].filter(Boolean).join(", "),
+      };
+  const countdown =
+    daysLeft === null || daysLeft < 0
+      ? null
+      : daysLeft === 0
+        ? t.today
+        : daysLeft === 1
+          ? t.oneDayToGo
+          : t.daysToGo.replace("{n}", String(daysLeft));
+  // Hindi lines are set in the Devanagari face; English in the serif (the script is only for the title)
+  const serif = hindi ? "font-deva" : "font-display";
+
+  // ── as the guest scrolls on: the clouds part, and the swipe hint goes ──
+  const cloudLeft = useRef<HTMLImageElement>(null);
+  const cloudRight = useRef<HTMLImageElement>(null);
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    if (!done) return;
+    let frame = 0;
+    const onScroll = () => {
+      if (window.scrollY > 24) setScrolled(true);
+      if (still || frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        const y = Math.min(window.scrollY, window.innerHeight);
+        if (cloudLeft.current) cloudLeft.current.style.transform = `translate3d(${-y * 0.14}px, ${-y * 0.3}px, 0)`;
+        if (cloudRight.current) cloudRight.current.style.transform = `translate3d(${y * 0.14}px, ${-y * 0.22}px, 0)`;
+      });
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(frame);
+    };
+  }, [done, still]);
+
+  const openInvitation = () => {
+    const next = document.getElementById("couple");
+    if (next) glideTo(next.getBoundingClientRect().top + window.scrollY, 1200);
+  };
 
   // ── styles for each beat ──
   // the card rises in piece by piece, top to bottom (opacity and transform only, so nothing shifts);
@@ -207,74 +297,121 @@ export function Invitation() {
   return (
     <section
       id="invitation"
+      lang={hindi ? "hi" : undefined}
       aria-labelledby="invitation-names"
       className="save-the-date relative flex min-h-[100dvh] flex-col items-center overflow-x-clip px-[var(--gutter)] text-center"
       style={{ paddingTop: "calc(var(--status-bar) + var(--std-top))" }}
     >
-      {/* light gathered behind the words, so gold reads on the bright upper sky */}
+      {/* light gathered behind the words, so they read clearly on the bright upper sky */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 h-[60%]"
         style={{
           background:
-            "radial-gradient(ellipse 85% 62% at 50% 34%, rgb(var(--ivory) / 0.86) 0%, rgb(var(--ivory) / 0.52) 52%, rgb(var(--ivory) / 0) 82%)",
+            "radial-gradient(ellipse 85% 62% at 50% 34%, rgb(var(--ivory) / 0.88) 0%, rgb(var(--ivory) / 0.56) 52%, rgb(var(--ivory) / 0) 82%)",
           ...rise(0, 0, 1400),
         }}
       />
 
-      {/* ── the card's words, layered above the illustration ── */}
-      <div className="relative z-[2] flex w-full flex-col items-center">
-        <p className="relative font-script text-[length:var(--std-title)] leading-none text-gold-ink" style={rise(0)}>
-          {copy.title}
-        </p>
+      {/* EN / हिं — the card in English or Hindi */}
+      <div
+        role="group"
+        aria-label="Language"
+        className="absolute left-4 z-[3] flex rounded-full border border-gold/70 bg-ivory/80 p-0.5 shadow-[0_4px_14px_-6px_rgb(var(--navy)/0.3)] backdrop-blur-sm transition-opacity duration-500"
+        style={{ top: "calc(var(--status-bar) + 12px)", opacity: card ? 1 : 0, pointerEvents: card ? undefined : "none" }}
+      >
+        {(["en", "hi"] as const).map((code) => (
+          <button
+            key={code}
+            type="button"
+            onClick={() => chooseLang(code)}
+            aria-pressed={lang === code}
+            lang={code === "hi" ? "hi" : "en"}
+            className={`flex h-8 min-w-8 items-center justify-center rounded-full px-2 text-[14px] font-semibold transition-colors duration-300 ${code === "hi" ? "font-deva" : "font-display"} ${lang === code ? "bg-navy text-ivory" : "text-navy"}`}
+          >
+            {code === "hi" ? "हिं" : "EN"}
+          </button>
+        ))}
+      </div>
+
+      {/* ── the card's words, layered above the painting: names first, then the date, then the place ── */}
+      <div
+        className="relative z-[2] flex w-full flex-col items-center"
+        style={{ pointerEvents: card ? undefined : "none" }}
+      >
         <p
-          className="relative mt-[var(--std-gap)] max-w-[18rem] text-balance font-display text-[16px] font-medium italic leading-snug text-slate"
-          style={rise(1)}
+          className={`relative leading-none text-gold-ink ${hindi ? "font-deva text-[length:var(--std-title-deva)]" : "font-script text-[length:var(--std-title)]"}`}
+          style={rise(0)}
         >
-          {copy.blessing}
+          {t.title}
         </p>
         <h1
           id="invitation-names"
-          className="relative mt-[var(--std-gap)] font-display text-[clamp(34px,10.4vw,44px)] font-semibold italic leading-tight text-navy"
-          style={rise(2)}
+          className={`relative mt-[var(--std-gap)] text-[length:var(--std-names)] font-semibold leading-tight text-navy ${hindi ? "font-deva" : "font-display italic"}`}
+          style={rise(1)}
         >
           <span className="text-balance">
-            {couple.bride.displayName} <span className="font-medium text-gold-ink">&amp;</span>{" "}
-            {couple.groom.displayName}
+            {t.bride} <span className="font-display font-medium text-gold-ink">&amp;</span> {t.groom}
           </span>
         </h1>
         <p
-          className="relative mt-[var(--std-gap-sm)] max-w-[18rem] text-balance font-display text-[15px] font-medium italic leading-snug text-slate"
-          style={rise(3)}
+          className={`relative mt-[var(--std-gap-sm)] max-w-[19rem] text-balance text-[15px] font-medium leading-snug text-navy/90 ${serif} ${hindi ? "" : "italic"}`}
+          style={rise(2)}
         >
-          {copy.request}
+          {t.request}
         </p>
+
+        {/* the date on one line: month | day | year */}
         {date && (
-          <div className="relative mt-[var(--std-gap-lg)] flex flex-col items-center" style={rise(4)}>
-            <p className="font-sans text-[11px] font-semibold uppercase tracking-eyebrow text-gold-ink">{date.month}</p>
-            <p className="flex items-start font-display font-semibold leading-none text-navy">
-              <span className="text-[length:var(--std-day)] leading-[0.9]">{date.day}</span>
-              <span className="ml-0.5 mt-1 text-[22px] font-medium italic text-gold-ink">{date.ordinal}</span>
-            </p>
-            <p className="mt-1 font-sans text-[12px] font-semibold tracking-[0.5em] text-gold-ink">{date.year}</p>
-          </div>
-        )}
-        {venue.city && (
           <p
-            className="relative mt-[var(--std-gap)] flex items-center gap-1 font-sans text-[11px] font-medium uppercase tracking-eyebrow text-navy"
+            className={`relative mt-[var(--std-gap-lg)] flex items-center justify-center gap-3.5 ${serif}`}
+            style={rise(3)}
+          >
+            <span className={`text-[14px] font-semibold text-gold-ink ${hindi ? "" : "uppercase tracking-[0.24em]"}`}>
+              {date.month}
+            </span>
+            <span aria-hidden className="h-7 w-px bg-gold" />
+            <span className="font-display text-[length:var(--std-day)] font-semibold leading-none text-navy">
+              {date.day}
+            </span>
+            <span aria-hidden className="h-7 w-px bg-gold" />
+            <span className="font-display text-[14px] font-semibold tracking-[0.24em] text-gold-ink">{date.year}</span>
+          </p>
+        )}
+
+        {/* the venue: tap for directions */}
+        {t.venue && (
+          <a
+            href={directionsUrl(venue)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`group relative mt-[var(--std-gap-sm)] inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-3 text-[16px] font-semibold text-navy transition-colors duration-300 hover:bg-ivory/60 ${serif}`}
+            style={rise(4)}
+          >
+            <Icon name="pin" className="h-[18px] w-[18px] shrink-0 text-gold-ink" />
+            <span className="underline decoration-gold/70 decoration-dotted decoration-1 underline-offset-[5px] group-hover:decoration-solid">
+              {t.venue}
+            </span>
+            <Icon name="external" className="h-3.5 w-3.5 shrink-0 text-gold-ink" />
+          </a>
+        )}
+
+        {/* how many days are left */}
+        {countdown && (
+          <p
+            className={`relative mt-[var(--std-gap-sm)] rounded-full border border-gold/50 bg-ivory/70 px-3.5 py-1 text-[14px] font-medium text-gold-ink ${serif} ${hindi ? "" : "italic"}`}
             style={rise(5)}
           >
-            <Icon name="pin" className="h-4 w-4 text-gold-ink" /> {venue.city}
+            {countdown}
           </p>
         )}
       </div>
 
-      {/* ── Mahadev blessing Maa Parvati before the Himalaya — last to rise in. This block takes
-          whatever height is left (never less than room for both faces); the painting starts just
-          below the words, its pale sky melting into ours behind them, and runs to the foot of the
-          card, where it melts away too. ── */}
+      {/* ── Mahadev blessing Maa Parvati before the Himalaya. This block takes whatever height is
+          left (never less than room for both faces); the painting starts just below the words, its
+          pale sky melting into ours behind them, and melts away again at its foot. ── */}
       <div
-        className="relative mt-[var(--std-gap)] w-full flex-1 pb-[env(safe-area-inset-bottom,0px)]"
+        className="relative mt-[var(--std-gap)] w-full flex-1"
         style={{ minHeight: "var(--std-art-min)", ...rise(6, 28, 1300) }}
       >
         <div
@@ -289,8 +426,116 @@ export function Invitation() {
             className="block h-full w-full object-cover object-top"
             draggable={false}
           />
+          {/* the crescent moon in Mahadev's hair, softly aglow */}
+          <span aria-hidden className="std-moon" />
         </div>
+        {/* light clouds drifting over the peaks; they part as the guest scrolls */}
+        <img
+          ref={cloudLeft}
+          src={assets.clouds}
+          alt=""
+          aria-hidden
+          className="std-cloud left-[-24%] w-[66%] opacity-50"
+          style={{ top: "calc(var(--std-rise) * -1 - var(--std-paint-w) * 0.07)" }}
+          draggable={false}
+        />
+        <img
+          ref={cloudRight}
+          src={assets.clouds}
+          alt=""
+          aria-hidden
+          className="std-cloud right-[-22%] w-[56%] opacity-40"
+          style={{ top: "calc(var(--std-rise) * -1 + var(--std-paint-w) * 0.03)", scale: "-1 1" }}
+          draggable={false}
+        />
       </div>
+
+      {/* the blessing, as the painting's caption */}
+      <p
+        className={`relative z-[2] mt-[var(--std-gap-sm)] max-w-[20rem] text-balance text-[15px] font-medium leading-snug text-navy/90 ${serif} ${hindi ? "" : "italic"}`}
+        style={rise(7)}
+      >
+        {t.blessing}
+      </p>
+
+      {/* ── the way on: open the invitation, or save the date ── */}
+      <div
+        className={`relative z-[2] mt-[var(--std-gap)] flex w-full max-w-[22rem] gap-2.5 ${serif}`}
+        style={{ ...rise(8, 12), pointerEvents: card ? undefined : "none" }}
+      >
+        <button
+          type="button"
+          onClick={openInvitation}
+          className="flex min-h-[48px] flex-1 items-center justify-center whitespace-nowrap rounded-full bg-navy px-3 text-[16px] font-semibold text-ivory shadow-[0_8px_20px_-10px_rgb(var(--navy)/0.7)] transition-transform duration-300 hover:bg-navy-deep active:scale-[0.97]"
+        >
+          {t.open}
+        </button>
+        {calendar && (
+          <button
+            type="button"
+            onClick={() => setCalendarOpen(true)}
+            className="flex min-h-[48px] flex-1 items-center justify-center gap-1 whitespace-nowrap rounded-full border border-gold bg-ivory/90 px-2.5 text-[15px] font-semibold text-navy transition-transform duration-300 hover:bg-ivory active:scale-[0.97]"
+          >
+            <Icon name="calendar" className="h-4 w-4 shrink-0 text-gold-ink" />
+            {t.addToCalendar}
+          </button>
+        )}
+      </div>
+
+      {/* "Swipe up" — on a short screen it waits at the foot of the screen (over the garlands, never
+          the faces) until the guest scrolls; on a tall one it simply sits under the buttons */}
+      <div
+        aria-hidden
+        className="std-swipe-strip pointer-events-none sticky bottom-0 z-[3] flex w-[calc(100%+var(--gutter)*2)] justify-center pb-[max(12px,env(safe-area-inset-bottom))] pt-5 transition-opacity duration-500"
+        style={{ opacity: done && !scrolled ? 1 : 0 }}
+      >
+        <p
+          className={`flex items-center gap-1 rounded-full bg-ivory/90 px-3 py-1 text-[13px] font-medium text-navy shadow-[0_4px_14px_-6px_rgb(var(--navy)/0.35)] ${serif}`}
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="std-swipe" aria-hidden>
+            <path d="M3 8.5L7 4.5l4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          {t.swipeUp}
+        </p>
+      </div>
+
+      {calendar && (
+        <Sheet open={calendarOpen} onClose={() => setCalendarOpen(false)} label={t.addToCalendar}>
+          <div className={`text-center ${serif}`}>
+            <p className="text-[24px] font-semibold text-navy">{t.addToCalendar}</p>
+            {date && (
+              <p className={`mt-1 text-[16px] text-slate ${hindi ? "" : "italic"}`}>
+                {date.day} {date.month} {date.year}
+                {date.time && ` · ${date.time}`} · {t.venue}
+              </p>
+            )}
+            <div className="mx-auto mt-6 flex max-w-[18rem] flex-col gap-3">
+              <a
+                href={googleCalendarUrl(calendar)}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setCalendarOpen(false)}
+                className="flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-navy px-4 font-display text-[17px] font-semibold text-ivory active:scale-[0.97]"
+              >
+                <Icon name="calendar" className="h-[18px] w-[18px]" /> Google Calendar
+              </a>
+              <button
+                type="button"
+                onClick={() => {
+                  downloadIcs(calendar);
+                  setCalendarOpen(false);
+                }}
+                className="flex min-h-[48px] items-center justify-center gap-2 rounded-full border border-gold bg-ivory px-4 font-display text-[17px] font-semibold text-navy active:scale-[0.97]"
+              >
+                <Icon name="calendar" className="h-[18px] w-[18px] text-gold-ink" /> Apple · Outlook
+              </button>
+            </div>
+          </div>
+        </Sheet>
+      )}
+
+      {/* soft temple bells, off until tapped — in the corner once the opening is over */}
+      <MusicToggle visible={!locked} />
 
       {/* ── the two hands: they glide in, Shiva's settles over the bride's, then both fade into the sky ── */}
       <div
@@ -333,7 +578,7 @@ export function Invitation() {
         <button
           type="button"
           onClick={skip}
-          className={`fixed right-4 z-40 rounded-full border border-gold/70 bg-ivory/75 px-4 py-2 font-sans text-[13px] font-medium tracking-[0.12em] text-navy backdrop-blur-sm transition-opacity duration-500 hover:bg-ivory/90 ${beat >= 0 ? "opacity-100" : "pointer-events-none opacity-0"}`}
+          className={`fixed right-4 z-40 rounded-full border border-gold/70 bg-ivory/75 px-4 py-1.5 font-display text-[15px] font-semibold tracking-[0.08em] text-navy backdrop-blur-sm transition-opacity duration-500 hover:bg-ivory/90 ${beat >= 0 ? "opacity-100" : "pointer-events-none opacity-0"}`}
           style={{ top: "calc(var(--status-bar) + 12px)" }}
         >
           Skip <span aria-hidden>›</span>
@@ -341,10 +586,4 @@ export function Invitation() {
       )}
     </section>
   );
-}
-
-/** 1 → "st", 2 → "nd", 12 → "th", 23 → "rd". */
-function ordinal(n: number): string {
-  if (n % 100 >= 11 && n % 100 <= 13) return "th";
-  return ["th", "st", "nd", "rd"][n % 10] ?? "th";
 }
