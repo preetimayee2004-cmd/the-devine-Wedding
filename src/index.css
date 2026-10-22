@@ -35,6 +35,18 @@
     /* The page never pans sideways on a phone. */
     overflow-x: hidden;
     overscroll-behavior-x: none;
+    /* in-page links glide (JS glides scroll "instant" per frame, so they're unaffected) */
+    scroll-behavior: smooth;
+    /* the page still scrolls, but no scrollbar shows */
+    scrollbar-width: none;
+  }
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
   }
 
   body {
@@ -258,6 +270,9 @@
      One vertical rhythm that breathes with the screen's height, so a short
      phone stays compact and a tall one gains air evenly instead of one big gap. */
   .save-the-date {
+    /* exactly one screen; the painting runs to its foot */
+    height: 100vh;
+    height: 100svh;
     /* compact on short screens (a phone browser's toolbars leave ~650px), airy on tall ones */
     --std-top: clamp(16px, 8vh - 26px, 60px);
     --std-gap: clamp(6px, 2.4vh - 7px, 18px);
@@ -277,11 +292,8 @@
     --std-paint-w: min(100vw, 600px);
     /* it reaches up behind the last lines of text, so only its sky band is behind them */
     --std-rise: calc(var(--std-paint-w) * 0.25);
-    /* always room for both faces, even on a short phone */
-    --std-art-min: calc(var(--std-paint-w) * 0.86);
-    /* its sky melts into the site's sky; its foot melts away at the end of the card */
+    /* its sky melts into the site's sky */
     --std-fade-top: calc(var(--std-paint-w) * 0.22);
-    --std-fade-bottom: calc(var(--std-paint-w) * 0.22);
   }
   @supports (height: 1dvh) {
     .save-the-date {
@@ -336,29 +348,33 @@
     will-change: transform;
   }
 
-  /* Behind "Swipe up": whatever runs under the foot of the screen fades softly away. */
-  .std-swipe-strip {
-    background: linear-gradient(to top, rgb(var(--sky-pale) / 0.95) 20%, rgb(var(--sky-pale) / 0));
+  /* Under the blessing at the foot of the painting: a soft dark-navy veil, so the words read. */
+  .std-foot {
+    background: linear-gradient(rgb(10 25 50 / 0), rgb(10 25 50 / 0.65));
+  }
+  .std-foot p {
+    text-shadow: 0 1px 10px rgb(10 25 50 / 0.55);
   }
 
-  /* "Swipe up": a short nudge (600ms), then a rest. */
-  .std-swipe {
-    animation: swipe-nudge 2.6s ease-in-out infinite;
+  /* The double arrow under "View the Invitation": a gentle bob. */
+  .std-arrows {
+    animation: arrows-bob 1.6s ease-in-out infinite;
   }
-  @keyframes swipe-nudge {
+  @keyframes arrows-bob {
     0%,
-    24%,
     100% {
       transform: translateY(0);
+      opacity: 0.6;
     }
-    12% {
-      transform: translateY(-4px);
+    50% {
+      transform: translateY(6px);
+      opacity: 1;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .std-moon,
-    .std-swipe {
+    .std-arrows {
       animation: none;
     }
     .std-moon {
@@ -366,13 +382,8 @@
     }
   }
   .std-painting {
-    --std-fade: linear-gradient(
-      transparent,
-      #000 var(--std-fade-top),
-      #000 calc(100% - var(--std-fade-bottom)),
-      rgb(0 0 0 / 0.45) calc(100% - var(--std-fade-bottom) * 0.45),
-      transparent
-    );
+    /* only its top fades (into the sky); its foot meets the bottom edge of the screen */
+    --std-fade: linear-gradient(transparent, #000 var(--std-fade-top));
     -webkit-mask-image: var(--std-fade);
     mask-image: var(--std-fade);
   }

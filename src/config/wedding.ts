@@ -48,14 +48,8 @@ export const wedding = {
     title: "Save the Date",
     blessing: "With the blessings of Mahadev and Maa Parvati, two hearts begin their sacred journey together.",
     request: "request the honour of your presence as they celebrate their union",
-    /** The two buttons at the foot of the card. */
-    open: "Open Invitation",
-    addToCalendar: "Add to Calendar",
-    /** The little countdown under the venue; {n} = days left at the venue. */
-    daysToGo: "{n} days to go",
-    oneDayToGo: "1 day to go",
-    today: "Today is the day",
-    swipeUp: "Swipe up",
+    /** The link at the foot of the card, under the blessing: it scrolls on to the next section. */
+    viewInvitation: "View the Invitation",
     /**
      * Once the invitation has been on screen this long (ms) and the guest
      * hasn't touched anything, it glides up to reveal the couple. 0 = never.
@@ -71,12 +65,7 @@ export const wedding = {
       names: { bride: "प्रीति", groom: "शिवाशीष" },
       request: "अपने विवाह के शुभ अवसर पर आपकी गरिमामयी उपस्थिति की कामना करते हैं",
       venue: "कैलाश वाटिका, वाराणसी",
-      open: "निमंत्रण खोलें",
-      addToCalendar: "कैलेंडर में जोड़ें",
-      daysToGo: "विवाह में {n} दिन शेष",
-      oneDayToGo: "विवाह में 1 दिन शेष",
-      today: "आज शुभ विवाह का दिन है",
-      swipeUp: "ऊपर स्वाइप करें",
+      viewInvitation: "निमंत्रण देखें",
     },
   },
 

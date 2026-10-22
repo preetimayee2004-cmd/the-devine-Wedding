@@ -22,7 +22,8 @@ export function glideTo(y: number, duration: number): () => void {
 
   const step = (now: number) => {
     const t = Math.min(1, (now - start) / duration);
-    window.scrollTo(0, from + distance * drift(t));
+    // "instant": each frame is one step of our own glide, whatever the page's scroll-behavior
+    window.scrollTo({ top: from + distance * drift(t), behavior: "instant" });
     if (t < 1) frame = requestAnimationFrame(step);
     else stop();
   };

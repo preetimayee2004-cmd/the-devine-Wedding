@@ -1,17 +1,15 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent } from "react";
 import { wedding } from "@/config/wedding";
 import { REDUCED_MOTION_QUERY } from "@/hooks/useMediaQuery";
-import { downloadIcs, googleCalendarUrl, weddingCalendarItem } from "@/lib/calendar";
 import { directionsUrl } from "@/lib/maps";
 import { EASE, MOTION } from "@/lib/motion";
 import { glideTo, USER_INPUT_EVENTS } from "@/lib/scroll";
 import { readSessionFlag, writeSessionFlag } from "@/lib/session";
-import { formatVenueDate, parseVenueDateTime, venueDateKey } from "@/lib/venueTime";
+import { formatVenueDate, parseVenueDateTime } from "@/lib/venueTime";
 import { Icon } from "@/components/art/Icons";
 import { GoldMotes } from "@/components/ui/GoldMotes";
 import { MusicToggle } from "@/components/ui/MusicToggle";
 import { PetalShower } from "@/components/ui/PetalShower";
-import { Sheet } from "@/components/ui/Sheet";
 
 /**
  * Sections 00 + 01 — the opening, which becomes the Save the Date. One
@@ -24,11 +22,11 @@ import { Sheet } from "@/components/ui/Sheet";
  *            there, a soft shadow where they touch, a warm gold glow between
  *   release  the glow widens and fades, a few gold motes drift outward, and
  *            the hands fade gently into the sky
- *   reveal   the card rises in, top to bottom: the names, the date, the
- *            venue (a map link) and the days to go; then the painting of
- *            Mahadev blessing Maa Parvati before the Himalaya, its blessing
- *            line, and the two buttons — Open Invitation, Add to Calendar;
- *            a few petals fall
+ *   reveal   the card rises in, top to bottom: the names, the date and the
+ *            venue (a map link); then the painting of Mahadev blessing Maa
+ *            Parvati before the Himalaya, down to the very foot of the
+ *            screen, with the blessing line and "View the Invitation" over
+ *            its lower edge; a few petals fall
  *
  * The card reads in English or Hindi (the EN / हिं switch), clouds part
  * gently as the guest scrolls, the moon in Mahadev's hair glows softly, and
@@ -77,14 +75,6 @@ function readLang(): Lang {
   } catch {
     return "en";
   }
-}
-
-/** Whole days from today (at the venue) to the wedding day; negative once it has passed. */
-function daysUntilWedding(): number | null {
-  const when = parseVenueDateTime(wedding.wedding.dateTime);
-  if (!when) return null;
-  const [y, m, d] = venueDateKey(Date.now(), wedding.wedding.timeZone).split("-").map(Number);
-  return Math.round((Date.UTC(when.year, when.month - 1, when.day) - Date.UTC(y, m - 1, d)) / 86_400_000);
 }
 
 export function Invitation() {
@@ -187,9 +177,6 @@ export function Invitation() {
     const parts = parseVenueDateTime(wedding.wedding.dateTime);
     return parts ? formatVenueDate(parts, hindi ? "hi-IN" : "en-IN") : null;
   }, [hindi]);
-  const daysLeft = useMemo(daysUntilWedding, []);
-  const calendar = useMemo(() => weddingCalendarItem(), []);
-  const [calendarOpen, setCalendarOpen] = useState(false);
 
   const { invitation: copy, couple, venue, assets } = wedding;
   const t = hindi
@@ -200,27 +187,17 @@ export function Invitation() {
         groom: couple.groom.displayName,
         venue: [venue.name, venue.city].filter(Boolean).join(", "),
       };
-  const countdown =
-    daysLeft === null || daysLeft < 0
-      ? null
-      : daysLeft === 0
-        ? t.today
-        : daysLeft === 1
-          ? t.oneDayToGo
-          : t.daysToGo.replace("{n}", String(daysLeft));
   // Hindi lines are set in the Devanagari face; English in the serif (the script is only for the title)
   const serif = hindi ? "font-deva" : "font-display";
 
-  // ── as the guest scrolls on: the clouds part, and the swipe hint goes ──
+  // ── as the guest scrolls on, the clouds part ──
   const cloudLeft = useRef<HTMLImageElement>(null);
   const cloudRight = useRef<HTMLImageElement>(null);
-  const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
-    if (!done) return;
+    if (!done || still) return;
     let frame = 0;
     const onScroll = () => {
-      if (window.scrollY > 24) setScrolled(true);
-      if (still || frame) return;
+      if (frame) return;
       frame = requestAnimationFrame(() => {
         frame = 0;
         const y = Math.min(window.scrollY, window.innerHeight);
@@ -235,9 +212,12 @@ export function Invitation() {
     };
   }, [done, still]);
 
-  const openInvitation = () => {
+  // "View the Invitation": on to the next section (smoothly, via scroll-behavior on <html>)
+  const viewInvitation = (e: MouseEvent) => {
     const next = document.getElementById("couple");
-    if (next) glideTo(next.getBoundingClientRect().top + window.scrollY, 1200);
+    if (!next) return;
+    e.preventDefault(); // no #couple left in the address, so a reload still starts at the opening
+    next.scrollIntoView();
   };
 
   // ── styles for each beat ──
@@ -299,7 +279,7 @@ export function Invitation() {
       id="invitation"
       lang={hindi ? "hi" : undefined}
       aria-labelledby="invitation-names"
-      className="save-the-date relative flex min-h-[100dvh] flex-col items-center overflow-x-clip px-[var(--gutter)] text-center"
+      className="save-the-date relative flex flex-col items-center overflow-x-clip px-[var(--gutter)] text-center"
       style={{ paddingTop: "calc(var(--status-bar) + var(--std-top))" }}
     >
       {/* light gathered behind the words, so they read clearly on the bright upper sky */}
@@ -395,25 +375,12 @@ export function Invitation() {
             <Icon name="external" className="h-3.5 w-3.5 shrink-0 text-gold-ink" />
           </a>
         )}
-
-        {/* how many days are left */}
-        {countdown && (
-          <p
-            className={`relative mt-[var(--std-gap-sm)] rounded-full border border-gold/50 bg-ivory/70 px-3.5 py-1 text-[14px] font-medium text-gold-ink ${serif} ${hindi ? "" : "italic"}`}
-            style={rise(5)}
-          >
-            {countdown}
-          </p>
-        )}
       </div>
 
-      {/* ── Mahadev blessing Maa Parvati before the Himalaya. This block takes whatever height is
-          left (never less than room for both faces); the painting starts just below the words, its
-          pale sky melting into ours behind them, and melts away again at its foot. ── */}
-      <div
-        className="relative mt-[var(--std-gap)] w-full flex-1"
-        style={{ minHeight: "var(--std-art-min)", ...rise(6, 28, 1300) }}
-      >
+      {/* ── Mahadev blessing Maa Parvati before the Himalaya. This block takes the rest of the screen;
+          the painting starts just below the words, its pale sky melting into ours behind them, and
+          runs to the very foot of the screen. ── */}
+      <div className="relative mt-[var(--std-gap)] min-h-0 w-full flex-1" style={rise(6, 28, 1300)}>
         <div
           className="std-painting absolute bottom-0 w-[var(--std-paint-w)]"
           style={{ left: "calc(50% - var(--std-paint-w) / 2)", height: "calc(100% + var(--std-rise))" }}
@@ -450,89 +417,43 @@ export function Invitation() {
         />
       </div>
 
-      {/* the blessing, as the painting's caption */}
-      <p
-        className={`relative z-[2] mt-[var(--std-gap-sm)] max-w-[20rem] text-balance text-[15px] font-medium leading-snug text-navy/90 ${serif} ${hindi ? "" : "italic"}`}
-        style={rise(7)}
-      >
-        {t.blessing}
-      </p>
-
-      {/* ── the way on: open the invitation, or save the date ── */}
+      {/* ── over the painting's lower edge, on a soft dark-navy gradient: the blessing, and the way on ── */}
       <div
-        className={`relative z-[2] mt-[var(--std-gap)] flex w-full max-w-[22rem] gap-2.5 ${serif}`}
-        style={{ ...rise(8, 12), pointerEvents: card ? undefined : "none" }}
-      >
-        <button
-          type="button"
-          onClick={openInvitation}
-          className="flex min-h-[48px] flex-1 items-center justify-center whitespace-nowrap rounded-full bg-navy px-3 text-[16px] font-semibold text-ivory shadow-[0_8px_20px_-10px_rgb(var(--navy)/0.7)] transition-transform duration-300 hover:bg-navy-deep active:scale-[0.97]"
-        >
-          {t.open}
-        </button>
-        {calendar && (
-          <button
-            type="button"
-            onClick={() => setCalendarOpen(true)}
-            className="flex min-h-[48px] flex-1 items-center justify-center gap-1 whitespace-nowrap rounded-full border border-gold bg-ivory/90 px-2.5 text-[15px] font-semibold text-navy transition-transform duration-300 hover:bg-ivory active:scale-[0.97]"
-          >
-            <Icon name="calendar" className="h-4 w-4 shrink-0 text-gold-ink" />
-            {t.addToCalendar}
-          </button>
-        )}
-      </div>
-
-      {/* "Swipe up" — on a short screen it waits at the foot of the screen (over the garlands, never
-          the faces) until the guest scrolls; on a tall one it simply sits under the buttons */}
-      <div
-        aria-hidden
-        className="std-swipe-strip pointer-events-none sticky bottom-0 z-[3] flex w-[calc(100%+var(--gutter)*2)] justify-center pb-[max(12px,env(safe-area-inset-bottom))] pt-5 transition-opacity duration-500"
-        style={{ opacity: done && !scrolled ? 1 : 0 }}
+        className="std-foot pointer-events-none absolute inset-x-0 bottom-0 z-[2] flex flex-col items-center px-[var(--gutter)] pb-[calc(env(safe-area-inset-bottom,0px)+12px)] pt-16"
+        style={rise(7, 12)}
       >
         <p
-          className={`flex items-center gap-1 rounded-full bg-ivory/90 px-3 py-1 text-[13px] font-medium text-navy shadow-[0_4px_14px_-6px_rgb(var(--navy)/0.35)] ${serif}`}
+          className={`max-w-[20rem] text-balance text-[15px] font-medium leading-snug text-ivory ${serif} ${hindi ? "" : "italic"}`}
         >
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="std-swipe" aria-hidden>
-            <path d="M3 8.5L7 4.5l4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-          {t.swipeUp}
+          {t.blessing}
         </p>
+        <a
+          href="#couple"
+          onClick={viewInvitation}
+          className="pointer-events-auto mt-1.5 flex min-h-[44px] flex-col items-center justify-center px-4 pt-1 text-white"
+          style={{ pointerEvents: card ? undefined : "none" }}
+        >
+          <span
+            className={`text-[13px] font-semibold ${hindi ? "font-deva" : "font-display uppercase tracking-[0.28em]"}`}
+          >
+            {t.viewInvitation}
+          </span>
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="std-arrows mt-0.5"
+            aria-hidden
+          >
+            <path d="M7 6.5l5 5 5-5M7 12.5l5 5 5-5" />
+          </svg>
+        </a>
       </div>
-
-      {calendar && (
-        <Sheet open={calendarOpen} onClose={() => setCalendarOpen(false)} label={t.addToCalendar}>
-          <div className={`text-center ${serif}`}>
-            <p className="text-[24px] font-semibold text-navy">{t.addToCalendar}</p>
-            {date && (
-              <p className={`mt-1 text-[16px] text-slate ${hindi ? "" : "italic"}`}>
-                {date.day} {date.month} {date.year}
-                {date.time && ` · ${date.time}`} · {t.venue}
-              </p>
-            )}
-            <div className="mx-auto mt-6 flex max-w-[18rem] flex-col gap-3">
-              <a
-                href={googleCalendarUrl(calendar)}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => setCalendarOpen(false)}
-                className="flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-navy px-4 font-display text-[17px] font-semibold text-ivory active:scale-[0.97]"
-              >
-                <Icon name="calendar" className="h-[18px] w-[18px]" /> Google Calendar
-              </a>
-              <button
-                type="button"
-                onClick={() => {
-                  downloadIcs(calendar);
-                  setCalendarOpen(false);
-                }}
-                className="flex min-h-[48px] items-center justify-center gap-2 rounded-full border border-gold bg-ivory px-4 font-display text-[17px] font-semibold text-navy active:scale-[0.97]"
-              >
-                <Icon name="calendar" className="h-[18px] w-[18px] text-gold-ink" /> Apple · Outlook
-              </button>
-            </div>
-          </div>
-        </Sheet>
-      )}
 
       {/* soft temple bells, off until tapped — in the corner once the opening is over */}
       <MusicToggle visible={!locked} />
