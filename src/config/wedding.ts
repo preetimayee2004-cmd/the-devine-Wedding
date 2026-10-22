@@ -107,35 +107,53 @@ export const wedding = {
   },
 
   /** Section 04 — our story. SAMPLE: the couple's own moments, words and photos go here. */
+  /**
+   * Section 04 — "A Love Written in the Stars": four milestones on a gold constellation.
+   *
+   * ▶ PLACEHOLDERS — fill in your own story here:
+   *   - year:  the year of each milestone
+   *   - line:  one short line (and its Hindi in `hindi.line`)
+   *   - photo: put a WebP in public/photos/ and set `src`, e.g. "/photos/story-1.webp"
+   *            (any size; it is shown 4:5, cropped to fit). Until then a soft watercolour
+   *            wash holds its place. Keep the `alt` describing the photo.
+   */
   story: {
-    eyebrow: "Our Story",
-    title: "A Journey Written in the Stars",
+    eyebrow: "Under the same sky",
+    title: "A Love Written in the Stars",
+    subtitle: "Some souls are destined to find each other.",
+    hindi: {
+      eyebrow: "एक ही आसमान तले",
+      title: "सितारों में लिखा प्रेम",
+      subtitle: "कुछ आत्माएँ एक-दूसरे को पाने के लिए ही बनी होती हैं।",
+    },
     moments: list<StoryMoment>([
       {
-        title: "The First Hello",
-        when: "Spring 2021",
-        text: "A friend's Diwali gathering, one plate of jalebis, and a conversation that refused to end. Neither of us knew it then, but the story had already begun.",
-        photo: { src: null, alt: "Preeti and Shivashish when they first met" },
+        title: "The First Spark",
+        year: "2021", // PLACEHOLDER: your year
+        line: "One coffee, one long conversation.", // PLACEHOLDER: your line
+        photo: { src: null, alt: "Preeti and Shivashish when they first met" }, // PLACEHOLDER: your photo
+        hindi: { title: "पहली चिंगारी", line: "एक कॉफ़ी, एक लंबी बात।" },
       },
       {
-        title: "Long Calls & Chai",
-        when: "2022 – 2024",
-        text: "Different cities, the same sunsets. Evenings of video calls over cutting chai turned miles into minutes, and friendship into something more.",
-        photo: { src: null, alt: "Preeti and Shivashish on a video call" },
+        title: "Growing Closer",
+        year: "2023", // PLACEHOLDER: your year
+        line: "Long calls and cutting chai turned miles into minutes.", // PLACEHOLDER: your line
+        photo: { src: null, alt: "Preeti and Shivashish growing closer" }, // PLACEHOLDER: your photo
+        hindi: { title: "और क़रीब", line: "लंबी बातें और कटिंग चाय — मीलों की दूरी पलों में बदल गई।" },
       },
       {
-        title: "A Promise at the Ghats",
-        when: "December 2025",
-        text: "As the evening aarti lit up the Ganga, Shivashish asked the question — and Preeti said yes before he could finish it.",
-        photo: { src: null, alt: "The proposal at the ghats" },
-        motif: "diya",
+        title: "Our Promise",
+        year: "2025", // PLACEHOLDER: your year
+        line: "At the evening aarti by the Ganga, a question — and a yes.", // PLACEHOLDER: your line
+        photo: { src: null, alt: "The proposal by the Ganga" }, // PLACEHOLDER: your photo
+        hindi: { title: "हमारा वादा", line: "गंगा किनारे संध्या आरती में, एक सवाल — और एक हाँ।" },
       },
       {
-        title: "Forever Begins",
-        when: "February 2027",
-        text: "With our families' blessings and Mahadev's grace, we begin our forever — and we would love you beside us.",
-        photo: null,
-        motif: "lotus",
+        title: "Written in the Stars",
+        year: "2027", // PLACEHOLDER: your year
+        line: "With Mahadev's blessings, our forever begins.", // PLACEHOLDER: your line
+        photo: { src: null, alt: "Preeti and Shivashish together" }, // PLACEHOLDER: your photo
+        hindi: { title: "सितारों में लिखा", line: "महादेव के आशीर्वाद से, हमारा सदा का साथ शुरू होता है।" },
       },
     ]),
   },
