@@ -403,11 +403,11 @@ export const wedding = {
     /**
      * Section 03's frame — a wreath of flowering vines and the couple's little things (a plane, an
      * evil-eye charm, popcorn, a suitcase, donuts, a car, a coffee cup…), a watercolour mountain
-     * and the joined hands at its foot (1144 × 1272, transparent). Lifted from the couple's design
+     * and the joined hands at its foot (1324 × 1324, transparent). Lifted from the couple's design
      * screenshot; a larger original would look sharper.
      */
     countdownWreath: "/art/countdown-wreath.webp",
-    countdownWreathSize: { width: 1144, height: 1272 },
+    countdownWreathSize: { width: 1324, height: 1324 },
     /** Soft cloud bank (it parts for the countdown, and drifts over the Save the Date's peaks). */
     clouds: "/art/clouds.webp",
   },
