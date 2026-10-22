@@ -375,6 +375,11 @@ export const wedding = {
   assets: {
     /** The sky behind every section (supplied reference image). */
     sky: "/art/sky.jpg",
+    /**
+     * On desktop, behind the phone: Mount Kailash rising through the clouds (1376 × 768). The
+     * phone stands to the right of the peak, so the peak stays in view.
+     */
+    desktopBackdrop: "/art/kailash-desktop.webp",
     /** The opening's two hands, reaching from either side (same artboard, so they meet exactly). */
     opening: {
       shivaHand: "/art/opening/hand-shiva.webp",

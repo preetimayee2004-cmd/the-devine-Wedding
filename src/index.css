@@ -80,6 +80,19 @@
   /* ── The sky: one continuous backdrop behind every section ──
      A fixed layer (not background-attachment: fixed, which iOS ignores),
      sized to the large viewport so it never jumps as Safari's toolbars move. */
+  /* Desktop, behind the phone: Mount Kailash in the clouds. Anchored right, so on any screen shape
+     the peak sits left of the phone (which stands at 75% across). */
+  .desktop-backdrop {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-color: #2c3a4a;
+    background-size: cover;
+    background-position: 100% 42%;
+    background-repeat: no-repeat;
+  }
+
   .sky-backdrop {
     position: fixed;
     top: 0;

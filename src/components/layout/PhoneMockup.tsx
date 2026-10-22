@@ -9,8 +9,10 @@ const BEZEL = 14; // titanium band + black border
 const FRAME_W = SCREEN_W + BEZEL * 2;
 const FRAME_H = SCREEN_H + BEZEL * 2;
 
-// Space kept free above and below the phone.
+// Space kept free above and below the phone (and at least this much to its right).
 const PAD = 28;
+// Where the phone's centre stands across the screen: right of Mount Kailash's peak in the backdrop.
+const PHONE_AT = "75%";
 
 function useFitScale(): number {
   const compute = () => Math.max(0.5, Math.min(1, (window.innerHeight - PAD * 2) / FRAME_H));
@@ -25,23 +27,32 @@ function useFitScale(): number {
   return scale;
 }
 
-/** Desktop-only frame that hosts the live site in an iframe, floating in the same sky. */
+/** Desktop-only frame that hosts the live site in an iframe, before Mount Kailash in the clouds. */
 export function PhoneMockup({ src }: { src: string }) {
   const scale = useFitScale();
   useFixedPage();
+  const half = (FRAME_W * scale) / 2;
 
   return (
-    <div className="relative flex h-[100dvh] flex-col items-center justify-center overflow-hidden">
-      <div aria-hidden className="sky-backdrop" style={{ ["--sky-image" as string]: `url(${wedding.assets.sky})` }} />
-      {/* A soft brightening of the sky behind the phone */}
+    <div className="relative flex h-[100dvh] flex-col items-start justify-center overflow-hidden">
+      <div aria-hidden className="desktop-backdrop" style={{ backgroundImage: `url(${wedding.assets.desktopBackdrop})` }} />
+      {/* A soft brightening of the clouds behind the phone */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
-        style={{ background: "radial-gradient(ellipse 38% 60% at 50% 52%, rgb(255 255 255 / 0.35), transparent 70%)" }}
+        style={{ background: `radial-gradient(ellipse 26% 58% at ${PHONE_AT} 52%, rgb(255 255 255 / 0.16), transparent 70%)` }}
       />
 
-      {/* Reserves the scaled footprint so layout matches what's visible */}
-      <div style={{ width: FRAME_W * scale, height: FRAME_H * scale }}>
+      {/* Reserves the scaled footprint so layout matches what's visible; its centre stands at PHONE_AT,
+          but never closer than PAD to the right edge */}
+      <div
+        className="relative"
+        style={{
+          width: FRAME_W * scale,
+          height: FRAME_H * scale,
+          marginLeft: `max(${PAD}px, min(${PHONE_AT}, 100% - ${half + PAD}px) - ${half}px)`,
+        }}
+      >
         <div
           className="relative origin-top-left"
           style={{ width: FRAME_W, height: FRAME_H, transform: `scale(${scale})` }}

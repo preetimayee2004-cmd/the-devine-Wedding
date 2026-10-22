@@ -77,7 +77,7 @@ While developing without a database, a wish containing `#fail` rehearses the err
 | --- | --- |
 | under 768px (phones) | The site, full-bleed |
 | 768–1023px (tablets) | The site in a centred column on the same sky |
-| 1024px+ with a mouse | The phone site, live inside an iPhone 17 Pro Max mockup floating in the sky |
+| 1024px+ with a mouse | The phone site, live inside an iPhone 17 Pro Max mockup, standing right of Mount Kailash rising through the clouds (`assets.desktopBackdrop`) |
 
 ## Design
 
