@@ -26,8 +26,6 @@
     --gutter: 1.5rem;
     /* Breathing room above a section that doesn't arrive on a connecting line. */
     --section-gap: 5rem;
-    /* How far the Save the Date's foot and the couple section's arch overlap and cross-fade. */
-    --std-blend: 36px;
   }
 
   html {
@@ -352,11 +350,7 @@
 
   /* Under the blessing at the foot of the painting: a soft dark-navy veil, so the words read. */
   .std-foot {
-    background: linear-gradient(
-      rgb(10 25 50 / 0),
-      rgb(10 25 50 / 0.65) calc(100% - var(--std-blend)),
-      rgb(10 25 50 / 0)
-    );
+    background: linear-gradient(rgb(10 25 50 / 0), rgb(10 25 50 / 0.65));
   }
   .std-foot p {
     text-shadow: 0 1px 10px rgb(10 25 50 / 0.55);
@@ -394,8 +388,8 @@
     --std-sides: linear-gradient(to right, transparent, #000 9%, #000 91%, transparent);
   }
   .std-painting {
-    /* its foot fades over the last --std-blend, where the next section's arch fades in beneath it */
-    --std-fade: linear-gradient(transparent, #000 var(--std-fade-top), #000 calc(100% - var(--std-blend)), transparent);
+    /* only its top fades (into the sky); its foot meets the bottom edge of the screen */
+    --std-fade: linear-gradient(transparent, #000 var(--std-fade-top));
     -webkit-mask-image: var(--std-fade), var(--std-sides);
     -webkit-mask-composite: source-in;
     mask-image: var(--std-fade), var(--std-sides);
@@ -410,18 +404,6 @@
   .couple-scene {
     min-height: 100vh;
     min-height: 100svh;
-    /* tucked up under the Save the Date's fading foot: no gap, one soft join */
-    margin-top: calc(var(--std-blend) * -1);
-    transition: opacity 900ms ease;
-  }
-  /* while the gate and the hands play, its tucked-up top must not peek in at the foot of the screen */
-  html[data-opening] .couple-scene {
-    opacity: 0;
-  }
-  /* the arch's top edge fades in as the Save the Date fades out above it */
-  .couple-scene-arch {
-    -webkit-mask-image: linear-gradient(transparent, #000 var(--std-blend));
-    mask-image: linear-gradient(transparent, #000 var(--std-blend));
   }
   /* the floor melts into the sky of the next section instead of ending on a hard edge */
   .couple-scene-foot {

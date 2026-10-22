@@ -167,18 +167,6 @@ export function Invitation() {
     };
   }, [done, still]);
 
-  // The next section tucks up under this card's foot; until the card is in place (gate, hands)
-  // it stays hidden, so no strip of it shows at the bottom of the opening.
-  const cardShown = reached("reveal");
-  useEffect(() => {
-    const html = document.documentElement;
-    if (cardShown) delete html.dataset.opening;
-    else html.dataset.opening = "";
-    return () => {
-      delete html.dataset.opening;
-    };
-  }, [cardShown]);
-
   // ── the card's language: English or Hindi, remembered on this phone ──
   const [lang, setLang] = useState<Lang>(readLang);
   const chooseLang = (next: Lang) => {
@@ -440,7 +428,7 @@ export function Invitation() {
 
       {/* ── over the painting's lower edge, on a soft dark-navy gradient: the blessing, and the way on ── */}
       <div
-        className="std-foot pointer-events-none absolute bottom-0 z-[2] flex w-[var(--std-paint-w)] flex-col items-center px-4 pb-[calc(env(safe-area-inset-bottom,0px)+var(--std-blend)-8px)] pt-16"
+        className="std-foot pointer-events-none absolute bottom-0 z-[2] flex w-[var(--std-paint-w)] flex-col items-center px-4 pb-[calc(env(safe-area-inset-bottom,0px)+12px)] pt-16"
         style={{ left: "calc(50% - var(--std-paint-w) / 2)", ...rise(7, 12) }}
       >
         <p

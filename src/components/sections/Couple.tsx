@@ -11,7 +11,7 @@ import { wedding } from "@/config/wedding";
 export function Couple() {
   const { coupleArch, coupleArchSize, coupleScene, coupleSceneSize } = wedding.assets;
   return (
-    // it tucks up under the Save the Date's fading foot (by --std-blend), so the two melt together
+    // it starts right where the Save the Date ends — no gap
     <section id="couple" className="couple-scene flex flex-col justify-between">
       <img
         src={coupleArch}
@@ -22,7 +22,7 @@ export function Couple() {
         loading="lazy"
         decoding="async"
         draggable={false}
-        className="couple-scene-arch pointer-events-none block h-auto w-full select-none"
+        className="pointer-events-none block h-auto w-full select-none"
       />
       <img
         src={coupleScene}
