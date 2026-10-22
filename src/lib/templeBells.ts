@@ -161,3 +161,60 @@ export function createDhun(): Dhun | null {
     },
   };
 }
+
+/**
+ * One temple ghanti, struck once in a little reverberant space — for the
+ * gate's tap, when the guest has turned its sound on. Call it from a tap.
+ */
+let ghanti: AudioContext | null = null;
+export function ringGhanti() {
+  const Ctor: AudioCtor | undefined =
+    window.AudioContext ?? (window as unknown as { webkitAudioContext?: AudioCtor }).webkitAudioContext;
+  if (!Ctor) return;
+  try {
+    ghanti ??= new Ctor();
+    const ac = ghanti;
+    void ac.resume();
+    const out = ac.createGain();
+    out.gain.value = 0.22;
+    out.connect(ac.destination);
+    // the room: a short decaying noise
+    const seconds = 2.4;
+    const impulse = ac.createBuffer(2, Math.floor(ac.sampleRate * seconds), ac.sampleRate);
+    for (let c = 0; c < 2; c++) {
+      const data = impulse.getChannelData(c);
+      for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 3);
+    }
+    const room = ac.createConvolver();
+    room.buffer = impulse;
+    const wet = ac.createGain();
+    wet.gain.value = 0.3;
+    room.connect(wet).connect(ac.destination);
+    out.connect(room);
+    // a bright bell on Sa, and a softer one a fifth above just after
+    const ring = (freq: number, at: number, loud: number) => {
+      for (const [ratio, level, decay] of [
+        [1, 1, 3.6],
+        [2, 0.38, 2.4],
+        [2.76, 0.26, 1.6],
+        [5.4, 0.1, 0.7],
+      ] as const) {
+        const osc = ac.createOscillator();
+        osc.type = "sine";
+        osc.frequency.value = freq * ratio;
+        const g = ac.createGain();
+        g.gain.setValueAtTime(0, at);
+        g.gain.linearRampToValueAtTime(level * loud, at + 0.005);
+        g.gain.exponentialRampToValueAtTime(0.0001, at + decay);
+        osc.connect(g).connect(out);
+        osc.start(at);
+        osc.stop(at + decay + 0.05);
+      }
+    };
+    const now = ac.currentTime + 0.02;
+    ring(SA * 4, now, 1);
+    ring(SA * 6, now + 0.16, 0.5);
+  } catch {
+    // no sound, no matter
+  }
+}

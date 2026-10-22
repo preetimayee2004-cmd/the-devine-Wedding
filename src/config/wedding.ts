@@ -45,7 +45,11 @@ export const wedding = {
    * and `venue`.
    */
   invitation: {
-    /** The gate before the opening (first visit): a golden ॐ and this line. */
+    /**
+     * The gate before the opening (first visit in a browser session): this line over the golden ॐ
+     * seal, the couple's names and the date under it, then "Touch to begin".
+     */
+    youreInvited: "You're invited",
     touchToBegin: "Touch to begin",
     title: "Save the Date",
     blessing: "With the blessings of Mahadev and Maa Parvati, two hearts begin their sacred journey together.",
@@ -62,6 +66,7 @@ export const wedding = {
      * date). SAMPLE: have the family check the wording.
      */
     hindi: {
+      youreInvited: "आप आमंत्रित हैं",
       touchToBegin: "आरंभ करने के लिए स्पर्श करें",
       title: "शुभ विवाह",
       blessing: "महादेव और माँ पार्वती के आशीर्वाद से, दो हृदय अपनी पवित्र यात्रा आरंभ कर रहे हैं।",

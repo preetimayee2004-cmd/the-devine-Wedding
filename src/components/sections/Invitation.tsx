@@ -43,6 +43,13 @@ import { PetalShower } from "@/components/ui/PetalShower";
  */
 
 const SEEN_KEY = "dw:opening-seen";
+const GATE_KEY = "dw:gate-seen";
+
+/** The gate shows once per browser session (always with ?opening=full, for reviewing). */
+function showGate(): boolean {
+  if (new URLSearchParams(window.location.search).get("opening") === "full") return true;
+  return !readSessionFlag(GATE_KEY);
+}
 
 /** The beats, in order, and when each begins (ms, full version). */
 const BEATS = { arrive: 0, meet: 3900, release: 5200, reveal: 6000, done: 8100 } as const;
@@ -84,9 +91,13 @@ export function Invitation() {
   const pace = mode === "short" ? 0.6 : 1;
   const reached = (b: Beat) => beat >= ORDER.indexOf(b);
 
-  // ── the gate: the ॐ seal and "Touch to begin" come first, every time the link opens; its tap starts the opening ──
-  const [gate, setGate] = useState<"show" | "leaving" | "gone">("show");
+  // ── the gate: the ॐ seal and "Touch to begin" come first, once a session; its tap starts the opening ──
+  const [gate, setGate] = useState<"show" | "leaving" | "gone">(() => (showGate() ? "show" : "gone"));
   const started = gate !== "show";
+  const leaveGate = () => {
+    writeSessionFlag(GATE_KEY);
+    setGate("leaving");
+  };
 
   // ── the timeline ──
   useEffect(() => {
@@ -167,6 +178,13 @@ export function Invitation() {
     const parts = parseVenueDateTime(wedding.wedding.dateTime);
     return parts ? formatVenueDate(parts, hindi ? "hi-IN" : "en-IN") : null;
   }, [hindi]);
+
+  // the gate's date, "12 · 02 · 2027"
+  const gateDate = useMemo(() => {
+    const p = parseVenueDateTime(wedding.wedding.dateTime);
+    const two = (n: number) => String(n).padStart(2, "0");
+    return p ? `${two(p.day)} · ${two(p.month)} · ${p.year}` : null;
+  }, []);
 
   const { invitation: copy, couple, venue, assets } = wedding;
   const t = hindi
@@ -398,13 +416,17 @@ export function Invitation() {
       {gate !== "gone" && (
         <OpeningGate
           seal={assets.omSeal}
+          clouds={assets.clouds}
+          invited={t.youreInvited}
+          names={{ bride: t.bride, groom: t.groom }}
+          date={gateDate}
           label={t.touchToBegin}
           devanagari={hindi}
           reduced={still}
-          onBegin={() => setGate("leaving")}
+          onBegin={leaveGate}
           onSkip={() => {
             skip();
-            setGate("leaving");
+            leaveGate();
           }}
           onGone={() => setGate("gone")}
         />

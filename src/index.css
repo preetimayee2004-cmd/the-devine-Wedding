@@ -517,38 +517,359 @@
     transform: scaleY(-1);
   }
 
-  /* ── The gate: the ॐ seal and "Touch to begin", before the opening (every time) ──
+  /* ── The gate, before the opening (first visit in a session) ──
      Only transform and opacity move. */
   .gate {
-    background: linear-gradient(#bfe6ff, #eaf7ff);
+    --seal: clamp(150px, 44vw, 190px);
+    background: linear-gradient(#bfe6ff, #d9f1ff 55%, #eaf7ff);
   }
-  .gate-seal-go {
-    position: relative;
-    z-index: 1;
-    display: block;
-    transition:
-      transform 500ms cubic-bezier(0.22, 1, 0.36, 1),
-      opacity 500ms ease-out;
+
+  /* the sky: Mount Kailash faint at the foot, and clouds drifting slowly by (60s) */
+  .gate-kailash {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: auto;
+    opacity: 0.85;
+    pointer-events: none;
   }
-  .gate-seal-go[data-go] {
-    transform: scale(1.18);
+  .gate-cloud {
+    position: absolute;
+    height: auto;
+    opacity: 0.75;
+    pointer-events: none;
+    animation: gate-cloud 60s ease-in-out infinite;
+  }
+  @keyframes gate-cloud {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    50% {
+      transform: translateX(var(--drift));
+    }
+  }
+
+  /* gold dust rising from the foot; marigold petals drifting down from the top */
+  .gate-dust {
+    position: absolute;
+    bottom: 4%;
+    border-radius: 9999px;
+    background: radial-gradient(circle, #fff6d2 0%, #e9c565 45%, rgb(233 197 101 / 0) 72%);
     opacity: 0;
+    animation: gate-dust linear infinite;
   }
-  /* the golden ॐ wax seal */
-  .gate-seal {
+  @keyframes gate-dust {
+    0% {
+      transform: translate3d(0, 0, 0);
+      opacity: 0;
+    }
+    15% {
+      opacity: 0.95;
+    }
+    75% {
+      opacity: 0.6;
+    }
+    100% {
+      transform: translate3d(var(--x), -72vh, 0);
+      opacity: 0;
+    }
+  }
+  .gate-petal {
+    position: absolute;
+    top: -24px;
+    width: 11px;
+    height: 15px;
+    border-radius: 55% 55% 50% 50% / 70% 70% 32% 32%;
+    background: linear-gradient(160deg, #ffc23d, #f28a12 70%, #d8670b);
+    opacity: 0;
+    animation: gate-petal ease-in-out infinite;
+  }
+  @keyframes gate-petal {
+    0% {
+      transform: translate3d(0, 0, 0) rotate(0deg);
+      opacity: 0;
+    }
+    10% {
+      opacity: 0.85;
+    }
+    50% {
+      transform: translate3d(var(--x), 55vh, 0) rotate(170deg);
+    }
+    88% {
+      opacity: 0.75;
+    }
+    100% {
+      transform: translate3d(calc(var(--x) * -0.4), 108vh, 0) rotate(330deg);
+      opacity: 0;
+    }
+  }
+
+  /* the words fade away on the tap */
+  .gate-words[data-go] {
+    opacity: 0;
+    transition: opacity 250ms ease-out;
+  }
+  .gate-hint {
+    opacity: 0.85;
+    animation: gate-hint 2.4s ease-in-out infinite;
+  }
+  @keyframes gate-hint {
+    0%,
+    100% {
+      opacity: 0.85;
+    }
+    50% {
+      opacity: 0.45;
+    }
+  }
+  .gate-hint[data-go] {
+    animation: none;
+    opacity: 0;
+    transition: opacity 250ms ease-out;
+  }
+
+  /* the seal's stage: the mandala's square, the seal in its middle two-thirds */
+  .gate-stage {
+    width: calc(var(--seal) * 1.5);
+    height: calc(var(--seal) * 1.5);
+  }
+  .gate-glow {
+    position: absolute;
+    width: calc(var(--seal) * 2.1);
+    height: calc(var(--seal) * 2.1);
+    border-radius: 9999px;
+    background: radial-gradient(circle, rgb(232 201 122 / 0.6) 0%, rgb(232 201 122 / 0.22) 42%, rgb(232 201 122 / 0) 70%);
+    animation: om-glow 2.6s ease-in-out infinite;
+  }
+  @keyframes om-glow {
+    0%,
+    100% {
+      opacity: 0.5;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+  .gate-glow[data-go] {
+    animation: gate-glow-go 800ms ease-out forwards;
+  }
+  @keyframes gate-glow-go {
+    30% {
+      opacity: 1;
+      transform: scale(1.35);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(1.6);
+    }
+  }
+  .gate-mandala {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    animation: gate-turn 40s linear infinite;
+  }
+  @keyframes gate-turn {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  .gate-mandala[data-go] {
+    opacity: 0;
+    scale: 1.2;
+    transition:
+      opacity 500ms ease-out,
+      scale 600ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* the seal breathes (1 → 1.03, 2.6s), and keeps breathing as it opens, so nothing jumps */
+  .gate-tilt {
+    transition: transform 300ms ease-out;
+  }
+  .gate-seal-box {
+    position: relative;
+    width: var(--seal);
+    animation: om-breathe 2.6s ease-in-out infinite;
+  }
+  @keyframes om-breathe {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.03);
+    }
+  }
+  .gate-seal,
+  .gate-half {
     display: block;
-    width: clamp(150px, 44vw, 190px);
+    width: 100%;
     height: auto;
     user-select: none;
     -webkit-user-drag: none;
-    animation: om-breathe 2.4s ease-in-out infinite;
   }
-  /* the tapping hand: its fingertip is this point, on the seal's lower right */
+  .gate-seal[data-go] {
+    opacity: 0;
+  }
+  /* the two halves, cracked down the middle: hidden until the tap, then they part */
+  .gate-half {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+  }
+  .gate-half-l {
+    clip-path: polygon(0 0, 51% 0, 47% 14%, 54% 29%, 46% 45%, 55% 60%, 47% 76%, 53% 90%, 49% 100%, 0 100%);
+  }
+  .gate-half-r {
+    clip-path: polygon(51% 0, 100% 0, 100% 100%, 49% 100%, 53% 90%, 47% 76%, 55% 60%, 46% 45%, 54% 29%, 47% 14%);
+  }
+  .gate-half[data-go] {
+    opacity: 1;
+    animation: 600ms cubic-bezier(0.3, 0, 0.4, 1) 200ms forwards;
+  }
+  .gate-half-l[data-go] {
+    animation-name: gate-half-l;
+  }
+  .gate-half-r[data-go] {
+    animation-name: gate-half-r;
+  }
+  @keyframes gate-half-l {
+    0% {
+      opacity: 1;
+      transform: none;
+    }
+    60% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translate(-30%, 6%) rotate(-12deg);
+    }
+  }
+  @keyframes gate-half-r {
+    0% {
+      opacity: 1;
+      transform: none;
+    }
+    60% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translate(30%, 6%) rotate(12deg);
+    }
+  }
+  /* the ॐ flashes once as the seal is touched */
+  .gate-flash {
+    position: absolute;
+    left: 15%;
+    top: 15%;
+    width: 70%;
+    height: 70%;
+    border-radius: 9999px;
+    background: radial-gradient(circle, rgb(255 251 230 / 0.95) 0%, rgb(255 228 150 / 0.6) 38%, rgb(255 228 150 / 0) 70%);
+    mix-blend-mode: screen;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .gate-flash[data-go] {
+    animation: gate-flash 380ms ease-out forwards;
+  }
+  @keyframes gate-flash {
+    30% {
+      opacity: 1;
+      transform: scale(1.08);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(1.2);
+    }
+  }
+  /* golden light bursting out of the crack */
+  .gate-burst {
+    position: absolute;
+    width: var(--seal);
+    height: var(--seal);
+    border-radius: 9999px;
+    background: radial-gradient(circle, rgb(255 250 228) 0%, rgb(255 222 140 / 0.85) 30%, rgb(240 190 90 / 0.35) 55%, rgb(240 190 90 / 0) 72%);
+    opacity: 0;
+    transform: scale(0.2);
+    pointer-events: none;
+  }
+  .gate-burst[data-go] {
+    animation: gate-burst 900ms cubic-bezier(0.22, 1, 0.36, 1) 180ms forwards;
+  }
+  @keyframes gate-burst {
+    0% {
+      opacity: 0;
+      transform: scale(0.2);
+    }
+    30% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: scale(3.2);
+    }
+  }
+  /* a soft shine on the seal that follows the phone's tilt (moved from the orientation) */
+  .gate-shine {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    pointer-events: none;
+    mix-blend-mode: soft-light;
+  }
+  .gate-shine > span {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    background: radial-gradient(circle at 35% 30%, rgb(255 255 255 / 0.9), rgb(255 255 255 / 0) 45%);
+    transition:
+      transform 300ms ease-out,
+      opacity 600ms ease-out;
+  }
+  .gate-shine[data-go] {
+    opacity: 0;
+  }
+  /* the golden ripple, from the seal out over the whole screen */
+  .gate-ripple {
+    position: absolute;
+    width: var(--seal);
+    height: var(--seal);
+    border-radius: 9999px;
+    border: 2px solid #e8c97a;
+    box-shadow:
+      0 0 18px rgb(232 201 122 / 0.65),
+      inset 0 0 12px rgb(232 201 122 / 0.45);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .gate-ripple[data-go] {
+    animation: gate-ripple 1000ms ease-out 120ms forwards;
+  }
+  @keyframes gate-ripple {
+    from {
+      opacity: 0.95;
+      transform: scale(0.8);
+    }
+    to {
+      opacity: 0;
+      transform: scale(9);
+    }
+  }
+
+  /* the tapping hand: its fingertip is this point, on the seal's lower right rim (clear of the ॐ) */
   .gate-hand-at {
     position: absolute;
     z-index: 2;
-    left: 64%;
-    top: 63%;
+    left: 72.5%;
+    top: 72.5%;
     width: 0;
     height: 0;
     color: rgb(var(--navy));
@@ -563,8 +884,8 @@
     left: -24px;
     top: -3.5px;
     transform-origin: 24px 3.5px;
-    filter: drop-shadow(0 4px 6px rgb(23 59 86 / 0.25));
-    animation: hand-tap 2s ease-in-out infinite;
+    filter: drop-shadow(0 4px 6px rgb(18 41 74 / 0.25));
+    animation: hand-tap 1.8s ease-in-out infinite;
   }
   @keyframes hand-tap {
     0% {
@@ -590,17 +911,17 @@
       opacity: 0;
     }
   }
-  /* the little ring where the fingertip presses */
+  /* the pulse ring where the fingertip presses (1.8s, with the tap) */
   .gate-tap-ring {
     position: absolute;
     left: 0;
     top: 0;
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
     border-radius: 9999px;
     border: 2px solid #c9a24b;
     opacity: 0;
-    animation: tap-ring 2s ease-out infinite;
+    animation: tap-ring 1.8s ease-out infinite;
   }
   @keyframes tap-ring {
     0%,
@@ -611,105 +932,27 @@
     34% {
       opacity: 0.9;
     }
-    64%,
+    70%,
     100% {
-      transform: translate(-50%, -50%) scale(1.6);
+      transform: translate(-50%, -50%) scale(1.8);
       opacity: 0;
     }
   }
-  .gate-hand[data-still] {
-    animation: none;
-    transform: rotate(-22deg);
-  }
-  @keyframes om-breathe {
-    0%,
-    100% {
-      transform: scale(1);
-    }
-    50% {
-      transform: scale(1.04);
-    }
-  }
-  .gate-glow {
-    position: absolute;
-    width: 300px;
-    height: 300px;
-    border-radius: 9999px;
-    background: radial-gradient(
-      circle,
-      rgb(232 201 122 / 0.55) 0%,
-      rgb(232 201 122 / 0.2) 42%,
-      rgb(232 201 122 / 0) 70%
-    );
-    animation: om-glow 2.4s ease-in-out infinite;
-  }
-  @keyframes om-glow {
-    0%,
-    100% {
-      opacity: 0.45;
-    }
-    50% {
-      opacity: 1;
-    }
-  }
-  .gate-glow[data-go] {
-    animation: none;
-    opacity: 0;
-    transition: opacity 400ms ease-out;
-  }
-  .gate-ripple {
-    position: absolute;
-    width: 160px;
-    height: 160px;
-    border-radius: 9999px;
-    border: 1.5px solid #e8c97a;
-    box-shadow:
-      0 0 16px rgb(232 201 122 / 0.6),
-      inset 0 0 10px rgb(232 201 122 / 0.4);
-    opacity: 0;
-    pointer-events: none;
-  }
-  .gate-ripple[data-go] {
-    animation: gate-ripple 700ms ease-out forwards;
-  }
-  @keyframes gate-ripple {
-    from {
-      opacity: 0.95;
-      transform: scale(0.6);
-    }
-    to {
-      opacity: 0;
-      transform: scale(10);
-    }
-  }
-  .gate-hint {
-    animation: gate-hint 2.4s ease-in-out infinite;
-  }
-  @keyframes gate-hint {
-    0%,
-    100% {
-      opacity: 0.35;
-    }
-    50% {
-      opacity: 0.6;
-    }
-  }
-  .gate-hint[data-go] {
-    animation: none;
-    opacity: 0;
-    transition: opacity 300ms ease-out;
-  }
-  /* reduced motion: no breathing, no ripple — just the plain fade */
-  .gate-seal[data-still],
+
+  /* reduced motion: nothing moves — the plain fade only */
+  .gate[data-still] .gate-cloud,
+  .gate-seal-box[data-still],
   .gate-glow[data-still],
+  .gate-mandala[data-still],
   .gate-hint[data-still] {
     animation: none;
   }
   .gate-glow[data-still] {
     opacity: 0.8;
   }
-  .gate-hint[data-still] {
-    opacity: 0.6;
+  .gate-hand[data-still] {
+    animation: none;
+    transform: rotate(-22deg);
   }
 
   /* ── Opening ── */
