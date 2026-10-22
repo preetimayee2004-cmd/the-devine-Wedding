@@ -7,9 +7,10 @@ import { EASE } from "./src/lib/motion";
  * opacity modifiers like `bg-ivory/70` work.
  *
  *  sky / sky-pale  the supplied sky image behind everything
- *  navy            every main heading and the couple's names (#173B56)
- *  gold-ink        supporting text in gold: mantra, date, labels, signature (#8A642F)
- *  slate           body text (slate blue)
+ *  navy            every main heading and the couple's names (#12294A)
+ *  gold-ink        supporting text in gold: mantra, date, labels, signature (#A8741F)
+ *  slate           body text (#1F3A5C)
+ *  (all three are the couple section's text colours, used site-wide since 22 Oct 2026)
  *  gold            fine lines and ornaments only, never text (#D0AF72)
  *  ivory           cards and buttons' text
  */

@@ -74,14 +74,21 @@ export const wedding = {
 
   /**
    * Section 02 — the welcome on the sky between the arch and the couple at the Shivling.
-   * {guest} = the guest's name from the link (?guest=…), or "Guest". Names, date and venue come
-   * from `couple`, `wedding` and `venue`.
+   * {guest} = the guest's name from the link (?guest=…), or `everyone` when the link has none.
+   * Names, date and venue come from `couple`, `wedding` and `venue`. A tap on the hashtag copies it.
    */
   coupleWelcome: {
     welcome: "Welcome",
     dear: "Dear {guest},",
+    everyone: "Family & Friends",
     invited: "you are warmly invited",
     hashtag: "#PreetiWedsShivashish",
+    copied: "Copied",
+    /** With the EN / हिं switch on हिं. */
+    hindi: {
+      welcome: "स्वागतम्",
+      invited: "आप सादर आमंत्रित हैं",
+    },
   },
 
   /** Section 03 — the celestial calendar. Counts to wedding.dateTime in wedding.timeZone. */
@@ -398,6 +405,15 @@ export const wedding = {
      */
     coupleArch: "/art/couple-arch.webp",
     coupleArchSize: { width: 1220, height: 600 },
+    /**
+     * The arch's three temple bells, lifted out so they can sway: each with the lower part of its
+     * chain, its top centre on the chain (the pivot). Placed in % of the arch.
+     */
+    coupleBells: [
+      { src: "/art/couple-bell-1.webp", left: 27.213, top: 21.667, width: 7.623, size: { width: 93, height: 148 } },
+      { src: "/art/couple-bell-2.webp", left: 45.492, top: 7, width: 8.197, size: { width: 100, height: 204 } },
+      { src: "/art/couple-bell-3.webp", left: 64.344, top: 21.667, width: 7.705, size: { width: 94, height: 148 } },
+    ],
     coupleScene: "/art/couple-scene.webp",
     coupleSceneSize: { width: 1220, height: 1448 },
     /**

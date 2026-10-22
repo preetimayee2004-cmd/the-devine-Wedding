@@ -7,10 +7,11 @@
     /* ── Colours (RGB channels for Tailwind alpha support) ── */
     --sky: 32 181 235; /* #20B5EB — upper sky */
     --sky-pale: 168 227 247; /* #A8E3F7 — lower sky */
-    --navy: 23 59 86; /* #173B56 — headings and names, ~8:1 on the pale sky */
+    /* the text colours are the couple section's, everywhere */
+    --navy: 18 41 74; /* #12294A — headings and names */
     --navy-deep: 15 42 62; /* #0F2A3E — pressed buttons */
-    --slate: 61 90 115; /* #3D5A73 — body text, ~5.5:1 on the pale sky */
-    --gold-ink: 138 100 47; /* #8A642F — gold text: mantra, date, labels */
+    --slate: 31 58 92; /* #1F3A5C — body text */
+    --gold-ink: 168 116 31; /* #A8741F — gold text: mantra, date, labels */
     --gold: 208 175 114; /* #D0AF72 — fine lines and ornaments only */
     --ivory: 255 249 239; /* #FFF9EF — cards, button text */
 
@@ -273,46 +274,54 @@
     /* exactly one screen; the painting runs to its foot */
     height: 100vh;
     height: 100svh;
-    /* compact on short screens (a phone browser's toolbars leave ~650px), airy on tall ones */
-    --std-top: clamp(16px, 8vh - 26px, 60px);
-    --std-gap: clamp(6px, 2.4vh - 7px, 18px);
-    --std-gap-sm: clamp(2px, 0.6vh, 8px);
-    --std-gap-lg: clamp(10px, 3.6vh - 11px, 30px);
+    /* the words: 64px from the top, 12px between each line */
+    --std-top: 64px;
+    --std-gap: 12px;
     /* hierarchy: the names lead, then the date, then the place; the title is a quiet script heading */
     --std-names: clamp(30px, 9vw, 40px);
     --std-title: clamp(32px, 3vh + 14px, 40px);
     --std-title-deva: clamp(28px, 2.4vh + 12px, 34px);
-    --std-day: clamp(30px, 2.4vh + 14px, 36px);
-    /*
-     * The painting (Mahadev blessing Maa Parvati, 572 × 1024): 86% of the
-     * screen's width, centred, up to 520px. Measured in its width W: a pale sky
-     * band runs to about 0.22 W, the peaks and Mahadev's crown begin about
-     * 0.26 W down, and both faces sit within the first 1.0 W.
-     */
-    --std-paint-w: min(86vw, 520px);
-    /* it reaches up behind the last lines of text, so only its sky band is behind them */
-    --std-rise: calc(var(--std-paint-w) * 0.25);
-    /* its sky melts into the site's sky */
-    --std-fade-top: calc(var(--std-paint-w) * 0.22);
   }
   @supports (height: 1dvh) {
     .save-the-date {
-      --std-top: clamp(16px, 8dvh - 26px, 60px);
-      --std-gap: clamp(6px, 2.4dvh - 7px, 18px);
-      --std-gap-sm: clamp(2px, 0.6dvh, 8px);
-      --std-gap-lg: clamp(10px, 3.6dvh - 11px, 30px);
       --std-title: clamp(32px, 3dvh + 14px, 40px);
       --std-title-deva: clamp(28px, 2.4dvh + 12px, 34px);
-      --std-day: clamp(30px, 2.4dvh + 14px, 36px);
     }
+  }
+  /* every line of the words carries a soft white glow, so it reads on the sky and the painting's top */
+  .std-words {
+    text-shadow: 0 0 10px rgb(255 255 255 / 0.55);
+  }
+
+  /*
+   * The painting (Mahadev blessing Maa Parvati, 572 × 1024), edge to edge
+   * across the foot of the screen (out past the section's side padding), and
+   * never less than 58% of the screen. Its own pale sky reaches up behind the
+   * last lines of words, so Mahadev's crown (0.262 of its width down) sits
+   * 16px under them. It is always taller than that box, so it is cropped —
+   * from the bottom, which keeps the crown and crescent in view; the blessing
+   * panel covers the foot anyway. Only its top edge fades, into the sky.
+   */
+  .std-painting {
+    left: calc(var(--gutter) * -1);
+    right: calc(var(--gutter) * -1);
+    height: max(58vh, 100% + 26.2vw - 16px);
+    height: max(58svh, 100% + 26.2vw - 16px);
+    /* so the moon can be placed in the painting's own width (cqw) */
+    container-type: inline-size;
+    -webkit-mask-image: linear-gradient(transparent, #000 22%);
+    mask-image: linear-gradient(transparent, #000 22%);
+  }
+  .std-painting > img:first-child {
+    object-position: center top;
   }
 
   /* The crescent moon in Mahadev's hair (at 24.5%, 0.428 W of the painting), softly aglow. */
   .std-moon {
     position: absolute;
     left: 24.5%;
-    top: calc(var(--std-paint-w) * 0.428);
-    width: calc(var(--std-paint-w) * 0.3);
+    top: 42.8cqw;
+    width: 30cqw;
     aspect-ratio: 1;
     translate: -50% -50%;
     border-radius: 9999px;
@@ -338,22 +347,26 @@
     }
   }
 
-  /* Light clouds over the peaks (they part on scroll — see Invitation). */
+  /* Light clouds over the peaks (they part on scroll — see Invitation): faint, and soft on every side,
+     so no edge shows. */
   .std-cloud {
     position: absolute;
     z-index: 1;
     height: auto;
+    opacity: 0.3;
     pointer-events: none;
     user-select: none;
     will-change: transform;
+    -webkit-mask-image: radial-gradient(closest-side, #000 35%, transparent);
+    mask-image: radial-gradient(closest-side, #000 35%, transparent);
   }
 
-  /* Under the blessing at the foot of the painting: a soft dark-navy veil, so the words read. */
+  /* The panel at the foot: dark navy rising to clear, so the blessing and the way on read. */
   .std-foot {
-    background: linear-gradient(rgb(10 25 50 / 0), rgb(10 25 50 / 0.65));
+    background: linear-gradient(to top, rgb(8 24 52 / 0.88), rgb(8 24 52 / 0));
   }
   .std-foot p {
-    text-shadow: 0 1px 10px rgb(10 25 50 / 0.55);
+    text-shadow: 0 1px 8px rgb(0 0 0 / 0.5);
   }
 
   /* The double arrow under "View the Invitation": a gentle bob. */
@@ -381,31 +394,84 @@
       opacity: 0.8;
     }
   }
-  /* The painting and the veil over its foot: narrower than the screen, so their sides melt into
-     the sky; the painting's top fades into the sky too, and its foot meets the bottom edge. */
-  .std-painting,
-  .std-foot {
-    --std-sides: linear-gradient(to right, transparent, #000 9%, #000 91%, transparent);
-  }
-  .std-painting {
-    /* only its top fades (into the sky); its foot meets the bottom edge of the screen */
-    --std-fade: linear-gradient(transparent, #000 var(--std-fade-top));
-    -webkit-mask-image: var(--std-fade), var(--std-sides);
-    -webkit-mask-composite: source-in;
-    mask-image: var(--std-fade), var(--std-sides);
-    mask-composite: intersect;
-  }
-  .std-foot {
-    -webkit-mask-image: var(--std-sides);
-    mask-image: var(--std-sides);
-  }
-
   /* ── Section 02: the arch at the top, the scene at the foot, the sky between (one screen at least) ── */
   .couple-scene {
     min-height: 100vh;
     min-height: 100svh;
+    /* the arch starts 56px below the status bar, so the two never meet */
+    --couple-top: calc(var(--status-bar) + 56px);
+    padding-top: var(--couple-top);
     /* so the pieces below can be measured in the section's own width (cqw) */
     container-type: inline-size;
+  }
+  .couple-arch {
+    top: var(--couple-top);
+  }
+  /* The three temple bells sway gently from their chains (±2°, 4s), each a little out of step. */
+  .couple-bell {
+    position: absolute;
+    height: auto;
+    transform-origin: 50% 0;
+    animation: bell-sway 4s ease-in-out infinite;
+  }
+  @keyframes bell-sway {
+    0%,
+    100% {
+      transform: rotate(-2deg);
+    }
+    50% {
+      transform: rotate(2deg);
+    }
+  }
+  /* a fine gold line, 60px wide, between the names and the hashtag, and the date and the venue */
+  .couple-rule {
+    display: block;
+    width: 60px;
+    height: 1px;
+    background: rgb(var(--gold-ink) / 0.7);
+  }
+  /* "Copied", just above the hashtag for a moment after a tap */
+  .couple-toast {
+    position: absolute;
+    bottom: calc(100% + 4px);
+    left: 50%;
+    translate: -50% 4px;
+    padding: 3px 12px;
+    border-radius: 9999px;
+    background: rgb(var(--navy));
+    color: rgb(var(--ivory));
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    text-shadow: none;
+    pointer-events: none;
+    opacity: 0;
+    transition:
+      opacity 200ms ease-out,
+      translate 200ms ease-out;
+  }
+  .couple-toast:empty {
+    padding: 0;
+  }
+  .couple-toast[data-shown] {
+    opacity: 1;
+    translate: -50% 0;
+  }
+  /* The panel at the foot: dark navy rising to clear, with "View the Invitation" on it. */
+  .couple-foot {
+    padding-top: 40px;
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
+    background: linear-gradient(to top, rgb(8 24 52 / 0.85), rgb(8 24 52 / 0));
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .couple-bell {
+      animation: none;
+    }
+    .couple-toast {
+      transition: none;
+    }
   }
   /* The welcome: it starts about 12% down — never above the bells, which hang to ~22% of the width.
      Every line carries a soft white glow, so it reads over the clouds too. */
@@ -428,10 +494,14 @@
       margin-top: calc(40px - 35.1cqw);
     }
   }
-  /* the floor melts into the sky of the next section instead of ending on a hard edge */
-  .couple-scene-foot {
-    -webkit-mask-image: linear-gradient(#000 90%, transparent);
-    mask-image: linear-gradient(#000 90%, transparent);
+  /* The scene sits 40px up, so the Shivling's base and the lotuses clear "View the Invitation";
+     below it the marble floor carries on, reflected, under the panel. */
+  .couple-floor {
+    height: 40px;
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    background-size: 100% auto;
+    transform: scaleY(-1);
   }
 
   /* ── The gate: the ॐ seal and "Touch to begin", before the opening (every time) ──

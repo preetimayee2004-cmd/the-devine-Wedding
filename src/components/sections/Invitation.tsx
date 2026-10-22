@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { wedding } from "@/config/wedding";
 import { REDUCED_MOTION_QUERY } from "@/hooks/useMediaQuery";
+import { useLang } from "@/lib/lang";
 import { directionsUrl } from "@/lib/maps";
 import { EASE, MOTION } from "@/lib/motion";
 import { glideTo, USER_INPUT_EVENTS } from "@/lib/scroll";
@@ -8,7 +9,9 @@ import { readSessionFlag, writeSessionFlag } from "@/lib/session";
 import { formatVenueDate, parseVenueDateTime } from "@/lib/venueTime";
 import { Icon } from "@/components/art/Icons";
 import { GoldMotes } from "@/components/ui/GoldMotes";
+import { LangToggle } from "@/components/ui/LangToggle";
 import { MusicToggle } from "@/components/ui/MusicToggle";
+import { OnwardLink } from "@/components/ui/OnwardLink";
 import { OpeningGate } from "@/components/ui/OpeningGate";
 import { PetalShower } from "@/components/ui/PetalShower";
 
@@ -67,16 +70,6 @@ function pickMode(): Mode {
 }
 
 const MAX_ART_WAIT = 3500;
-
-type Lang = "en" | "hi";
-const LANG_KEY = "dw:lang";
-function readLang(): Lang {
-  try {
-    return window.localStorage.getItem(LANG_KEY) === "hi" ? "hi" : "en";
-  } catch {
-    return "en";
-  }
-}
 
 export function Invitation() {
   const [mode] = useState<Mode>(pickMode);
@@ -168,16 +161,7 @@ export function Invitation() {
   }, [done, still]);
 
   // ── the card's language: English or Hindi, remembered on this phone ──
-  const [lang, setLang] = useState<Lang>(readLang);
-  const chooseLang = (next: Lang) => {
-    setLang(next);
-    try {
-      window.localStorage.setItem(LANG_KEY, next);
-    } catch {
-      // private mode: the choice simply isn't remembered
-    }
-  };
-  const hindi = lang === "hi";
+  const hindi = useLang() === "hi";
 
   const date = useMemo(() => {
     const parts = parseVenueDateTime(wedding.wedding.dateTime);
@@ -217,14 +201,6 @@ export function Invitation() {
       cancelAnimationFrame(frame);
     };
   }, [done, still]);
-
-  // "View the Invitation": on to the next section (smoothly, via scroll-behavior on <html>)
-  const viewInvitation = (e: MouseEvent) => {
-    const next = document.getElementById("couple");
-    if (!next) return;
-    e.preventDefault(); // no #couple left in the address, so a reload still starts at the opening
-    next.scrollIntoView();
-  };
 
   // ── styles for each beat ──
   // the card rises in piece by piece, top to bottom (opacity and transform only, so nothing shifts);
@@ -286,7 +262,7 @@ export function Invitation() {
       lang={hindi ? "hi" : undefined}
       aria-labelledby="invitation-names"
       className="save-the-date relative flex flex-col items-center overflow-x-clip px-[var(--gutter)] text-center"
-      style={{ paddingTop: "calc(var(--status-bar) + var(--std-top))" }}
+      style={{ paddingTop: "max(var(--std-top), calc(var(--status-bar) + 24px))" }}
     >
       {/* light gathered behind the words, so they read clearly on the bright upper sky */}
       <div
@@ -300,29 +276,14 @@ export function Invitation() {
       />
 
       {/* EN / हिं — the card in English or Hindi */}
-      <div
-        role="group"
-        aria-label="Language"
-        className="absolute left-4 z-[3] flex rounded-full border border-gold/70 bg-ivory/80 p-0.5 shadow-[0_4px_14px_-6px_rgb(var(--navy)/0.3)] backdrop-blur-sm transition-opacity duration-500"
+      <LangToggle
+        className="absolute left-4 transition-opacity duration-500"
         style={{ top: "calc(var(--status-bar) + 12px)", opacity: card ? 1 : 0, pointerEvents: card ? undefined : "none" }}
-      >
-        {(["en", "hi"] as const).map((code) => (
-          <button
-            key={code}
-            type="button"
-            onClick={() => chooseLang(code)}
-            aria-pressed={lang === code}
-            lang={code === "hi" ? "hi" : "en"}
-            className={`flex h-8 min-w-8 items-center justify-center rounded-full px-2 text-[14px] font-semibold transition-colors duration-300 ${code === "hi" ? "font-deva" : "font-display"} ${lang === code ? "bg-navy text-ivory" : "text-navy"}`}
-          >
-            {code === "hi" ? "हिं" : "EN"}
-          </button>
-        ))}
-      </div>
+      />
 
-      {/* ── the card's words, layered above the painting: names first, then the date, then the place ── */}
+      {/* ── the card's words, above the painting: names first, then the date, then the place ── */}
       <div
-        className="relative z-[2] flex w-full flex-col items-center"
+        className="std-words relative z-[2] flex w-full flex-col items-center"
         style={{ pointerEvents: card ? undefined : "none" }}
       >
         <p
@@ -334,17 +295,17 @@ export function Invitation() {
         {/* the names, one above the other — never cut or pushed off the screen, however long */}
         <h1
           id="invitation-names"
-          className={`relative mt-[var(--std-gap)] flex w-full flex-col items-center text-[length:var(--std-names)] font-semibold leading-[1.1] text-navy [overflow-wrap:anywhere] ${hindi ? "font-deva" : "font-display italic"}`}
+          className={`relative mt-[var(--std-gap)] flex w-full flex-col items-center text-[length:var(--std-names)] font-semibold leading-[1.05] text-navy [overflow-wrap:anywhere] ${hindi ? "font-deva" : "font-display italic"}`}
           style={rise(1)}
         >
           <span className="block max-w-full">{t.bride}</span>
-          <span className="block font-display text-[0.55em] font-medium not-italic leading-[1.1] text-gold-ink">
+          <span className="block font-display text-[0.55em] font-medium not-italic leading-[1.05] text-gold-ink">
             &amp;
           </span>
           <span className="block max-w-full">{t.groom}</span>
         </h1>
         <p
-          className={`relative mt-[var(--std-gap-sm)] max-w-[19rem] text-balance text-[15px] font-medium leading-snug text-navy/90 ${serif} ${hindi ? "" : "italic"}`}
+          className={`relative mt-[var(--std-gap)] max-w-[19rem] text-balance text-[15px] font-medium leading-snug text-slate ${serif} ${hindi ? "" : "italic"}`}
           style={rise(2)}
         >
           {t.request}
@@ -353,28 +314,24 @@ export function Invitation() {
         {/* the date on one line: month | day | year */}
         {date && (
           <p
-            className={`relative mt-[var(--std-gap-lg)] flex items-center justify-center gap-3.5 ${serif}`}
+            className={`relative mt-[var(--std-gap)] flex items-center justify-center gap-3.5 font-semibold text-navy ${serif}`}
             style={rise(3)}
           >
-            <span className={`text-[14px] font-semibold text-gold-ink ${hindi ? "" : "uppercase tracking-[0.24em]"}`}>
-              {date.month}
-            </span>
+            <span className={`text-[15px] ${hindi ? "" : "uppercase tracking-[0.24em]"}`}>{date.month}</span>
             <span aria-hidden className="h-7 w-px bg-gold" />
-            <span className="font-display text-[length:var(--std-day)] font-semibold leading-none text-navy">
-              {date.day}
-            </span>
+            <span className="font-display text-[24px] leading-none">{date.day}</span>
             <span aria-hidden className="h-7 w-px bg-gold" />
-            <span className="font-display text-[14px] font-semibold tracking-[0.24em] text-gold-ink">{date.year}</span>
+            <span className="font-display text-[15px] tracking-[0.24em]">{date.year}</span>
           </p>
         )}
 
-        {/* the venue: tap for directions */}
+        {/* the venue: tap for directions (the tap area is taller than the line, so its top margin is less) */}
         {t.venue && (
           <a
             href={directionsUrl(venue)}
             target="_blank"
             rel="noopener noreferrer"
-            className={`group relative mt-[var(--std-gap-sm)] inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-3 text-[16px] font-semibold text-navy transition-colors duration-300 hover:bg-ivory/60 ${serif}`}
+            className={`group relative mt-[calc(var(--std-gap)-10px)] inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-3 text-[15px] font-semibold text-navy transition-colors duration-300 hover:bg-ivory/60 ${serif}`}
             style={rise(4)}
           >
             <Icon name="pin" className="h-[18px] w-[18px] shrink-0 text-gold-ink" />
@@ -386,82 +343,55 @@ export function Invitation() {
         )}
       </div>
 
-      {/* ── Mahadev blessing Maa Parvati before the Himalaya. This block takes the rest of the screen;
-          the painting starts just below the words, its pale sky melting into ours behind them, and
-          runs to the very foot of the screen. ── */}
-      <div className="relative mt-[var(--std-gap)] min-h-0 w-full flex-1" style={rise(6, 28, 1300)}>
-        <div
-          className="std-painting absolute bottom-0 w-[var(--std-paint-w)]"
-          style={{ left: "calc(50% - var(--std-paint-w) / 2)", height: "calc(100% + var(--std-rise))" }}
-        >
+      {/* ── Mahadev blessing Maa Parvati before the Himalaya: edge to edge across the foot of the screen,
+          from just under the words (and at least 58% of the screen), its top melting into the sky ── */}
+      <div className="relative min-h-0 w-full flex-1">
+        <div className="std-painting absolute bottom-0" style={rise(6, 28, 1300)}>
           <img
             src={assets.saveTheDateArt}
             alt="Mahadev gently blessing Maa Parvati, before the snowy Himalaya and a lotus lake"
             width={assets.saveTheDateArtSize.width}
             height={assets.saveTheDateArtSize.height}
-            className="block h-full w-full object-cover object-top"
+            className="block h-full w-full object-cover"
             draggable={false}
           />
           {/* the crescent moon in Mahadev's hair, softly aglow */}
           <span aria-hidden className="std-moon" />
+          {/* light clouds drifting over the peaks; they part as the guest scrolls */}
+          <img
+            ref={cloudLeft}
+            src={assets.clouds}
+            alt=""
+            aria-hidden
+            className="std-cloud left-[-22%] top-[3%] w-[70%]"
+            draggable={false}
+          />
+          <img
+            ref={cloudRight}
+            src={assets.clouds}
+            alt=""
+            aria-hidden
+            className="std-cloud right-[-22%] top-[9%] w-[60%]"
+            style={{ scale: "-1 1" }}
+            draggable={false}
+          />
         </div>
-        {/* light clouds drifting over the peaks; they part as the guest scrolls */}
-        <img
-          ref={cloudLeft}
-          src={assets.clouds}
-          alt=""
-          aria-hidden
-          className="std-cloud left-[-24%] w-[66%] opacity-50"
-          style={{ top: "calc(var(--std-rise) * -1 - var(--std-paint-w) * 0.07)" }}
-          draggable={false}
-        />
-        <img
-          ref={cloudRight}
-          src={assets.clouds}
-          alt=""
-          aria-hidden
-          className="std-cloud right-[-22%] w-[56%] opacity-40"
-          style={{ top: "calc(var(--std-rise) * -1 + var(--std-paint-w) * 0.03)", scale: "-1 1" }}
-          draggable={false}
-        />
       </div>
 
-      {/* ── over the painting's lower edge, on a soft dark-navy gradient: the blessing, and the way on ── */}
+      {/* ── at the foot, on a dark-navy panel over the painting: the blessing, and the way on ── */}
       <div
-        className="std-foot pointer-events-none absolute bottom-0 z-[2] flex w-[var(--std-paint-w)] flex-col items-center px-4 pb-[calc(env(safe-area-inset-bottom,0px)+12px)] pt-16"
-        style={{ left: "calc(50% - var(--std-paint-w) / 2)", ...rise(7, 12) }}
+        className="std-foot pointer-events-none absolute inset-x-0 bottom-0 z-[2] flex flex-col items-center px-6 pb-[calc(env(safe-area-inset-bottom,0px)+18px)] pt-12"
+        style={rise(7, 12)}
       >
-        <p
-          className={`max-w-[20rem] text-balance text-[15px] font-medium leading-snug text-ivory ${serif} ${hindi ? "" : "italic"}`}
-        >
+        <p className={`max-w-[21rem] text-balance text-[15px] leading-snug text-white ${serif} ${hindi ? "" : "italic"}`}>
           {t.blessing}
         </p>
-        <a
-          href="#couple"
-          onClick={viewInvitation}
-          className="pointer-events-auto mt-1.5 flex min-h-[44px] flex-col items-center justify-center px-4 pt-1 text-white"
-          style={{ pointerEvents: card ? undefined : "none" }}
-        >
-          <span
-            className={`text-[13px] font-semibold ${hindi ? "font-deva" : "font-display uppercase tracking-[0.28em]"}`}
-          >
-            {t.viewInvitation}
-          </span>
-          <svg
-            width="22"
-            height="22"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.6"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="std-arrows mt-0.5"
-            aria-hidden
-          >
-            <path d="M7 6.5l5 5 5-5M7 12.5l5 5 5-5" />
-          </svg>
-        </a>
+        <OnwardLink
+          to="couple"
+          label={t.viewInvitation}
+          devanagari={hindi}
+          style={{ marginTop: 8, pointerEvents: card ? undefined : "none" }}
+        />
       </div>
 
       {/* before it all, on a first visit: "Touch to begin" */}
