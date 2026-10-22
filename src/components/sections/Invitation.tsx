@@ -40,10 +40,6 @@ import { PetalShower } from "@/components/ui/PetalShower";
  */
 
 const SEEN_KEY = "dw:opening-seen";
-/** "Touch to begin" shows once per visit (and always with ?opening=full). */
-const GATE_KEY = "dw:gate-seen";
-const showGateFirst = () =>
-  !readSessionFlag(GATE_KEY) || new URLSearchParams(window.location.search).get("opening") === "full";
 
 /** The beats, in order, and when each begins (ms, full version). */
 const BEATS = { arrive: 0, meet: 3900, release: 5200, reveal: 6000, done: 8100 } as const;
@@ -95,8 +91,8 @@ export function Invitation() {
   const pace = mode === "short" ? 0.6 : 1;
   const reached = (b: Beat) => beat >= ORDER.indexOf(b);
 
-  // ── the gate: "Touch to begin" comes first; its tap starts the opening ──
-  const [gate, setGate] = useState<"show" | "leaving" | "gone">(() => (showGateFirst() ? "show" : "gone"));
+  // ── the gate: the ॐ seal and "Touch to begin" come first, every time the link opens; its tap starts the opening ──
+  const [gate, setGate] = useState<"show" | "leaving" | "gone">("show");
   const started = gate !== "show";
 
   // ── the timeline ──
@@ -170,6 +166,18 @@ export function Invitation() {
       USER_INPUT_EVENTS.forEach((type) => window.removeEventListener(type, onInput));
     };
   }, [done, still]);
+
+  // The next section tucks up under this card's foot; until the card is in place (gate, hands)
+  // it stays hidden, so no strip of it shows at the bottom of the opening.
+  const cardShown = reached("reveal");
+  useEffect(() => {
+    const html = document.documentElement;
+    if (cardShown) delete html.dataset.opening;
+    else html.dataset.opening = "";
+    return () => {
+      delete html.dataset.opening;
+    };
+  }, [cardShown]);
 
   // ── the card's language: English or Hindi, remembered on this phone ──
   const [lang, setLang] = useState<Lang>(readLang);
@@ -432,7 +440,7 @@ export function Invitation() {
 
       {/* ── over the painting's lower edge, on a soft dark-navy gradient: the blessing, and the way on ── */}
       <div
-        className="std-foot pointer-events-none absolute bottom-0 z-[2] flex w-[var(--std-paint-w)] flex-col items-center px-4 pb-[calc(env(safe-area-inset-bottom,0px)+12px)] pt-16"
+        className="std-foot pointer-events-none absolute bottom-0 z-[2] flex w-[var(--std-paint-w)] flex-col items-center px-4 pb-[calc(env(safe-area-inset-bottom,0px)+var(--std-blend)-8px)] pt-16"
         style={{ left: "calc(50% - var(--std-paint-w) / 2)", ...rise(7, 12) }}
       >
         <p
@@ -471,15 +479,12 @@ export function Invitation() {
       {/* before it all, on a first visit: "Touch to begin" */}
       {gate !== "gone" && (
         <OpeningGate
+          seal={assets.omSeal}
           label={t.touchToBegin}
           devanagari={hindi}
           reduced={still}
-          onBegin={() => {
-            writeSessionFlag(GATE_KEY);
-            setGate("leaving");
-          }}
+          onBegin={() => setGate("leaving")}
           onSkip={() => {
-            writeSessionFlag(GATE_KEY);
             skip();
             setGate("leaving");
           }}

@@ -375,6 +375,8 @@ export const wedding = {
     divineCouple: "/art/shiva-parvati-seated.webp",
     /** Soft-edged bloom used for every watercolour reveal. */
     watercolorMask: "/art/watercolor-mask.png",
+    /** The golden ॐ wax seal on the gate before the opening ("Touch to begin"). */
+    omSeal: "/art/om-seal.webp",
     /**
      * Section 02, made from one painting (its text and sky taken out, so the site's sky shows
      * through): the carved arch with bells and jasmine strings across the top (1220 × 600), and

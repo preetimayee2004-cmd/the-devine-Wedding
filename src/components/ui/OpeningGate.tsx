@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 
 interface OpeningGateProps {
+  /** The golden ॐ wax seal at its centre. */
+  seal: string;
   /** "Touch to begin", in the card's language. */
   label: string;
   /** The label is in Hindi (set in Devanagari, without letter-spacing, which would break its joins). */
@@ -20,13 +22,14 @@ const FADE_START_MS = 300;
 const REDUCED_FADE_MS = 300;
 
 /**
- * Before the opening, on a guest's first visit: a soft sky, a golden ॐ that
- * breathes, and "Touch to begin". A tap anywhere sends a golden ripple out
- * from the ॐ, the ॐ swells and fades, the phone gives a tiny buzz, and the
- * gate melts away as the hands begin. Skip goes straight to the card.
- * Only transform and opacity move; reduced motion gets a plain fade.
+ * Before the opening, every time the link opens: a soft sky, a golden ॐ wax
+ * seal that breathes, a little hand tapping it, and "Touch to begin". A tap
+ * anywhere sends a golden ripple out from the seal, the seal swells and
+ * fades, the phone gives a tiny buzz, and the gate melts away as the hands
+ * begin. Skip goes straight to the card. Only transform and opacity move;
+ * reduced motion gets a plain fade.
  */
-export function OpeningGate({ label, devanagari = false, reduced, onBegin, onSkip, onGone }: OpeningGateProps) {
+export function OpeningGate({ seal, label, devanagari = false, reduced, onBegin, onSkip, onGone }: OpeningGateProps) {
   const [phase, setPhase] = useState<"waiting" | "opening" | "leaving">("waiting");
   const timers = useRef<number[]>([]);
   const root = useRef<HTMLDivElement>(null);
@@ -91,15 +94,35 @@ export function OpeningGate({ label, devanagari = false, reduced, onBegin, onSki
       }}
     >
       <div className="relative flex items-center justify-center">
-        {/* the golden ripple that spreads out from the ॐ on the tap */}
+        {/* the golden ripple that spreads out from the seal on the tap */}
         {!reduced && <span aria-hidden className="gate-ripple" data-go={tapped || undefined} />}
-        {/* soft light behind the ॐ, breathing */}
+        {/* soft light behind the seal, breathing */}
         <span aria-hidden className="gate-glow" data-still={reduced || undefined} data-go={tapped || undefined} />
         {/* the outer layer swells and fades on the tap; the inner one breathes */}
-        <span aria-hidden className="gate-om-go" data-go={tapped || undefined}>
-          <span lang="sa" className="gate-om font-deva" data-still={reduced || undefined}>
-            ॐ
-          </span>
+        <span aria-hidden className="gate-seal-go" data-go={tapped || undefined}>
+          <img src={seal} alt="" draggable={false} className="gate-seal" data-still={reduced || undefined} />
+        </span>
+        {/* a little hand tapping the seal: "touch here" (its fingertip sits at this point) */}
+        <span aria-hidden className="gate-hand-at" data-go={tapped || undefined}>
+          {!reduced && <span className="gate-tap-ring" />}
+          <svg
+            className="gate-hand"
+            data-still={reduced || undefined}
+            width="52"
+            height="64"
+            viewBox="0 0 44 54"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinejoin="round"
+            strokeLinecap="round"
+          >
+            <path
+              fill="#FFF9EF"
+              d="M17 6.5a3.5 3.5 0 0 1 7 0V21a3.2 3.2 0 0 1 6 1.4a3.2 3.2 0 0 1 5.6 2a3 3 0 0 1 4.4 2.6V36c0 7-5.6 12.6-12.6 12.6h-3c-3.6 0-7-1.7-9.2-4.6l-7.6-10.2a3.2 3.2 0 0 1 5-4L17 31Z"
+            />
+            <path d="M24 21v7M30 22.4v6.6M35.6 24.4v6" />
+          </svg>
         </span>
       </div>
       <p
