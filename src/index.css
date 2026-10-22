@@ -279,17 +279,17 @@
     --std-gap-sm: clamp(2px, 0.6vh, 8px);
     --std-gap-lg: clamp(10px, 3.6vh - 11px, 30px);
     /* hierarchy: the names lead, then the date, then the place; the title is a quiet script heading */
-    --std-names: clamp(36px, 10.8vw, 46px);
+    --std-names: clamp(30px, 9vw, 40px);
     --std-title: clamp(32px, 3vh + 14px, 40px);
     --std-title-deva: clamp(28px, 2.4vh + 12px, 34px);
     --std-day: clamp(30px, 2.4vh + 14px, 36px);
     /*
-     * The painting (Mahadev blessing Maa Parvati, 572 × 1024) spans the screen,
-     * up to 600px. Measured in its width W: a pale sky band runs to about
-     * 0.22 W, the peaks and Mahadev's crown begin about 0.26 W down, and both
-     * faces sit within the first 1.0 W.
+     * The painting (Mahadev blessing Maa Parvati, 572 × 1024): 86% of the
+     * screen's width, centred, up to 520px. Measured in its width W: a pale sky
+     * band runs to about 0.22 W, the peaks and Mahadev's crown begin about
+     * 0.26 W down, and both faces sit within the first 1.0 W.
      */
-    --std-paint-w: min(100vw, 600px);
+    --std-paint-w: min(86vw, 520px);
     /* it reaches up behind the last lines of text, so only its sky band is behind them */
     --std-rise: calc(var(--std-paint-w) * 0.25);
     /* its sky melts into the site's sky */
@@ -381,20 +381,140 @@
       opacity: 0.8;
     }
   }
-  .std-painting {
-    /* only its top fades (into the sky); its foot meets the bottom edge of the screen */
-    --std-fade: linear-gradient(transparent, #000 var(--std-fade-top));
-    -webkit-mask-image: var(--std-fade);
-    mask-image: var(--std-fade);
+  /* The painting and the veil over its foot: narrower than the screen, so their sides melt into
+     the sky; the painting's top fades into the sky too, and its foot meets the bottom edge. */
+  .std-painting,
+  .std-foot {
+    --std-sides: linear-gradient(to right, transparent, #000 9%, #000 91%, transparent);
   }
-  /* wider than the painting (tablets): its sides melt into the sky too */
-  @media (min-width: 601px) {
-    .std-painting {
-      -webkit-mask-image: var(--std-fade), linear-gradient(to right, transparent, #000 14%, #000 86%, transparent);
-      -webkit-mask-composite: source-in;
-      mask-image: var(--std-fade), linear-gradient(to right, transparent, #000 14%, #000 86%, transparent);
-      mask-composite: intersect;
+  .std-painting {
+    --std-fade: linear-gradient(transparent, #000 var(--std-fade-top));
+    -webkit-mask-image: var(--std-fade), var(--std-sides);
+    -webkit-mask-composite: source-in;
+    mask-image: var(--std-fade), var(--std-sides);
+    mask-composite: intersect;
+  }
+  .std-foot {
+    -webkit-mask-image: var(--std-sides);
+    mask-image: var(--std-sides);
+  }
+
+  /* ── The gate: "Touch to begin", before the opening (first visit only) ──
+     Only transform and opacity move. */
+  .gate {
+    background: linear-gradient(#bfe6ff, #eaf7ff);
+  }
+  .gate-om-go {
+    position: relative;
+    z-index: 1;
+    display: block;
+    transition:
+      transform 500ms cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 500ms ease-out;
+  }
+  .gate-om-go[data-go] {
+    transform: scale(1.18);
+    opacity: 0;
+  }
+  .gate-om {
+    display: block;
+    font-size: 132px;
+    line-height: 1;
+    background: linear-gradient(165deg, #e8c97a 0%, #c9a24b 55%, #e8c97a 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: om-breathe 2.4s ease-in-out infinite;
+  }
+  @keyframes om-breathe {
+    0%,
+    100% {
+      transform: scale(1);
     }
+    50% {
+      transform: scale(1.04);
+    }
+  }
+  .gate-glow {
+    position: absolute;
+    width: 240px;
+    height: 240px;
+    border-radius: 9999px;
+    background: radial-gradient(
+      circle,
+      rgb(232 201 122 / 0.55) 0%,
+      rgb(232 201 122 / 0.2) 42%,
+      rgb(232 201 122 / 0) 70%
+    );
+    animation: om-glow 2.4s ease-in-out infinite;
+  }
+  @keyframes om-glow {
+    0%,
+    100% {
+      opacity: 0.45;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+  .gate-glow[data-go] {
+    animation: none;
+    opacity: 0;
+    transition: opacity 400ms ease-out;
+  }
+  .gate-ripple {
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    border-radius: 9999px;
+    border: 1.5px solid #e8c97a;
+    box-shadow:
+      0 0 16px rgb(232 201 122 / 0.6),
+      inset 0 0 10px rgb(232 201 122 / 0.4);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .gate-ripple[data-go] {
+    animation: gate-ripple 700ms ease-out forwards;
+  }
+  @keyframes gate-ripple {
+    from {
+      opacity: 0.95;
+      transform: scale(0.6);
+    }
+    to {
+      opacity: 0;
+      transform: scale(10);
+    }
+  }
+  .gate-hint {
+    animation: gate-hint 2.4s ease-in-out infinite;
+  }
+  @keyframes gate-hint {
+    0%,
+    100% {
+      opacity: 0.35;
+    }
+    50% {
+      opacity: 0.6;
+    }
+  }
+  .gate-hint[data-go] {
+    animation: none;
+    opacity: 0;
+    transition: opacity 300ms ease-out;
+  }
+  /* reduced motion: no breathing, no ripple — just the plain fade */
+  .gate-om[data-still],
+  .gate-glow[data-still],
+  .gate-hint[data-still] {
+    animation: none;
+  }
+  .gate-glow[data-still] {
+    opacity: 0.8;
+  }
+  .gate-hint[data-still] {
+    opacity: 0.6;
   }
 
   /* ── Opening ── */

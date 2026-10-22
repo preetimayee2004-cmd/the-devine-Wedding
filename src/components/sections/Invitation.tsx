@@ -9,6 +9,7 @@ import { formatVenueDate, parseVenueDateTime } from "@/lib/venueTime";
 import { Icon } from "@/components/art/Icons";
 import { GoldMotes } from "@/components/ui/GoldMotes";
 import { MusicToggle } from "@/components/ui/MusicToggle";
+import { OpeningGate } from "@/components/ui/OpeningGate";
 import { PetalShower } from "@/components/ui/PetalShower";
 
 /**
@@ -39,6 +40,10 @@ import { PetalShower } from "@/components/ui/PetalShower";
  */
 
 const SEEN_KEY = "dw:opening-seen";
+/** "Touch to begin" shows once per visit (and always with ?opening=full). */
+const GATE_KEY = "dw:gate-seen";
+const showGateFirst = () =>
+  !readSessionFlag(GATE_KEY) || new URLSearchParams(window.location.search).get("opening") === "full";
 
 /** The beats, in order, and when each begins (ms, full version). */
 const BEATS = { arrive: 0, meet: 3900, release: 5200, reveal: 6000, done: 8100 } as const;
@@ -90,8 +95,13 @@ export function Invitation() {
   const pace = mode === "short" ? 0.6 : 1;
   const reached = (b: Beat) => beat >= ORDER.indexOf(b);
 
+  // ── the gate: "Touch to begin" comes first; its tap starts the opening ──
+  const [gate, setGate] = useState<"show" | "leaving" | "gone">(() => (showGateFirst() ? "show" : "gone"));
+  const started = gate !== "show";
+
   // ── the timeline ──
   useEffect(() => {
+    if (!started) return;
     let cancelled = false;
     const timers: number[] = [];
     (async () => {
@@ -118,7 +128,7 @@ export function Invitation() {
       cancelled = true;
       timers.forEach(clearTimeout);
     };
-  }, [mode, pace]);
+  }, [mode, pace, started]);
 
   const skip = () => {
     setSkipped(true);
@@ -325,14 +335,17 @@ export function Invitation() {
         >
           {t.title}
         </p>
+        {/* the names, one above the other — never cut or pushed off the screen, however long */}
         <h1
           id="invitation-names"
-          className={`relative mt-[var(--std-gap)] text-[length:var(--std-names)] font-semibold leading-tight text-navy ${hindi ? "font-deva" : "font-display italic"}`}
+          className={`relative mt-[var(--std-gap)] flex w-full flex-col items-center text-[length:var(--std-names)] font-semibold leading-[1.1] text-navy [overflow-wrap:anywhere] ${hindi ? "font-deva" : "font-display italic"}`}
           style={rise(1)}
         >
-          <span className="text-balance">
-            {t.bride} <span className="font-display font-medium text-gold-ink">&amp;</span> {t.groom}
+          <span className="block max-w-full">{t.bride}</span>
+          <span className="block font-display text-[0.55em] font-medium not-italic leading-[1.1] text-gold-ink">
+            &amp;
           </span>
+          <span className="block max-w-full">{t.groom}</span>
         </h1>
         <p
           className={`relative mt-[var(--std-gap-sm)] max-w-[19rem] text-balance text-[15px] font-medium leading-snug text-navy/90 ${serif} ${hindi ? "" : "italic"}`}
@@ -419,8 +432,8 @@ export function Invitation() {
 
       {/* ── over the painting's lower edge, on a soft dark-navy gradient: the blessing, and the way on ── */}
       <div
-        className="std-foot pointer-events-none absolute inset-x-0 bottom-0 z-[2] flex flex-col items-center px-[var(--gutter)] pb-[calc(env(safe-area-inset-bottom,0px)+12px)] pt-16"
-        style={rise(7, 12)}
+        className="std-foot pointer-events-none absolute bottom-0 z-[2] flex w-[var(--std-paint-w)] flex-col items-center px-4 pb-[calc(env(safe-area-inset-bottom,0px)+12px)] pt-16"
+        style={{ left: "calc(50% - var(--std-paint-w) / 2)", ...rise(7, 12) }}
       >
         <p
           className={`max-w-[20rem] text-balance text-[15px] font-medium leading-snug text-ivory ${serif} ${hindi ? "" : "italic"}`}
@@ -454,6 +467,25 @@ export function Invitation() {
           </svg>
         </a>
       </div>
+
+      {/* before it all, on a first visit: "Touch to begin" */}
+      {gate !== "gone" && (
+        <OpeningGate
+          label={t.touchToBegin}
+          devanagari={hindi}
+          reduced={still}
+          onBegin={() => {
+            writeSessionFlag(GATE_KEY);
+            setGate("leaving");
+          }}
+          onSkip={() => {
+            writeSessionFlag(GATE_KEY);
+            skip();
+            setGate("leaving");
+          }}
+          onGone={() => setGate("gone")}
+        />
+      )}
 
       {/* soft temple bells, off until tapped — in the corner once the opening is over */}
       <MusicToggle visible={!locked} />
