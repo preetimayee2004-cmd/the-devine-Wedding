@@ -407,22 +407,15 @@
     /* so the pieces below can be measured in the section's own width (cqw) */
     container-type: inline-size;
   }
-  /* The welcome: it starts just below the bells (about 13% down, never above the bells,
-     which hang to ~22% of the width); short screens get slightly smaller type and gaps. */
+  /* The welcome: it starts about 12% down — never above the bells, which hang to ~22% of the width.
+     Every line carries a soft white glow, so it reads over the clouds too. */
   .couple-welcome {
-    --cw-welcome: clamp(24px, 3.4vh, 28px);
-    --cw-dear: clamp(18px, 2.6vh, 21px);
-    --cw-gap: clamp(4px, 1vh, 10px);
-    --cw-gap-lg: clamp(8px, 1.8vh, 18px);
-    padding-top: max(13vh, calc(22vw + 18px));
+    padding-top: max(12vh, calc(22vw + 18px));
+    text-shadow: 0 0 10px rgb(255 255 255 / 0.55);
   }
   @supports (height: 1svh) {
     .couple-welcome {
-      --cw-welcome: clamp(24px, 3.4svh, 28px);
-      --cw-dear: clamp(18px, 2.6svh, 21px);
-      --cw-gap: clamp(4px, 1svh, 10px);
-      --cw-gap-lg: clamp(8px, 1.8svh, 18px);
-      padding-top: max(13svh, calc(22cqw + 18px));
+      padding-top: max(12svh, calc(22cqw + 18px));
     }
   }
   /* The couple's heads sit 35.1% of the width down the scene piece (its top is clear sky with palms

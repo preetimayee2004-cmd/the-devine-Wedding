@@ -8,8 +8,11 @@ import { EASE } from "@/lib/motion";
 import { formatVenueDate, parseVenueDateTime } from "@/lib/venueTime";
 import { Icon } from "@/components/art/Icons";
 
-const GOLD = "#b8893a";
-const NAVY = "#1b3556";
+// deeper, for contrast on the sky and its clouds (each line also carries a soft white glow — index.css)
+const GOLD = "#a8741f";
+const HASHTAG = "#8a5a10";
+const NAVY = "#12294a";
+const NAVY_SOFT = "#1f3a5c";
 
 /**
  * Section 02 — one screen, in the style of the couple's chosen painting, on
@@ -29,6 +32,9 @@ export function Couple() {
   const { guestName } = useGuest();
   const { coupleWelcome: copy, couple, venue, assets } = wedding;
   const { coupleArch, coupleArchSize, coupleScene, coupleSceneSize } = assets;
+
+  // "Dear {guest}," — the name set in bold
+  const [dearBefore, dearAfter = ""] = copy.dear.split("{guest}");
 
   const date = useMemo(() => {
     const parts = parseVenueDateTime(wedding.wedding.dateTime);
@@ -62,68 +68,65 @@ export function Couple() {
 
       {/* ── the welcome, on the sky just below the bells ── */}
       <div className="couple-welcome relative z-[1] flex w-full flex-col items-center px-[var(--gutter)] text-center">
-        <p className="font-display text-[length:var(--cw-welcome)] font-medium italic leading-none" style={{ color: GOLD, ...appear(0) }}>
+        <p className="font-display text-[30px] font-semibold italic leading-none" style={{ color: GOLD, ...appear(0) }}>
           {copy.welcome}
         </p>
         <p
-          className="mt-[var(--cw-gap)] max-w-full font-display text-[length:var(--cw-dear)] font-semibold leading-tight [overflow-wrap:anywhere]"
+          className="mt-[14px] max-w-full font-display text-[17px] font-medium leading-tight [overflow-wrap:anywhere]"
           style={{ color: NAVY, ...appear(1) }}
         >
-          {copy.dear.replace("{guest}", guestName.slice(0, 40))}
+          {dearBefore}
+          <strong className="font-bold">{guestName.slice(0, 40)}</strong>
+          {dearAfter}
         </p>
-        <p className="mt-0.5 font-display text-[15px] italic leading-snug" style={{ color: NAVY, opacity: 0.85, ...appear(2) }}>
+        <p className="mt-0.5 font-display text-[14px] font-medium italic leading-snug" style={{ color: NAVY_SOFT, ...appear(2) }}>
           {copy.invited}
         </p>
 
         {/* the couple, one above the other */}
         <h2
-          className="mt-[var(--cw-gap-lg)] flex w-full flex-col items-center font-display text-[clamp(28px,8.5vw,38px)] font-semibold italic leading-[1.1] [overflow-wrap:anywhere]"
+          className="mt-[20px] flex w-full flex-col items-center font-display text-[clamp(34px,10vw,44px)] font-semibold italic leading-[1.1] [overflow-wrap:anywhere]"
           style={{ color: NAVY, ...appear(3) }}
         >
           <span className="block max-w-full">{couple.bride.displayName}</span>
-          <span className="block text-[0.55em] font-medium not-italic leading-[1.1]" style={{ color: GOLD }}>
+          <span className="block text-[0.55em] font-semibold not-italic leading-[1.1]" style={{ color: GOLD }}>
             &amp;
           </span>
           <span className="block max-w-full">{couple.groom.displayName}</span>
         </h2>
 
-        <p
-          className="mt-[var(--cw-gap)] font-display text-[14px] font-semibold tracking-[0.08em]"
-          style={{ color: GOLD, ...appear(4) }}
-        >
+        <p className="mt-[14px] font-display text-[15px] font-bold tracking-[0.08em]" style={{ color: HASHTAG, ...appear(4) }}>
           {copy.hashtag}
         </p>
 
         {/* the date on one line: day | month | year */}
         {date && (
           <p
-            className="mt-[var(--cw-gap-lg)] flex items-center justify-center gap-3 font-display text-[13px] font-semibold uppercase tracking-[0.22em]"
+            className="mt-[22px] flex items-center justify-center gap-3 font-display text-[15px] font-semibold uppercase tracking-[0.2em]"
             style={{ color: NAVY, ...appear(5) }}
           >
             <span>{date.day}</span>
-            <span aria-hidden className="h-3.5 w-px" style={{ background: GOLD }} />
+            <span aria-hidden className="h-4 w-px" style={{ background: GOLD, boxShadow: "none" }} />
             <span>{date.month}</span>
-            <span aria-hidden className="h-3.5 w-px" style={{ background: GOLD }} />
+            <span aria-hidden className="h-4 w-px" style={{ background: GOLD, boxShadow: "none" }} />
             <span>{date.year}</span>
           </p>
         )}
 
-        {/* the full location: tap for directions */}
+        {/* the full location — the pin above, then the venue, then the address; tap for directions */}
         <a
           href={directionsUrl(venue)}
           target="_blank"
           rel="noopener noreferrer"
-          className="group mt-[var(--cw-gap)] inline-flex min-h-[44px] max-w-full items-start justify-center gap-1.5 px-2 py-1 font-display"
+          className="mt-[18px] flex min-h-[44px] max-w-full flex-col items-center px-2 font-display"
           style={{ color: NAVY, ...appear(6) }}
         >
-          <span className="mt-[3px] shrink-0" style={{ color: GOLD }}>
-            <Icon name="pin" className="h-[18px] w-[18px]" />
+          <span aria-hidden style={{ color: GOLD }}>
+            <Icon name="pin" className="h-[22px] w-[22px]" strokeWidth={1.6} />
           </span>
-          <span className="flex min-w-0 flex-col items-center">
-            <span className="text-[16px] font-bold leading-snug underline decoration-dotted decoration-1 underline-offset-4 [overflow-wrap:anywhere] group-hover:decoration-solid" style={{ textDecorationColor: GOLD }}>
-              {venue.name}
-            </span>
-            <span className="text-[13px] font-medium leading-snug opacity-90 [overflow-wrap:anywhere]">{venue.address}</span>
+          <span className="mt-1 text-[18px] font-bold leading-snug [overflow-wrap:anywhere]">{venue.name}</span>
+          <span className="text-[14px] font-medium leading-snug [overflow-wrap:anywhere]" style={{ color: NAVY_SOFT }}>
+            {venue.address}
           </span>
         </a>
       </div>
