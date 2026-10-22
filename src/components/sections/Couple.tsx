@@ -8,8 +8,6 @@ import { directionsUrl } from "@/lib/maps";
 import { EASE } from "@/lib/motion";
 import { formatVenueDate, parseVenueDateTime } from "@/lib/venueTime";
 import { Icon } from "@/components/art/Icons";
-import { LangToggle } from "@/components/ui/LangToggle";
-import { OnwardLink } from "@/components/ui/OnwardLink";
 
 // a deeper gold for the hashtag, so it reads on the sky (every line also carries a soft white glow — index.css)
 const HASHTAG = "#8a5a10";
@@ -23,10 +21,10 @@ const TOAST_MS = 1500;
  * couple's names, the hashtag (a tap copies it), the date and the venue (a
  * map link); and at the foot the couple offering water to the Shivling, by
  * the river with a temple, a diya and lotuses — always with clear sky above
- * their heads — with "View the Invitation" on a dark-navy panel, as on the
- * Save the Date. The words rise in one by one as the section comes into view.
- * It keeps its id because "View the Invitation" and the Save the Date's
- * auto-glide land here.
+ * their heads. The words rise in one by one as the section comes into view
+ * (in Hindi too, when the Save the Date's EN / हिं switch is on हिं). It keeps
+ * its id because the Save the Date's "View the Invitation" and auto-glide land
+ * here.
  */
 export function Couple() {
   const ref = useRef<HTMLElement>(null);
@@ -34,7 +32,7 @@ export function Couple() {
   const reduced = usePrefersReducedMotion();
   const hindi = useLang() === "hi";
   const { guestName, isPersonalized } = useGuest();
-  const { coupleWelcome: copy, invitation, couple, venue, assets } = wedding;
+  const { coupleWelcome: copy, couple, venue, assets } = wedding;
   const { coupleArch, coupleArchSize, coupleBells, coupleScene, coupleSceneSize } = assets;
 
   // "Dear {guest}," — the name set in bold; with no name in the link, "Dear Family & Friends,"
@@ -70,9 +68,6 @@ export function Couple() {
   return (
     // it starts right where the Save the Date ends
     <section ref={ref} id="couple" aria-label="Welcome" className="couple-scene relative flex flex-col items-center">
-      {/* EN / हिं, as on the Save the Date */}
-      <LangToggle className="absolute left-4" style={{ top: "calc(var(--status-bar) + 12px)" }} />
-
       {/* the arch, from the very top (no gap after the Save the Date), with its three bells hung back in place to sway */}
       <div
         aria-hidden
@@ -194,31 +189,19 @@ export function Couple() {
       {/* whatever height is left goes here, as sky above the couple */}
       <div aria-hidden className="flex-1" />
 
-      {/* the couple at the Shivling: its clear top may sit beside the words, but their heads always
-          keep at least 40px of sky below the last line. It sits 40px up, so the Shivling's base and
-          the lotuses clear the panel; the marble floor carries on below it, reflected. */}
-      <div className="couple-scene-foot relative w-full">
-        <img
-          src={coupleScene}
-          alt="The couple offering water to the Shivling by the river, a temple behind them"
-          width={coupleSceneSize.width}
-          height={coupleSceneSize.height}
-          loading="lazy"
-          decoding="async"
-          draggable={false}
-          className="pointer-events-none block h-auto w-full select-none"
-        />
-        <div aria-hidden className="couple-floor" style={{ backgroundImage: `url(${coupleScene})` }} />
-      </div>
+      {/* the couple at the Shivling, down to the section's foot: its clear top may sit beside the
+          words, but their heads always keep at least 40px of sky below the last line */}
+      <img
+        src={coupleScene}
+        alt="The couple offering water to the Shivling by the river, a temple behind them"
+        width={coupleSceneSize.width}
+        height={coupleSceneSize.height}
+        loading="lazy"
+        decoding="async"
+        draggable={false}
+        className="couple-scene-foot pointer-events-none block h-auto w-full select-none"
+      />
 
-      {/* ── at the foot, on a dark-navy panel: the way on ── */}
-      <div className="couple-foot pointer-events-none absolute inset-x-0 bottom-0 z-[2] flex flex-col items-center">
-        <OnwardLink
-          to="countdown"
-          label={hindi ? invitation.hindi.viewInvitation : invitation.viewInvitation}
-          devanagari={hindi}
-        />
-      </div>
     </section>
   );
 }

@@ -478,12 +478,6 @@
     opacity: 1;
     translate: -50% 0;
   }
-  /* The panel at the foot: dark navy rising to clear, with "View the Invitation" on it. */
-  .couple-foot {
-    padding-top: 40px;
-    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
-    background: linear-gradient(to top, rgb(8 24 52 / 0.85), rgb(8 24 52 / 0));
-  }
   @media (prefers-reduced-motion: reduce) {
     .couple-bell {
       animation: none;
@@ -512,15 +506,6 @@
     .couple-scene-foot {
       margin-top: calc(40px - 35.1cqw);
     }
-  }
-  /* The scene sits 40px up, so the Shivling's base and the lotuses clear "View the Invitation";
-     below it the marble floor carries on, reflected, under the panel. */
-  .couple-floor {
-    height: 40px;
-    background-repeat: no-repeat;
-    background-position: center bottom;
-    background-size: 100% auto;
-    transform: scaleY(-1);
   }
 
   /* ── Section 04: "A Love Written in the Stars" (on the site's own sky) ── */
