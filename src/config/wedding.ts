@@ -72,6 +72,18 @@ export const wedding = {
     },
   },
 
+  /**
+   * Section 02 — the welcome on the sky between the arch and the couple at the Shivling.
+   * {guest} = the guest's name from the link (?guest=…), or "Guest". Names, date and venue come
+   * from `couple`, `wedding` and `venue`.
+   */
+  coupleWelcome: {
+    welcome: "Welcome",
+    dear: "Dear {guest},",
+    invited: "you are warmly invited",
+    hashtag: "#PreetiWedsShivashish",
+  },
+
   /** Section 03 — the celestial calendar. Counts to wedding.dateTime in wedding.timeZone. */
   countdown: {
     eyebrow: "शुभ मुहूर्त",
