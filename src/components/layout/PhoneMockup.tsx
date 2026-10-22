@@ -2,20 +2,22 @@ import { useEffect, useState } from "react";
 import { wedding } from "@/config/wedding";
 import { FRAMED_STATUS_BAR } from "@/lib/viewMode";
 
-// iPhone 17 Pro Max: 6.9" display, 440 × 956 CSS px viewport.
-const SCREEN_W = 440;
-const SCREEN_H = 956;
-const BEZEL = 14; // titanium band + black border
+// The phone's screen is a 390 × 844 CSS px viewport — the size the invitation is designed at —
+// inside a thin dark bezel, the outer corners rounded at 54px.
+const SCREEN_W = 390;
+const SCREEN_H = 844;
+const BEZEL = 12;
 const FRAME_W = SCREEN_W + BEZEL * 2;
 const FRAME_H = SCREEN_H + BEZEL * 2;
+const RADIUS = 54;
 
-// Space kept free above and below the phone (and at least this much to its right).
-const PAD = 28;
-// Where the phone's centre stands across the screen: right of Mount Kailash's peak in the backdrop.
-const PHONE_AT = "75%";
+// Space always kept free around the phone (24px above and below: 100svh − 48px at most).
+const PAD = 24;
 
+/** The phone at full size when it fits, otherwise in proportion — never cut, never scrolled. */
 function useFitScale(): number {
-  const compute = () => Math.max(0.5, Math.min(1, (window.innerHeight - PAD * 2) / FRAME_H));
+  const compute = () =>
+    Math.max(0.25, Math.min(1, (window.innerHeight - PAD * 2) / FRAME_H, (window.innerWidth - PAD * 2) / FRAME_W));
   const [scale, setScale] = useState(compute);
 
   useEffect(() => {
@@ -27,53 +29,39 @@ function useFitScale(): number {
   return scale;
 }
 
-/** Desktop-only frame that hosts the live site in an iframe, before Mount Kailash in the clouds. */
+/**
+ * Desktop: the live site in a phone, in the very middle of the screen, before Mount Kailash in the
+ * clouds (full-bleed, under a soft dark-navy veil so the phone stands out).
+ */
 export function PhoneMockup({ src }: { src: string }) {
   const scale = useFitScale();
   useFixedPage();
-  const half = (FRAME_W * scale) / 2;
 
   return (
-    <div className="relative flex h-[100dvh] flex-col items-start justify-center overflow-hidden">
+    <div className="relative flex h-[100dvh] items-center justify-center overflow-hidden">
       <div aria-hidden className="desktop-backdrop" style={{ backgroundImage: `url(${wedding.assets.desktopBackdrop})` }} />
-      {/* A soft brightening of the clouds behind the phone */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{ background: `radial-gradient(ellipse 26% 58% at ${PHONE_AT} 52%, rgb(255 255 255 / 0.16), transparent 70%)` }}
-      />
 
-      {/* Reserves the scaled footprint so layout matches what's visible; its centre stands at PHONE_AT,
-          but never closer than PAD to the right edge */}
-      <div
-        className="relative"
-        style={{
-          width: FRAME_W * scale,
-          height: FRAME_H * scale,
-          marginLeft: `max(${PAD}px, min(${PHONE_AT}, 100% - ${half + PAD}px) - ${half}px)`,
-        }}
-      >
+      {/* Reserves the scaled footprint so layout matches what's visible */}
+      <div className="relative" style={{ width: FRAME_W * scale, height: FRAME_H * scale }}>
         <div
           className="relative origin-top-left"
           style={{ width: FRAME_W, height: FRAME_H, transform: `scale(${scale})` }}
         >
           <SideButtons />
-          {/* Titanium band */}
+          {/* The dark bezel */}
           <div
-            className="absolute inset-0 rounded-[76px]"
+            className="absolute inset-0 bg-[#0b0b0d]"
             style={{
-              background: "linear-gradient(145deg, #ebe8e3 0%, #b8b3ac 35%, #dcd8d2 55%, #a7a29b 100%)",
+              borderRadius: RADIUS,
               boxShadow:
-                "0 40px 80px -20px rgb(15 42 62 / 0.45), 0 18px 36px -18px rgb(15 42 62 / 0.35), inset 0 0 0 1px rgb(255 255 255 / 0.35)",
+                "0 50px 100px -30px rgb(0 0 0 / 0.55), 0 24px 48px -24px rgb(0 0 0 / 0.45), inset 0 0 0 1.5px rgb(255 255 255 / 0.1)",
             }}
           />
-          {/* Black border */}
-          <div className="absolute inset-[3px] rounded-[73px] bg-[#0b0b0c]" />
 
           {/* Screen: the site fills it edge to edge; the status bar floats on top, as on a real iPhone */}
           <div
-            className="absolute overflow-hidden rounded-[62px] bg-black"
-            style={{ inset: BEZEL, width: SCREEN_W, height: SCREEN_H }}
+            className="absolute overflow-hidden bg-black"
+            style={{ inset: BEZEL, width: SCREEN_W, height: SCREEN_H, borderRadius: RADIUS - BEZEL }}
           >
             <iframe
               src={src}
@@ -84,9 +72,9 @@ export function PhoneMockup({ src }: { src: string }) {
             />
             <StatusBar />
             {/* Dynamic Island */}
-            <div className="pointer-events-none absolute left-1/2 top-[11px] h-[37px] w-[125px] -translate-x-1/2 rounded-full bg-black" />
+            <div className="pointer-events-none absolute left-1/2 top-[11px] h-[34px] w-[112px] -translate-x-1/2 rounded-full bg-black" />
             {/* Home indicator */}
-            <div className="pointer-events-none absolute bottom-2 left-1/2 h-[5px] w-[140px] -translate-x-1/2 rounded-full bg-navy/80" />
+            <div className="pointer-events-none absolute bottom-2 left-1/2 h-[5px] w-[128px] -translate-x-1/2 rounded-full bg-navy/80" />
           </div>
         </div>
       </div>
@@ -144,7 +132,7 @@ function StatusBar() {
 }
 
 function SideButtons() {
-  const btn = "absolute w-[4px] bg-gradient-to-b from-[#c9c5bf] to-[#9e9993]";
+  const btn = "absolute w-[4px] bg-gradient-to-b from-[#2e2e33] to-[#151518]";
   return (
     <div aria-hidden>
       {/* Left: Action button, volume up, volume down */}

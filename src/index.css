@@ -80,17 +80,23 @@
   /* ── The sky: one continuous backdrop behind every section ──
      A fixed layer (not background-attachment: fixed, which iOS ignores),
      sized to the large viewport so it never jumps as Safari's toolbars move. */
-  /* Desktop, behind the phone: Mount Kailash in the clouds. Anchored right, so on any screen shape
-     the peak sits left of the phone (which stands at 75% across). */
+  /* Desktop, behind the phone: Mount Kailash in the clouds, full-bleed, under a soft dark-navy veil
+     so the phone stands out. */
   .desktop-backdrop {
-    position: absolute;
+    position: fixed;
     inset: 0;
     z-index: -1;
     pointer-events: none;
     background-color: #2c3a4a;
     background-size: cover;
-    background-position: 100% 42%;
+    background-position: center;
     background-repeat: no-repeat;
+  }
+  .desktop-backdrop::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgb(10 22 40 / 0.35);
   }
 
   .sky-backdrop {
@@ -411,8 +417,8 @@
   .couple-scene {
     min-height: 100vh;
     min-height: 100svh;
-    /* the arch starts 56px below the status bar, so the two never meet */
-    --couple-top: calc(var(--status-bar) + 56px);
+    /* the arch starts right where the Save the Date ends — no gap of sky between them */
+    --couple-top: 0px;
     padding-top: var(--couple-top);
     /* so the pieces below can be measured in the section's own width (cqw) */
     container-type: inline-size;

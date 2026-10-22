@@ -18,7 +18,7 @@ const TOAST_MS = 1500;
 /**
  * Section 02 — one screen, in the style of the couple's chosen painting, on
  * the site's own sky: a carved golden arch with gently swaying temple bells
- * and jasmine strings across the top, clear of the status bar; on the sky
+ * and jasmine strings across the top, right where the Save the Date ends; on the sky
  * below the bells, the guest's welcome — their name from the link, the
  * couple's names, the hashtag (a tap copies it), the date and the venue (a
  * map link); and at the foot the couple offering water to the Shivling, by
@@ -73,7 +73,7 @@ export function Couple() {
       {/* EN / हिं, as on the Save the Date */}
       <LangToggle className="absolute left-4" style={{ top: "calc(var(--status-bar) + 12px)" }} />
 
-      {/* the arch, below the status bar, with its three bells hung back in place to sway */}
+      {/* the arch, from the very top (no gap after the Save the Date), with its three bells hung back in place to sway */}
       <div
         aria-hidden
         className="couple-arch pointer-events-none absolute inset-x-0 select-none"
