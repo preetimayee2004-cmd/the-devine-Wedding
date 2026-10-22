@@ -258,23 +258,56 @@
      One vertical rhythm that breathes with the screen's height, so a short
      phone stays compact and a tall one gains air evenly instead of one big gap. */
   .save-the-date {
-    --std-top: clamp(20px, 5vh, 56px);
-    --std-gap: clamp(8px, 1.6vh, 16px);
+    /* compact on short screens (a phone browser's toolbars leave ~650px), airy on tall ones */
+    --std-top: clamp(16px, 8vh - 26px, 60px);
+    --std-gap: clamp(6px, 2.4vh - 7px, 18px);
     --std-gap-sm: clamp(2px, 0.6vh, 8px);
-    --std-gap-lg: clamp(12px, 2.6vh, 28px);
-    /* how far the mountains rise behind the lower lines of text */
-    --std-rise: clamp(24px, 6vh, 72px);
-    /* Shiv–Parvati: a little smaller on short screens (--std-art-ratio = its height ÷ width, set inline) */
-    --std-art-w: min(74vw, calc(38vh / var(--std-art-ratio, 1)), 340px);
+    --std-gap-lg: clamp(10px, 3.6vh - 11px, 30px);
+    --std-title: clamp(40px, 4vh + 18px, 48px);
+    --std-day: clamp(46px, 5vh + 20px, 58px);
+    /*
+     * The painting (Mahadev blessing Maa Parvati, 572 × 1024) spans the screen,
+     * up to 600px. Measured in its width W: a pale sky band runs to about
+     * 0.22 W, the peaks and Mahadev's crown begin about 0.26 W down, and both
+     * faces sit within the first 1.0 W.
+     */
+    --std-paint-w: min(100vw, 600px);
+    /* it reaches up behind the last lines of text, so only its sky band is behind them */
+    --std-rise: calc(var(--std-paint-w) * 0.25);
+    /* always room for both faces, even on a short phone */
+    --std-art-min: calc(var(--std-paint-w) * 0.86);
+    /* its sky melts into the site's sky; its foot melts away at the end of the card */
+    --std-fade-top: calc(var(--std-paint-w) * 0.22);
+    --std-fade-bottom: calc(var(--std-paint-w) * 0.22);
   }
   @supports (height: 1dvh) {
     .save-the-date {
-      --std-top: clamp(20px, 5dvh, 56px);
-      --std-gap: clamp(8px, 1.6dvh, 16px);
+      --std-top: clamp(16px, 8dvh - 26px, 60px);
+      --std-gap: clamp(6px, 2.4dvh - 7px, 18px);
       --std-gap-sm: clamp(2px, 0.6dvh, 8px);
-      --std-gap-lg: clamp(12px, 2.6dvh, 28px);
-      --std-rise: clamp(24px, 6dvh, 72px);
-      --std-art-w: min(74vw, calc(38dvh / var(--std-art-ratio, 1)), 340px);
+      --std-gap-lg: clamp(10px, 3.6dvh - 11px, 30px);
+      --std-title: clamp(40px, 4dvh + 18px, 48px);
+      --std-day: clamp(46px, 5dvh + 20px, 58px);
+    }
+  }
+  .std-painting {
+    --std-fade: linear-gradient(
+      transparent,
+      #000 var(--std-fade-top),
+      #000 calc(100% - var(--std-fade-bottom)),
+      rgb(0 0 0 / 0.45) calc(100% - var(--std-fade-bottom) * 0.45),
+      transparent
+    );
+    -webkit-mask-image: var(--std-fade);
+    mask-image: var(--std-fade);
+  }
+  /* wider than the painting (tablets): its sides melt into the sky too */
+  @media (min-width: 601px) {
+    .std-painting {
+      -webkit-mask-image: var(--std-fade), linear-gradient(to right, transparent, #000 14%, #000 86%, transparent);
+      -webkit-mask-composite: source-in;
+      mask-image: var(--std-fade), linear-gradient(to right, transparent, #000 14%, #000 86%, transparent);
+      mask-composite: intersect;
     }
   }
 

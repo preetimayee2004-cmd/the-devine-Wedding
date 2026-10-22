@@ -6,7 +6,6 @@ import { glideTo, USER_INPUT_EVENTS } from "@/lib/scroll";
 import { readSessionFlag, writeSessionFlag } from "@/lib/session";
 import { formatVenueDate, parseVenueDateTime } from "@/lib/venueTime";
 import { Icon } from "@/components/art/Icons";
-import { Kailash } from "@/components/art/Kailash";
 import { GoldMotes } from "@/components/ui/GoldMotes";
 import { PetalShower } from "@/components/ui/PetalShower";
 
@@ -21,8 +20,9 @@ import { PetalShower } from "@/components/ui/PetalShower";
  *            there, a soft shadow where they touch, a warm gold glow between
  *   release  the glow widens and fades, a few gold motes drift outward, and
  *            the hands fade gently into the sky
- *   reveal   the card's words rise in one after another, then Shiv and
- *            Parvati before Kailash; a few petals fall
+ *   reveal   the card's words rise in one after another, then the painting
+ *            of Mahadev blessing Maa Parvati before the Himalaya; a few
+ *            petals fall
  *
  * The hands are the painted artwork, only moved and faded — never stretched
  * or redrawn. Never a gate: Skip is always there, a guest who already watched
@@ -209,12 +209,7 @@ export function Invitation() {
       id="invitation"
       aria-labelledby="invitation-names"
       className="save-the-date relative flex min-h-[100dvh] flex-col items-center overflow-x-clip px-[var(--gutter)] text-center"
-      style={
-        {
-          paddingTop: "calc(var(--status-bar) + var(--std-top))",
-          "--std-art-ratio": assets.saveTheDateArtSize.height / assets.saveTheDateArtSize.width,
-        } as CSSProperties
-      }
+      style={{ paddingTop: "calc(var(--status-bar) + var(--std-top))" }}
     >
       {/* light gathered behind the words, so gold reads on the bright upper sky */}
       <div
@@ -229,7 +224,7 @@ export function Invitation() {
 
       {/* ── the card's words, layered above the illustration ── */}
       <div className="relative z-[2] flex w-full flex-col items-center">
-        <p className="relative font-script text-[48px] leading-none text-gold-ink" style={rise(0)}>
+        <p className="relative font-script text-[length:var(--std-title)] leading-none text-gold-ink" style={rise(0)}>
           {copy.title}
         </p>
         <p
@@ -258,7 +253,7 @@ export function Invitation() {
           <div className="relative mt-[var(--std-gap-lg)] flex flex-col items-center" style={rise(4)}>
             <p className="font-sans text-[11px] font-semibold uppercase tracking-eyebrow text-gold-ink">{date.month}</p>
             <p className="flex items-start font-display font-semibold leading-none text-navy">
-              <span className="text-[58px] leading-[0.9]">{date.day}</span>
+              <span className="text-[length:var(--std-day)] leading-[0.9]">{date.day}</span>
               <span className="ml-0.5 mt-1 text-[22px] font-medium italic text-gold-ink">{date.ordinal}</span>
             </p>
             <p className="mt-1 font-sans text-[12px] font-semibold tracking-[0.5em] text-gold-ink">{date.year}</p>
@@ -274,28 +269,24 @@ export function Invitation() {
         )}
       </div>
 
-      {/* ── Shiv and Parvati before Kailash — last to rise in. This block takes whatever height
-          is left, so the mountains rise to meet the words instead of leaving a gap; the couple
-          stays anchored at the foot, clear of the home indicator. ── */}
+      {/* ── Mahadev blessing Maa Parvati before the Himalaya — last to rise in. This block takes
+          whatever height is left (never less than room for both faces); the painting starts just
+          below the words, its pale sky melting into ours behind them, and runs to the foot of the
+          card, where it melts away too. ── */}
       <div
-        className="relative mt-[var(--std-gap)] flex w-full flex-1 flex-col justify-end pb-[env(safe-area-inset-bottom,0px)]"
-        style={{ minHeight: "calc(var(--std-art-w) * var(--std-art-ratio) + var(--std-gap-lg))", ...rise(6, 28, 1300) }}
+        className="relative mt-[var(--std-gap)] w-full flex-1 pb-[env(safe-area-inset-bottom,0px)]"
+        style={{ minHeight: "var(--std-art-min)", ...rise(6, 28, 1300) }}
       >
-        {/* distant mountains: from just behind the lowest lines of text down to the foot */}
         <div
-          aria-hidden
-          className="absolute bottom-0 w-screen"
-          style={{ left: "calc(50% - 50vw)", height: "min(max(calc(100% + var(--std-rise)), 92vw), 150vw)" }}
+          className="std-painting absolute bottom-0 w-[var(--std-paint-w)]"
+          style={{ left: "calc(50% - var(--std-paint-w) / 2)", height: "calc(100% + var(--std-rise))" }}
         >
-          <Kailash className="h-full w-full" />
-        </div>
-        <div className="relative z-[1] mx-auto w-[var(--std-art-w)] [-webkit-mask-image:linear-gradient(#000_80%,transparent)] [mask-image:linear-gradient(#000_80%,transparent)]">
           <img
             src={assets.saveTheDateArt}
-            alt="Shiva and Parvati together"
+            alt="Mahadev gently blessing Maa Parvati, before the snowy Himalaya and a lotus lake"
             width={assets.saveTheDateArtSize.width}
             height={assets.saveTheDateArtSize.height}
-            className="block h-auto w-full"
+            className="block h-full w-full object-cover object-top"
             draggable={false}
           />
         </div>

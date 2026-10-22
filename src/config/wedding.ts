@@ -357,13 +357,15 @@ export const wedding = {
       parvatiHand: "/art/opening/hand-parvati.webp",
     },
     /**
-     * The Save the Date's illustration, at the foot of the card before
-     * Kailash. STAND-IN: a larger Shiv–Parvati illustration (transparent
-     * background) will look sharper — put it in public/art/, point this at it,
-     * and set its pixel size below so the layout keeps its proportions.
+     * The Save the Date's painting — Mahadev blessing Maa Parvati before the
+     * snowy Himalaya and a lotus lake — filling the card's lower half, its sky
+     * melting into the site's. The layout is tuned to this painting's
+     * composition (sky band, then their heads), see `.save-the-date` in
+     * index.css. A larger original of the same painting will look sharper:
+     * replace the file and update its pixel size here.
      */
-    saveTheDateArt: "/art/shiva-parvati-seated.webp",
-    saveTheDateArtSize: { width: 380, height: 360 },
+    saveTheDateArt: "/art/shiva-parvati-blessing.jpg",
+    saveTheDateArtSize: { width: 572, height: 1024 },
     /** Shiv–Parvati seated together (Thank You, gallery). */
     divineCouple: "/art/shiva-parvati-seated.webp",
     /** Soft-edged bloom used for every watercolour reveal. */

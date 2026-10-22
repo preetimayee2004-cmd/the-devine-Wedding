@@ -25,7 +25,7 @@ Everything a family changes lives in **`src/config/wedding.ts`**. Every value ma
 | `wishes.samples` | The starting wishes. Remove them once real wishes arrive. |
 | `travel` | Verified stations, pickup plan, travel contacts with phone numbers, and the actual hotels with phone numbers or booking links. |
 | `meta.siteUrl` | The deployed address. WhatsApp needs it to show the preview image. |
-| `assets.saveTheDateArt` | The Save the Date's illustration. The stand-in is small; a large Shiv–Parvati illustration (1500 px+ wide, transparent background) will look sharper. When you swap it, set `assets.saveTheDateArtSize` to its pixel size so the card keeps its proportions. |
+| `assets.saveTheDateArt` | The Save the Date's painting (Mahadev blessing Maa Parvati before the Himalaya), filling the card's lower half. It is 572 × 1024; a larger original of the same painting will look sharper — replace the file and update `assets.saveTheDateArtSize`. The layout is tuned to this painting's composition (see `.save-the-date` in `src/index.css`). |
 
 Call, WhatsApp and Book buttons appear only when a number or link is filled in. Nothing is invented for the guest.
 
@@ -111,7 +111,7 @@ Each section has its own composition, and each hands over to the next.
 | | Section | What happens |
 | --- | --- | --- |
 | 00 | Opening | Both hands start partly off the screen — Shiva's at the upper left, palm down; the bride's at the lower right, palm up — and glide slowly to the centre, where Shiva's hand settles over hers and rests (a soft contact shadow, a warm gold glow). The hands are the painted artwork, only moved and faded, never stretched or redrawn. Then the glow widens, a few gold motes drift outward and both hands fade together into the sky. Skip is always shown, a reload gets a quicker version, and `?opening=full` replays the full one. |
-| 01 | Save the Date | The card rises in piece by piece, top to bottom: "Save the Date", the blessing, the names, the request, the date and the city, then Shiv–Parvati before Kailash and a lotus lake; a short shower of red petals. After 5 s of reading it glides to the couple (`invitation.autoAdvanceMs`); any touch cancels this. |
+| 01 | Save the Date | The card rises in piece by piece, top to bottom: "Save the Date", the blessing, the names, the request, the date and the city, then the painting of Mahadev blessing Maa Parvati before the snowy Himalaya, its sky melting into the site's sky behind the words; a short shower of red petals. After 5 s of reading it glides to the couple (`invitation.autoAdvanceMs`); any touch cancels this. |
 | 02 | Couple | Ganpati draws himself in a gold ring with ॐ गं गणपतये नमः and "Welcome, Dear {guest}"; then the couple at the Shivling paints in like watercolour and settles on a cloud; then names and the Lagna card. |
 | 03 | Countdown | The cloud parts; a gold temple arch draws down from Shiva's crescent; live time to the muhurat at the venue. On the day it reads "Today Is the Day", afterwards "Happily Married". |
 | 04 | Our Story | A golden path winds between the moments and draws with the scroll, ending in a kalash. |
