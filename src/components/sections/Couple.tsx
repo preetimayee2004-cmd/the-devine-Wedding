@@ -37,13 +37,13 @@ export function Couple() {
   // the bells and garlands swing once, as the section arrives
   const arrived = useInView(ref, { threshold: 0.3 });
   const hindi = useLang() === "hi";
-  const { guestName, isPersonalized } = useGuest();
+  const { guestName } = useGuest();
   const { coupleWelcome: copy, couple, venue, assets } = wedding;
   const { coupleArch, coupleArchSize, coupleBells, coupleGarlands, coupleScene, coupleSceneSize } = assets;
 
-  // "Dear {guest}," — the name set in bold; with no name in the link, "Dear Family & Friends,"
+  // "Dear {guest}," — the guest's name from their link, set in bold (without one, the fallback name)
   const [dearBefore, dearAfter = ""] = copy.dear.split("{guest}");
-  const guest = isPersonalized ? guestName.slice(0, 40) : copy.everyone;
+  const guest = guestName.slice(0, 40);
 
   const date = useMemo(() => {
     const parts = parseVenueDateTime(wedding.wedding.dateTime);
@@ -139,11 +139,11 @@ export function Couple() {
           {hindi ? copy.hindi.welcome : copy.welcome}
         </p>
         <p
-          className="mt-[14px] max-w-full font-display text-[17px] font-medium leading-tight text-navy [overflow-wrap:anywhere]"
+          className="mt-[14px] max-w-full font-display text-[20px] font-medium leading-tight text-navy [overflow-wrap:anywhere]"
           style={appear(1)}
         >
           {dearBefore}
-          <strong className="text-[20px] font-bold">{guest}</strong>
+          <strong className="text-[26px] font-bold">{guest}</strong>
           {dearAfter}
         </p>
         <p

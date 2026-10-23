@@ -1,4 +1,4 @@
-import { useMemo, useRef, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { wedding } from "@/config/wedding";
 import { useCountdown } from "@/hooks/useCountdown";
 import { useInView } from "@/hooks/useInView";
@@ -14,9 +14,12 @@ import { Reveal } from "@/components/ui/Reveal";
  * Above: शुभ मुहूर्त, "Countdown Begins", a fine gold line and the date. Then
  * the couple's wreath — flowering vines threaded with their little things, a
  * watercolour mountain and the joined hands — larger, with the wedding's month
- * drawn inside it as a small calendar, a watercolour lotus blooming on the
- * wedding day. Under it, one fine row: days, hours, minutes and seconds to
- * the wedding at the venue's time. The couple's clouds part as it appears.
+ * drawn inside it as a small calendar, a watercolour lotus blooming (and
+ * gently glowing) on the wedding day. Under it, "Hamare vivah mein baaki hain"
+ * and one row: the days large, then hours, minutes and seconds, to the wedding
+ * at the venue's time (whatever the guest's own time zone) — counting up from
+ * zero the first time it is seen, then each digit rolling as it changes, a
+ * gold bead beating with the seconds. The couple's clouds part as it appears.
  */
 export function Countdown() {
   const ref = useRef<HTMLElement>(null);
@@ -41,7 +44,8 @@ export function Countdown() {
   }, [when, locale]);
 
   if (!state) return null;
-  const message = state.phase === "today" ? copy.today : state.phase === "after" ? copy.after : null;
+  const words = hindi ? copy.hindi : copy;
+  const message = state.phase === "today" ? words.today : state.phase === "after" ? words.after : null;
 
   return (
     <section
@@ -49,10 +53,10 @@ export function Countdown() {
       ref={ref}
       aria-labelledby="countdown-heading"
       lang={hindi ? "hi" : undefined}
-      className="relative flex flex-col items-center px-[var(--gutter)] pt-10 text-center"
+      className="relative flex flex-col items-center px-[var(--gutter)] pb-12 pt-10 text-center"
     >
       {/* ── the heading, above the wreath ── */}
-      <Reveal show={seen} delay={at(300)} as="p" className="font-deva text-[16px] leading-none text-gold-ink">
+      <Reveal show={seen} delay={at(300)} as="p" className="cd-deep-gold font-deva text-[16px] font-semibold leading-none">
         <span lang="sa">{copy.eyebrow}</span>
       </Reveal>
       <Reveal show={seen} delay={at(420)}>
@@ -73,7 +77,7 @@ export function Countdown() {
           show={seen}
           delay={at(600)}
           as="p"
-          className={`mt-2.5 text-balance text-[12.5px] font-semibold text-gold-ink ${hindi ? "font-deva" : "font-sans uppercase tracking-[0.1em]"}`}
+          className={`cd-deep-gold mt-2.5 text-balance text-[14px] font-semibold ${hindi ? "font-deva" : "font-sans uppercase tracking-[0.1em]"}`}
         >
           {dateLine}
         </Reveal>
@@ -130,47 +134,22 @@ export function Countdown() {
         </div>
       </div>
 
-      {/* ── one fine row: the time left ── */}
-      <div className="relative mt-2 w-full max-w-[24rem]">
+      {/* ── the time left: one line, then the numbers ── */}
+      <div className="relative mt-6 w-full max-w-[24rem]">
         {message ? (
           <Reveal
             show={seen}
             delay={at(1400)}
             as="p"
-            className="text-balance font-display text-[22px] font-medium italic leading-snug text-slate"
+            className={`text-balance text-[22px] font-medium leading-snug text-slate ${hindi ? "font-deva" : "font-display italic"}`}
           >
             {message.line}
           </Reveal>
         ) : (
           state.phase === "counting" && (
             <Reveal show={seen} delay={at(1400)}>
-              <dl role="timer" aria-live="off" className="grid grid-cols-4">
-                {(
-                  [
-                    [t.labels.days, String(state.days), false],
-                    [t.labels.hours, pad(state.hours), false],
-                    [t.labels.minutes, pad(state.minutes), false],
-                    [t.labels.seconds, pad(state.seconds), true],
-                  ] as const
-                ).map(([label, value, fades], i) => (
-                  <div key={i} className={`flex flex-col-reverse items-center ${i ? "border-l border-gold/50" : ""}`}>
-                    <dt
-                      className={`mt-1.5 text-[11px] font-medium text-gold-ink ${hindi ? "font-deva" : "font-sans uppercase tracking-[0.2em]"}`}
-                    >
-                      {label}
-                    </dt>
-                    <dd className="font-display text-[34px] font-semibold leading-none text-navy [font-variant-numeric:lining-nums_tabular-nums]">
-                      {fades ? (
-                        <span key={value} className="cd-fade">
-                          {value}
-                        </span>
-                      ) : (
-                        value
-                      )}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
+              <p className={`cd-lead ${hindi ? "font-deva" : "font-display italic"}`}>{words.lead}</p>
+              <CountdownRow state={state} start={seen} reduced={reduced} after={at(1400)} />
             </Reveal>
           )
         )}
@@ -180,6 +159,106 @@ export function Countdown() {
 }
 
 const pad = (n: number) => String(n).padStart(2, "0");
+
+/** The four units, each in English and Hindi. */
+const UNITS = [
+  { en: "Days", hi: "दिन" },
+  { en: "Hours", hi: "घंटे" },
+  { en: "Minutes", hi: "मिनट" },
+  { en: "Seconds", hi: "सेकंड" },
+] as const;
+
+/**
+ * Days, hours, minutes, seconds. The first time it comes into view the numbers count up from zero
+ * (1s, easing out); after that each digit rolls on its own as it changes — the old one rising away,
+ * the new one coming up from below (300ms). A small gold bead by the seconds beats once a second.
+ */
+function CountdownRow({
+  state,
+  start,
+  reduced,
+  after,
+}: {
+  state: { days: number; hours: number; minutes: number; seconds: number };
+  start: boolean;
+  reduced: boolean;
+  after: number;
+}) {
+  const [progress, setProgress] = useState(reduced ? 1 : 0);
+  useEffect(() => {
+    if (!start || reduced) return;
+    let frame = 0;
+    let t0 = 0;
+    const timer = window.setTimeout(() => {
+      const step = (now: number) => {
+        if (!t0) t0 = now;
+        const p = Math.min(1, (now - t0) / 1000);
+        setProgress(p);
+        if (p < 1) frame = requestAnimationFrame(step);
+      };
+      frame = requestAnimationFrame(step);
+    }, after);
+    return () => {
+      clearTimeout(timer);
+      cancelAnimationFrame(frame);
+    };
+  }, [start, reduced, after]);
+  const counting = progress < 1;
+  const eased = 1 - (1 - progress) ** 3;
+  const v = (n: number) => (counting ? Math.round(n * eased) : n);
+  const values = [String(v(state.days)), pad(v(state.hours)), pad(v(state.minutes)), pad(v(state.seconds))];
+
+  return (
+    <dl role="timer" aria-live="off" className="cd-row">
+      {UNITS.map((unit, i) => (
+        <div key={unit.en} className={`cd-unit${i === 0 ? " cd-unit-days" : ""}`}>
+          <dt className="cd-label">
+            <span className="cd-label-en">
+              {unit.en}
+              {i === 3 && !reduced && <span key={state.seconds} aria-hidden className="cd-bead" />}
+              {i === 3 && reduced && <span aria-hidden className="cd-bead cd-bead-still" />}
+            </span>
+            <span lang="hi" className="cd-label-hi font-deva">
+              {unit.hi}
+            </span>
+          </dt>
+          <dd className="cd-num">
+            <Digits value={values[i]} roll={!counting && !reduced} />
+          </dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+/** A number as separate digits, each keyed by its place from the right, so each rolls on its own. */
+function Digits({ value, roll }: { value: string; roll: boolean }) {
+  const chars = value.split("");
+  return (
+    <span className="cd-digits">
+      {chars.map((c, i) => (
+        <Digit key={chars.length - i} ch={c} roll={roll} />
+      ))}
+    </span>
+  );
+}
+
+function Digit({ ch, roll }: { ch: string; roll: boolean }) {
+  const [shown, setShown] = useState<{ ch: string; prev: string | null; n: number }>({ ch, prev: null, n: 0 });
+  if (shown.ch !== ch) setShown({ ch, prev: roll ? shown.ch : null, n: shown.n + 1 });
+  return (
+    <span className="cd-digit">
+      {shown.prev !== null && (
+        <span key={`o${shown.n}`} aria-hidden className="cd-d cd-d-out">
+          {shown.prev}
+        </span>
+      )}
+      <span key={`i${shown.n}`} className={shown.prev !== null ? "cd-d cd-d-in" : "cd-d"}>
+        {shown.ch}
+      </span>
+    </span>
+  );
+}
 
 /**
  * The wedding's month, made from the date itself: its name, the days of the week, and its weeks
@@ -257,7 +336,8 @@ function MonthCalendar({
             <tr key={w}>
               {week.map((day, i) =>
                 day === when.day ? (
-                  <td key={i} className="font-display text-[15px] font-semibold">
+                  <td key={i} className="font-display text-[14px] font-semibold">
+                    <span aria-hidden className="cd-lotus-glow" data-still={reduced || undefined} />
                     <img
                       src={lotus}
                       alt=""
@@ -268,13 +348,14 @@ function MonthCalendar({
                       decoding="async"
                       draggable={false}
                       className="cd-lotus"
+                      data-still={reduced || undefined}
                       style={bloom}
                     />
                     <span className="cd-lotus-day">{day}</span>
                     <span className="sr-only">, {weddingDay}</span>
                   </td>
                 ) : (
-                  <td key={i} className="font-display text-[15px] font-semibold text-navy">
+                  <td key={i} className="font-display text-[14px] font-semibold text-navy">
                     {day ?? ""}
                   </td>
                 ),

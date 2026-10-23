@@ -136,11 +136,12 @@
      so the grid sits in 21–73% across, from 19% down, its fourth week ending by 55.6% (14px+
      clear of every flower, the peak and the hands); the fifth week holds only the 28th, on the
      left, where the open sky reaches lower. */
+  /* raised a little and widened, so the 28th clears the mountain's peak and the lotus has room */
   .cd-month {
     position: absolute;
-    left: 21cqw;
-    top: 15cqw;
-    width: 52cqw;
+    left: 17cqw;
+    top: 11.5cqw;
+    width: 60cqw;
   }
   .cd-month-title {
     height: 4.5cqw;
@@ -160,7 +161,7 @@
   }
   .cd-month td {
     position: relative;
-    height: 6.4cqw;
+    height: 6.6cqw;
     padding: 0;
     line-height: 1;
     text-align: center;
@@ -171,12 +172,52 @@
     position: absolute;
     left: 50%;
     top: 50%;
-    width: clamp(38px, 11.6cqw, 48px);
+    width: clamp(40px, 12.2cqw, 54px);
     height: auto;
     max-width: none;
     translate: -50% -52%;
     filter: drop-shadow(0 3px 4px rgb(120 30 50 / 0.28));
     pointer-events: none;
+  }
+  /* the lotus breathes, a soft gold glow swelling behind it (2.6s) */
+  .cd-lotus {
+    animation: cd-breathe 2.6s ease-in-out infinite;
+  }
+  .cd-lotus-glow {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 15cqw;
+    aspect-ratio: 1;
+    translate: -50% -50%;
+    border-radius: 9999px;
+    background: radial-gradient(closest-side, rgb(246 214 140 / 0.8), rgb(246 214 140 / 0.28) 60%, rgb(246 214 140 / 0));
+    pointer-events: none;
+    animation: cd-glow 2.6s ease-in-out infinite;
+  }
+  @keyframes cd-breathe {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.035);
+    }
+  }
+  @keyframes cd-glow {
+    0%,
+    100% {
+      opacity: 0.5;
+      transform: scale(0.9);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.08);
+    }
+  }
+  .cd-lotus[data-still],
+  .cd-lotus-glow[data-still] {
+    animation: none;
   }
   .cd-lotus-day {
     position: relative;
@@ -185,19 +226,135 @@
       0 1px 2px rgb(110 20 45 / 0.75),
       0 0 6px rgb(150 30 60 / 0.5);
   }
-  /* the seconds: the new number simply fades in (150ms) */
-  .cd-fade {
-    display: inline-block;
-    animation: cd-fade 150ms ease-out;
+  /* the words above, in a deeper gold that reads on the pale sky */
+  .cd-deep-gold {
+    color: #7a561c;
   }
-  @keyframes cd-fade {
-    from {
+  /* the line over the numbers: the section's italic, in a soft navy turning gold */
+  .cd-lead {
+    margin-bottom: 14px;
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.3;
+    background: linear-gradient(90deg, #3d5576, #9a7432);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  /* the numbers: the days larger, in navy turning gold; the rest a little smaller, in navy */
+  .cd-row {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 1fr 1fr;
+    align-items: end;
+  }
+  .cd-unit {
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+  }
+  .cd-unit + .cd-unit {
+    border-left: 1px solid rgb(var(--gold) / 0.5);
+  }
+  .cd-num {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 1;
+    color: rgb(var(--navy));
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+  .cd-unit-days .cd-num {
+    font-size: 50px;
+  }
+  .cd-unit-days .cd-d {
+    background: linear-gradient(180deg, #12294a 30%, #8a6420 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .cd-digits {
+    display: inline-flex;
+  }
+  /* each digit in its own window: the old one rises away as the new one comes up (300ms) */
+  .cd-digit {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    padding: 0.08em 0;
+    margin: -0.08em 0;
+  }
+  .cd-d {
+    display: inline-block;
+  }
+  .cd-d-out {
+    position: absolute;
+    left: 0;
+    top: 0.08em;
+    animation: cd-out 300ms cubic-bezier(0.4, 0, 0.7, 0.4) both;
+  }
+  .cd-d-in {
+    animation: cd-in 300ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
+  }
+  @keyframes cd-out {
+    to {
+      transform: translateY(-65%);
       opacity: 0;
     }
   }
-  @media (prefers-reduced-motion: reduce) {
-    .cd-fade {
-      animation: none;
+  @keyframes cd-in {
+    from {
+      transform: translateY(65%);
+      opacity: 0;
+    }
+  }
+  /* the labels: English over Hindi, small but dark enough to read in the sun */
+  .cd-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 7px;
+    line-height: 1.25;
+    color: #7a561c;
+  }
+  .cd-label-en {
+    position: relative;
+    font-family: var(--font-body);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .cd-label-hi {
+    font-size: 11.5px;
+    font-weight: 600;
+  }
+  /* by the seconds, a small rudraksha-gold bead that beats once a second */
+  .cd-bead {
+    position: absolute;
+    right: -11px;
+    top: 50%;
+    width: 6px;
+    height: 6px;
+    margin-top: -3px;
+    border-radius: 9999px;
+    background: radial-gradient(circle at 35% 35%, #ecc77f, #a8741f 60%, #6d4a14);
+    animation: cd-beat 900ms ease-out both;
+  }
+  .cd-bead-still {
+    animation: none;
+  }
+  @keyframes cd-beat {
+    0% {
+      transform: scale(1);
+      opacity: 0.7;
+    }
+    30% {
+      transform: scale(1.55);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 0.75;
     }
   }
 

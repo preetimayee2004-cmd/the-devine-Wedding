@@ -25,8 +25,8 @@ export function MusicToggle({ visible }: { visible: boolean }) {
       onClick={toggle}
       aria-pressed={playing}
       aria-label={playing ? "Turn off the temple bells" : "Play soft temple bells"}
-      className={`fixed right-4 z-40 flex h-10 w-10 items-center justify-center rounded-full border border-gold/70 bg-ivory/80 text-navy shadow-[0_4px_14px_-6px_rgb(var(--navy)/0.35)] backdrop-blur-sm transition-opacity duration-500 hover:bg-ivory ${visible ? "opacity-100" : "pointer-events-none opacity-0"}`}
-      style={{ top: "calc(var(--status-bar) + 12px)" }}
+      className={`fixed right-5 z-40 flex h-10 w-10 items-center justify-center rounded-full border border-gold/70 bg-ivory/80 text-navy shadow-[0_4px_14px_-6px_rgb(var(--navy)/0.35)] backdrop-blur-sm transition-opacity duration-500 hover:bg-ivory ${visible ? "opacity-100" : "pointer-events-none opacity-0"}`}
+      style={{ top: "calc(var(--status-bar) + 22px)" }}
     >
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
         {/* a temple bell */}

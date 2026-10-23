@@ -78,13 +78,12 @@ export const wedding = {
 
   /**
    * Section 02 — the welcome on the sky between the arch and the couple at the Shivling.
-   * {guest} = the guest's name from the link (?guest=…), or `everyone` when the link has none.
+   * {guest} = the guest's name from the link (?guest=…), or `guest.fallbackName` when the link has none.
    * Names, date and venue come from `couple`, `wedding` and `venue`. A tap on the hashtag copies it.
    */
   coupleWelcome: {
     welcome: "Welcome",
     dear: "Dear {guest},",
-    everyone: "Family & Friends",
     invited: "you are warmly invited",
     hashtag: "#PreetiWedsShivasish",
     copied: "Copied",
@@ -100,6 +99,8 @@ export const wedding = {
     eyebrow: "शुभ मुहूर्त",
     title: "Countdown Begins",
     labels: { days: "Days", hours: "Hours", minutes: "Minutes", seconds: "Seconds" },
+    /** The line above the numbers. */
+    lead: "Hamare vivah mein baaki hain",
     /** Read out for the wedding's date in the little calendar. */
     weddingDay: "wedding day",
     /** With the EN / हिं switch on हिं (the date and the calendar's month and days come from the date). */
@@ -107,11 +108,14 @@ export const wedding = {
       title: "उल्टी गिनती शुरू",
       labels: { days: "दिन", hours: "घंटे", minutes: "मिनट", seconds: "सेकंड" },
       weddingDay: "विवाह का दिन",
+      lead: "हमारे विवाह में बाकी हैं",
+      today: { title: "आज हमारा विवाह है", line: "महादेव के आशीर्वाद से, आज दो दिल एक हो रहे हैं।" },
+      after: { title: "शुभ विवाह", line: "हमें आशीर्वाद देने के लिए धन्यवाद।" },
     },
     /** Shown on the wedding day itself (at the venue), instead of the numbers. */
-    today: { title: "Today Is the Day", line: "Today, two hearts become one." },
+    today: { title: "Aaj Hamara Vivah Hai", line: "Today, with Mahadev's blessings, two hearts become one." },
     /** Shown once the wedding day has passed. */
-    after: { title: "Happily Married", line: "With the blessings of Mahadev and Maa Parvati." },
+    after: { title: "Shubh Vivah", line: "Thank you for blessing us." },
   },
 
   /**
