@@ -202,9 +202,13 @@
   }
 
   /* Events: the couple's arch, edge to edge on a phone (its banana leaves run off the left side);
-     it rises in gently, once. */
+     it rises in gently, once. Inside it, one ceremony at a time, all sized to the arch's own width
+     (cqw), so a real phone and the desktop's phone show it in the same proportions. */
   .events-arch {
+    position: relative;
     margin: 22px calc(var(--gutter) * -1) 0;
+    aspect-ratio: 1098 / 1228;
+    container-type: inline-size;
     opacity: 0;
     transform: translateY(18px);
     transition:
@@ -218,6 +222,368 @@
   .events-arch[data-still] {
     transform: none;
     transition: opacity 400ms linear;
+  }
+  .ea-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    user-select: none;
+    pointer-events: none;
+  }
+  /* the leaves and lotus: the faintest sway, each at its own pace */
+  .ea-sway {
+    will-change: transform;
+    animation: ea-sway 6s ease-in-out infinite alternate;
+  }
+  @keyframes ea-sway {
+    from {
+      transform: rotate(calc(var(--a) * -1));
+    }
+    to {
+      transform: rotate(var(--a));
+    }
+  }
+
+  /* the card: the couple in the arch's upper part, standing on one line; the words below them */
+  .ev-card {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .ev-figure {
+    position: absolute;
+    left: 15%;
+    width: 72%;
+    top: 11%;
+    height: 31.8%;
+  }
+  .ev-figure img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: 50% 100%;
+  }
+  .ev-words {
+    position: absolute;
+    left: 25.5%;
+    width: 50%;
+    top: 44.2%;
+    text-align: center;
+    color: rgb(var(--slate));
+  }
+  .ev-name {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 7cqw;
+    line-height: 1.04;
+    color: rgb(var(--navy));
+    text-wrap: balance;
+  }
+  .ev-when,
+  .ev-venue,
+  .ev-dress {
+    margin-top: 0.7cqw;
+    font-family: var(--font-body);
+    font-size: max(3.2cqw, 10.5px);
+    line-height: 1.32;
+    text-wrap: balance;
+  }
+  .ev-when {
+    margin-top: 1.6cqw;
+    font-weight: 500;
+  }
+  .ev-sep {
+    color: rgb(var(--gold-ink));
+  }
+  .ev-label {
+    font-size: 0.82em;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgb(var(--gold-ink));
+  }
+  /* the whole arch is the button (it sits over everything, invisible) */
+  .ev-tap {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .ev-tap:focus-visible {
+    outline: 2px solid rgb(var(--gold-ink) / 0.7);
+    outline-offset: -6px;
+    border-radius: 20px;
+  }
+
+  /* a tap: the card dissolves into the falling water — a soft wash sweeps down it as it drifts down… */
+  .ev-card[data-phase="wash"] {
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, transparent 44%, #000 56%, #000 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, transparent 44%, #000 56%, #000 100%);
+    -webkit-mask-size: 100% 300%;
+    mask-size: 100% 300%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    animation: ev-wash 640ms cubic-bezier(0.45, 0, 0.55, 1) 70ms both;
+  }
+  @keyframes ev-wash {
+    from {
+      -webkit-mask-position: 0 100%;
+      mask-position: 0 100%;
+      opacity: 1;
+      transform: none;
+    }
+    to {
+      -webkit-mask-position: 0 0%;
+      mask-position: 0 0%;
+      opacity: 0.15;
+      transform: translateY(22px);
+    }
+  }
+  /* …and the next one rises in, its words just after */
+  .ev-card[data-phase="enter"] .ev-figure {
+    animation: ev-rise 800ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  }
+  .ev-card[data-phase="enter"] .ev-words {
+    animation: ev-words 600ms ease-out 180ms both;
+  }
+  @keyframes ev-rise {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes ev-words {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* the Ganga: from the arch's top to the card's foot in 0.5s, glistening; then it thins away */
+  .ev-ganga-run {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+  }
+  .ev-ganga {
+    position: absolute;
+    left: 51%;
+    top: 1.7%;
+    height: 71%;
+    width: 7cqw;
+    margin-left: -3.5cqw;
+    transform-origin: 50% 0;
+    animation: ev-fall 500ms cubic-bezier(0.5, 0, 0.75, 0.6) both;
+  }
+  .ev-ganga-thin {
+    position: absolute;
+    inset: 0;
+    animation: ev-thin 340ms ease-in 760ms both;
+  }
+  .ev-ganga-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(closest-side, rgb(160 212 244 / 0.7), rgb(176 220 246 / 0.25) 60%, rgb(196 230 250 / 0) 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 8%, #000 86%, transparent);
+    mask-image: linear-gradient(to bottom, transparent, #000 8%, #000 86%, transparent);
+  }
+  .ev-ganga-core {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 1.4cqw;
+    margin-left: -0.7cqw;
+    border-radius: 9999px;
+    background:
+      linear-gradient(to right, transparent 30%, rgb(255 255 255 / 0.95) 50%, transparent 70%),
+      linear-gradient(to bottom, rgb(255 255 255 / 0), #e6f6ff 5%, #9fd3f2 30%, #84c3ea 62%, rgb(226 190 112 / 0.9) 90%, rgb(226 190 112 / 0));
+  }
+  .ev-ganga-shine {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 0.5cqw;
+    height: 22%;
+    margin-left: -0.25cqw;
+    border-radius: 9999px;
+    background: linear-gradient(to bottom, rgb(255 255 255 / 0), #fff, rgb(255 255 255 / 0));
+    animation: ev-shine 520ms linear 120ms 2 both;
+  }
+  @keyframes ev-fall {
+    from {
+      transform: scaleY(0);
+    }
+    to {
+      transform: scaleY(1);
+    }
+  }
+  @keyframes ev-thin {
+    from {
+      transform: scaleX(1);
+      opacity: 1;
+    }
+    to {
+      transform: scaleX(0.12);
+      opacity: 0;
+    }
+  }
+  @keyframes ev-shine {
+    from {
+      transform: translateY(-20%);
+      opacity: 0;
+    }
+    15% {
+      opacity: 1;
+    }
+    to {
+      transform: translateY(420%);
+      opacity: 0;
+    }
+  }
+  /* droplets thrown off the stream, and a few lotus petals carried down */
+  .ev-drop,
+  .ev-petal {
+    position: absolute;
+    left: calc(51% + var(--x));
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+  .ev-drop {
+    width: calc(1.25cqw * var(--s));
+    height: calc(1.8cqw * var(--s));
+    border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+    background: radial-gradient(circle at 35% 30%, #fff, #bfe2f7 40%, #6fb4e0);
+    animation: ev-drop 620ms cubic-bezier(0.3, 0, 0.7, 1) both;
+  }
+  @keyframes ev-drop {
+    0% {
+      opacity: 0;
+      transform: translate(0, 0) scale(0.5);
+    }
+    20% {
+      opacity: 0.95;
+    }
+    100% {
+      opacity: 0;
+      transform: translate(var(--dx), var(--dy)) scale(1);
+    }
+  }
+  .ev-petal {
+    width: 2.1cqw;
+    height: 3.6cqw;
+    border-radius: 50% 50% 50% 50% / 72% 72% 28% 28%;
+    background: linear-gradient(170deg, #fde3ea, #f2a9be 55%, #e07c9b);
+    animation: ev-petal 1000ms cubic-bezier(0.33, 0, 0.5, 1) both;
+  }
+  @keyframes ev-petal {
+    0% {
+      opacity: 0;
+      transform: translate(0, 0) rotate(0deg) scale(0.7);
+    }
+    15% {
+      opacity: 0.95;
+    }
+    100% {
+      opacity: 0;
+      transform: translate(var(--dx), var(--dy)) rotate(var(--turn)) scale(1);
+    }
+  }
+
+  /* under the arch: the ceremonies counted in small dots, and the first-time hint */
+  .ev-foot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+    min-height: 22px;
+  }
+  .ev-dots {
+    display: flex;
+    gap: 8px;
+  }
+  .ev-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 9999px;
+    background: rgb(182 154 103 / 0.35);
+    transition:
+      background 400ms ease,
+      transform 400ms ease;
+  }
+  .ev-dot[data-on] {
+    background: rgb(var(--gold-ink));
+    transform: scale(1.35);
+  }
+  .ev-hint {
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: rgb(var(--gold-ink));
+    animation: ev-hint 2.6s ease-in-out infinite;
+  }
+  @keyframes ev-hint {
+    0%,
+    100% {
+      opacity: 0.95;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+  .ev-credit {
+    font-family: var(--font-body);
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    color: rgb(var(--slate) / 0.6);
+  }
+
+  /* reduced motion: nothing sways, nothing flows — the card simply crossfades */
+  .events-arch[data-still] .ea-sway {
+    animation: none;
+  }
+  .ev-card[data-still][data-phase="wash"] {
+    -webkit-mask-image: none;
+    mask-image: none;
+    animation: ev-fade-out 200ms linear both;
+  }
+  .ev-card[data-still][data-phase="enter"] .ev-figure,
+  .ev-card[data-still][data-phase="enter"] .ev-words {
+    animation: ev-fade-in 300ms linear both;
+  }
+  .ev-card[data-still] ~ .ev-foot .ev-hint {
+    animation: none;
+  }
+  @keyframes ev-fade-out {
+    to {
+      opacity: 0;
+    }
+  }
+  @keyframes ev-fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ev-hint {
+      animation: none;
+    }
   }
 
   /* RSVP: the seal's glow, ring and scatter of gold. */

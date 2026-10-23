@@ -7,6 +7,7 @@
  */
 import {
   list,
+  type Ceremony,
   type Contact,
   type FamilySide,
   type Photo,
@@ -113,10 +114,53 @@ export const wedding = {
     after: { title: "Happily Married", line: "With the blessings of Mahadev and Maa Parvati." },
   },
 
-  /** Section 05 — the wedding events: the heading and one quote above the couple's arch. */
+  /**
+   * Section 05 — the wedding events: the heading and one quote above the couple's arch, and inside
+   * the arch one ceremony at a time — a tap moves to the next (the Ganga washes the card away), and
+   * after the last it comes back to the first.
+   *
+   * ▶ SAMPLE details (dates, times, venues, dress codes): replace them with your own. Each line
+   *   wraps by itself if it is long. Images: a couple cut out on a transparent background, in
+   *   public/art/events/ (any size; it is fitted into the arch, standing on its foot).
+   */
   events: {
     title: "Wedding Events",
     quote: "Every ritual, a blessing; every moment, a memory we hope to share with you.",
+    list: list<Ceremony>([
+      {
+        name: "Mehendi",
+        date: "Wednesday, 10 February 2027",
+        time: "4:00 PM",
+        venue: "Kailash Vatika, Varanasi",
+        dressCode: "Shades of green",
+        image: { src: "/art/events/mehendi.webp", width: 444, height: 531, alt: "The couple at the Mehendi, her hands painted with henna, she in green" },
+      },
+      {
+        name: "Sangeet",
+        date: "Wednesday, 10 February 2027",
+        time: "8:00 PM",
+        venue: "The Lawn, Kailash Vatika",
+        dressCode: "Indo-western glam",
+        image: { src: "/art/events/sangeet.webp", width: 506, height: 556, alt: "The couple dancing at the Sangeet, she twirling in a red lehenga, he in a tuxedo" },
+        credit: "Illustration by @aarchi_sharma_",
+      },
+      {
+        name: "Haldi",
+        date: "Thursday, 11 February 2027",
+        time: "10:00 AM",
+        venue: "Kailash Vatika, Varanasi",
+        dressCode: "Yellow and white",
+        image: { src: "/art/events/haldi.webp", width: 586, height: 640, alt: "The couple at the Haldi in yellow, marigold petals falling as they dance" },
+      },
+      {
+        name: "Shubh Vivah",
+        date: "Friday, 12 February 2027",
+        time: "7:30 PM",
+        venue: "Kailash Vatika, Varanasi",
+        dressCode: "Pastels and gold",
+        image: { src: "/art/events/wedding.webp", width: 433, height: 640, alt: "The bride and groom in blush pink and gold, walking hand in hand" },
+      },
+    ]),
   },
 
   /** Section 06 — two families. SAMPLE: real names and photos replace these. */

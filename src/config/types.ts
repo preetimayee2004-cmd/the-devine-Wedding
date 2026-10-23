@@ -15,6 +15,21 @@ export type Motif = "lotus" | "diya" | "kalash" | "crescent" | "knot";
 export type EventIcon =
   "mehendi" | "sangeet" | "haldi" | "baraat" | "welcome" | "knot" | "sindoor" | "bidaai" | "reception";
 
+/** One ceremony, as its card shows it inside the events arch. Plain words, shown as written. */
+export interface Ceremony {
+  name: string;
+  /** e.g. "Wednesday, 10 February 2027" */
+  date: string;
+  /** e.g. "4:00 PM" */
+  time: string;
+  venue: string;
+  dressCode: string;
+  /** The couple dressed for it: a cut-out (transparent background), with its pixel size. */
+  image: { src: string; width: number; height: number; alt: string };
+  /** The illustration's artist, shown small under the arch while this card is up (optional). */
+  credit?: string;
+}
+
 export interface FamilyMember {
   relation: string;
   name: string;
