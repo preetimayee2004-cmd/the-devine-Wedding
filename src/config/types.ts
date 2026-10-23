@@ -8,10 +8,6 @@ export interface Photo {
   caption?: string;
   /** Which part stays in view when a frame crops it (CSS object-position), e.g. "50% 25%". */
   focus?: string;
-  /** Gallery only: its frame — the temple arch (default), a round "chandra" moon, or a tilted polaroid. */
-  frame?: "arch" | "moon" | "polaroid";
-  /** Gallery only: the photo's own colour, which the section's light wash takes on while it is shown. */
-  tint?: string;
 }
 
 export type Motif = "lotus" | "diya" | "kalash" | "crescent" | "knot";

@@ -197,15 +197,12 @@ export const wedding = {
   },
 
   /**
-   * Section 07 — the gallery: a coverflow of the couple's photos under a gold constellation.
+   * Section 07 — the gallery: a slideshow of the couple's photos.
    *
-   * The first photo starts in the centre; the arrows (or a swipe) turn through the rest in this
-   * order, and it loops — so the last one waits just to the left of the first. Each `caption` shows
-   * under the photo in the centre (keep them short). The photos are 3:4, shown whole in their
-   * frames; another shape is cropped to fit (`focus` says which part stays in view). `frame` puts a
-   * photo in a round "chandra" frame or a tilted polaroid (its caption then handwritten) instead of
-   * the arch; `tint` is its own colour, which the section's light wash takes on while it is shown. These are cut
-   * from the couple's shoot collage (public/photos/gallery-1..7.webp, each tile only ~240 px wide,
+   * The first photo is shown first; a swipe, a dot or the autoplay turns through the rest in this
+   * order, and it loops. Each `caption` shows under the photo (keep them short). The photos are 3:4,
+   * shown whole in their frame; another shape is cropped to fit (`focus` says which part stays in
+   * view). These are cut from the couple's shoot collage (public/photos/gallery-1..7.webp, each tile only ~240 px wide,
    * enlarged 2x): the full-size originals will look sharper — put them in public/photos/ under the
    * same names.
    */
@@ -219,52 +216,42 @@ export const wedding = {
         alt: "The couple seated close on the old stone steps, she in a red silk saree, he in a white kurta",
         caption: "Side by side",
         focus: "52% 40%",
-        tint: "#90755c",
       },
       {
         src: "/photos/gallery-3.webp",
         alt: "He holds her close on the steps; she smiles, eyes lowered",
         caption: "Held close",
         focus: "50% 40%",
-        tint: "#917359",
       },
       {
         src: "/photos/gallery-4.webp",
         alt: "Forehead to forehead, his hand on her cheek",
         caption: "Forehead to forehead",
         focus: "45% 40%",
-        frame: "moon",
-        tint: "#83674e",
       },
       {
         src: "/photos/gallery-5.webp",
         alt: "He kisses her forehead as she smiles, by the old stone wall",
         caption: "A kiss on the forehead",
         focus: "55% 40%",
-        tint: "#89715b",
       },
       {
         src: "/photos/gallery-6.webp",
         alt: "Seated on the steps, she in front of him, both smiling",
         caption: "Smiles on the steps",
         focus: "50% 45%",
-        frame: "polaroid",
-        tint: "#8c735d",
       },
       {
         src: "/photos/gallery-7.webp",
         alt: "Arm in arm, walking down the old stone steps",
         caption: "Walking on together",
         focus: "50% 50%",
-        tint: "#876f55",
       },
       {
         src: "/photos/gallery-2.webp",
         alt: "On a stone path by the ghat steps, they reach for each other's hands as if to dance",
         caption: "A dance on the ghats",
         focus: "50% 50%",
-        frame: "polaroid",
-        tint: "#84715b",
       },
     ]),
   },

@@ -1432,426 +1432,167 @@
     animation: none;
   }
 
-  /* ── Section 07: Gallery — the couple's photos under a crescent moon ──
-     The photos stand on a stage (a size container, so a real phone and the desktop's phone match):
-     the centre one large and sharp, the ones beside it smaller, tilted, softened and dimmed, the
-     rest waiting out of sight. Each place sets --x (across), --s (size), --r (tilt) and --k (how
-     fast it follows a swipe: centre 1, sides 0.65; the sky 0.3). Transform and opacity only. */
-  .cf-wash {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-  }
-  .cf-wash span {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse 90% 55% at 50% 56%, rgb(var(--tint) / 0.22), rgb(var(--tint) / 0.08) 55%, transparent 82%);
-    transition: opacity 600ms ease;
-  }
-  .cf {
-    margin: 22px calc(var(--gutter) * -1) 0;
-    container-type: inline-size;
-    overflow-x: clip;
-  }
-  @media (min-width: 768px) {
-    .cf {
-      margin-inline: calc((100% - min(92vw, 60rem)) / 2);
-    }
-  }
-  .cf-stage {
-    --ease: cubic-bezier(0.25, 0.8, 0.25, 1);
-    --card-w: 62cqw;
-    --band: 70px;
-    --side-x: 62%;
-    --far-x: 108%;
-    --gone-x: 136%;
-    --drag: 0px;
-    position: relative;
-    height: calc(var(--band) + var(--card-w) * 4 / 3 + 18px);
-    touch-action: pan-y;
-    outline: none;
-    user-select: none;
-    -webkit-user-select: none;
+  /* ── Section 07: Gallery — a simple slideshow ──
+     One large photo in a softly domed frame with a fine double gold edge (3:4, sized to the screen
+     so a real phone and the desktop's phone match); a change lifts the shown photo away in seven
+     strips (each a slice of the same picture, placed in the frame's own width units, so they meet
+     without a seam), 70ms apart, revealing the next beneath it. Transform and opacity only. */
+  .ss {
+    margin-top: 22px;
     opacity: 0;
     transition: opacity 900ms ease-out;
   }
-  .cf-stage[data-shown] {
+  .ss[data-shown] {
     opacity: 1;
   }
-  @container (min-width: 620px) {
-    .cf-stage {
-      --card-w: min(44cqw, 380px);
-      --band: 92px;
-      --side-x: 47%;
-      --far-x: 86%;
-      --gone-x: 116%;
-    }
-  }
-  .cf-stage:focus-visible {
-    outline: 2px solid rgb(var(--gold-ink) / 0.6);
-    outline-offset: 4px;
-    border-radius: 14px;
-  }
-
-  .cf-card {
-    --x: 0%;
-    --s: 1;
-    --r: 0deg;
-    --k: 1;
-    --o: 1;
-    position: absolute;
-    left: 50%;
-    top: var(--band);
-    width: var(--card-w);
-    aspect-ratio: 3 / 4;
-    margin-left: calc(var(--card-w) / -2);
-    padding: 0;
-    border: 0;
-    background: none;
-    transform: translateX(calc(var(--x) + var(--drag) * var(--k))) scale(var(--s)) rotate(var(--r));
-    opacity: var(--o);
-    transition:
-      transform 680ms var(--ease),
-      opacity 680ms var(--ease);
-    will-change: transform;
+  .ss-stage {
+    width: min(86vw, 360px);
+    margin-inline: auto;
+    touch-action: pan-y;
+    outline: none;
+    cursor: zoom-in;
+    user-select: none;
+    -webkit-user-select: none;
     -webkit-tap-highlight-color: transparent;
   }
-  .cf-card[data-pos="c"] {
-    z-index: 5;
-    cursor: zoom-in;
+  .ss-stage:focus-visible .ss-frame {
+    outline: 2px solid rgb(var(--gold-ink) / 0.7);
+    outline-offset: 4px;
   }
-  .cf-card[data-pos="l1"],
-  .cf-card[data-pos="r1"] {
-    --s: 0.85;
-    --k: 0.65;
-    --o: 0.8;
-    z-index: 4;
-  }
-  .cf-card[data-pos="l1"] {
-    --x: calc(var(--side-x) * -1);
-    --r: -4deg;
-  }
-  .cf-card[data-pos="r1"] {
-    --x: var(--side-x);
-    --r: 4deg;
-  }
-  .cf-card[data-pos="l2"],
-  .cf-card[data-pos="r2"] {
-    --s: 0.72;
-    --k: 0.45;
-    --o: 0;
-    z-index: 3;
-    pointer-events: none;
-  }
-  .cf-card[data-pos="l2"] {
-    --x: calc(var(--far-x) * -1);
-    --r: -6deg;
-  }
-  .cf-card[data-pos="r2"] {
-    --x: var(--far-x);
-    --r: 6deg;
-  }
-  .cf-card[data-pos="l3"],
-  .cf-card[data-pos="r3"] {
-    --s: 0.6;
-    --k: 0.3;
-    --o: 0;
-    z-index: 2;
-    pointer-events: none;
-  }
-  .cf-card[data-pos="l3"] {
-    --x: calc(var(--gone-x) * -1);
-    --r: -8deg;
-  }
-  .cf-card[data-pos="r3"] {
-    --x: var(--gone-x);
-    --r: 8deg;
-  }
-  /* while a finger drags, everything follows it at once */
-  .cf-stage[data-dragging] .cf-card,
-  .cf-stage[data-dragging] .cf-sky,
-  .cf-stage[data-dragging] .cf-ornament,
-  .cf-stage[data-dragging] .cf-sparkles {
-    transition: none;
-  }
-  .cf-card:focus-visible {
-    outline: none;
-  }
-  .cf-card:focus-visible .cf-frame {
-    outline: 2px solid rgb(var(--gold-ink));
-    outline-offset: 3px;
-  }
-
-  /* the frames: a softly domed arch with a fine double gold edge (the default) … */
-  .cf-frame {
-    position: absolute;
-    inset: 0;
-    display: block;
-    padding: 5px;
+  .ss-frame {
+    position: relative;
+    aspect-ratio: 3 / 4;
+    padding: 6px;
     border: 1px solid rgb(182 154 103 / 0.9);
     border-radius: 50% 50% 7% 7% / 30% 30% 5% 5%;
     background: rgb(252 248 239 / 0.92);
-    box-shadow: 0 22px 40px -28px rgb(23 59 86 / 0.45);
+    box-shadow: 0 24px 44px -30px rgb(23 59 86 / 0.45);
   }
-  .cf-photo {
+  .ss-photo {
     position: relative;
-    display: block;
     width: 100%;
     height: 100%;
     overflow: hidden;
     border: 1px solid rgb(182 154 103 / 0.75);
     border-radius: 50% 50% 6% 6% / 29% 29% 4.5% 4.5%;
     background: linear-gradient(rgb(var(--sky)), rgb(var(--sky-pale)));
+    container-type: inline-size;
     transform: translateZ(0);
   }
-  .cf-photo img {
+  .ss-img {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
+    will-change: transform;
+    /* the slow Ken Burns zoom, once the photo is shown */
+    animation: ss-kb 6s ease-out 250ms both;
   }
-  /* … a round "chandra" frame … */
-  .cf-card[data-frame="moon"] .cf-frame {
-    inset: auto 0;
-    top: 16.67%;
-    aspect-ratio: 1;
-    border-radius: 50%;
-  }
-  .cf-card[data-frame="moon"] .cf-photo {
-    border-radius: 50%;
-  }
-  /* … or a polaroid, tilted a little, its caption written by hand */
-  .cf-card[data-frame="polaroid"] .cf-frame {
-    padding: 6% 6% 0;
-    border-color: rgb(182 154 103 / 0.45);
-    border-radius: 3px;
-    background: #fffdf8;
-    rotate: -3deg;
-    box-shadow: 0 18px 34px -22px rgb(23 59 86 / 0.5);
-  }
-  .cf-card[data-frame="polaroid"] .cf-photo {
-    height: 79%;
-    border-color: rgb(182 154 103 / 0.3);
-    border-radius: 2px;
-  }
-  .cf-polaroid-words {
-    display: block;
-    padding-top: 3%;
-    font-family: var(--font-script);
-    font-size: calc(var(--card-w) * 0.088);
-    line-height: 1.15;
-    color: #6b5330;
-    text-align: center;
-    white-space: nowrap;
-  }
-
-  /* softened beside; sharp in the centre, opening upward inside its frame as it arrives */
-  .cf-img-soft {
-    filter: blur(2.5px);
-    transform: scale(1.08);
-  }
-  .cf-reveal,
-  .cf-reveal-in {
-    position: absolute;
-    inset: 0;
-    display: block;
-  }
-  .cf-reveal {
-    opacity: 0;
-    transform: translateY(101%);
-    transition:
-      opacity 320ms ease,
-      transform 0s linear 320ms;
-  }
-  .cf-reveal-in {
-    transform: translateY(-101%);
-    transition: transform 0s linear 320ms;
-  }
-  .cf-card[data-active] .cf-reveal {
-    opacity: 1;
-    transform: none;
-    transition:
-      opacity 0s,
-      transform 720ms cubic-bezier(0.65, 0, 0.35, 1) 140ms;
-  }
-  .cf-card[data-active] .cf-reveal-in {
-    transform: none;
-    transition: transform 720ms cubic-bezier(0.65, 0, 0.35, 1) 140ms;
-  }
-  /* and once there, a slow Ken Burns: 1 → 1.05 over 6s, and back */
-  .cf-card[data-active] .cf-img-sharp {
-    animation: cf-kb 6s ease-in-out 900ms infinite alternate;
-  }
-  @keyframes cf-kb {
+  @keyframes ss-kb {
+    from {
+      transform: scale(1);
+    }
     to {
       transform: scale(1.05);
     }
   }
-
-  /* the small gold lotus over the centre frame (lower for the round one) */
-  .cf-ornament {
-    --y: calc(var(--card-w) * -0.11);
+  /* the photo that was, in strips: each lifts up and away (420ms), the next 70ms after */
+  .ss-strips {
     position: absolute;
-    left: 50%;
-    top: var(--band);
-    z-index: 6;
-    width: calc(var(--card-w) * 0.2);
-    margin-left: calc(var(--card-w) * -0.1);
-    pointer-events: none;
-    transform: translate(var(--drag), var(--y));
-    transition: transform 500ms var(--ease);
+    inset: 0;
+    z-index: 1;
+    transform-origin: 50% 50%;
   }
-  .cf-ornament svg {
-    display: block;
-    width: 100%;
-    height: auto;
-    filter: drop-shadow(0 1px 1px rgb(120 90 30 / 0.25));
-  }
-  .cf-stage[data-frame="moon"] .cf-ornament {
-    --y: calc(var(--card-w) * 0.11);
-  }
-  .cf-stage[data-frame="polaroid"] .cf-ornament {
-    --y: calc(var(--card-w) * -0.13);
-  }
-  /* sparkles at the corners: each fades in and out, somewhere a little different each time */
-  .cf-sparkles {
+  .ss-strip {
     position: absolute;
-    left: 50%;
-    top: var(--band);
-    z-index: 6;
-    width: var(--card-w);
-    aspect-ratio: 3 / 4;
-    margin-left: calc(var(--card-w) / -2);
-    pointer-events: none;
-    transform: translateX(var(--drag));
-    transition: transform 500ms var(--ease);
-  }
-  .cf-sparkle {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    margin: -5px 0 0 -5px;
-    background: radial-gradient(circle, rgb(255 246 214) 0 18%, transparent 20%),
-      conic-gradient(from 45deg, transparent 0 10%, rgb(233 205 143) 12% 13%, transparent 15% 35%, rgb(233 205 143) 37% 38%, transparent 40% 60%, rgb(233 205 143) 62% 63%, transparent 65% 85%, rgb(233 205 143) 87% 88%, transparent 90%);
-    -webkit-mask-image: radial-gradient(circle, #000 30%, transparent 72%);
-    mask-image: radial-gradient(circle, #000 30%, transparent 72%);
-    opacity: 0;
-    animation: cf-twinkle 3.6s ease-in-out infinite;
-  }
-  @keyframes cf-twinkle {
-    0%,
-    100% {
-      opacity: 0;
-      transform: scale(0.4) rotate(0deg);
-    }
-    45% {
-      opacity: 0.95;
-      transform: scale(1) rotate(25deg);
-    }
-    60% {
-      opacity: 0.85;
-    }
-  }
-
-  /* the sky: the thin gold crescent draws itself once; the moon follows it, slower than the photos */
-  .cf-sky {
-    position: absolute;
-    left: 0;
     top: 0;
-    overflow: visible;
-    pointer-events: none;
-    transform: translateX(calc(var(--drag) * 0.3));
-    transition: transform 680ms var(--ease);
+    width: calc(100% / 7 + 1px);
+    height: 100%;
+    background-repeat: no-repeat;
+    background-size: 100cqw auto;
+    will-change: transform, opacity;
+    animation: ss-lift 420ms cubic-bezier(0.55, 0, 0.75, 0.2) both;
   }
-  .cf-crescent {
-    fill: none;
-    stroke: #b69a67;
-    stroke-width: 1.2;
-    stroke-linecap: round;
-    stroke-dasharray: 1 1;
-    stroke-dashoffset: 1;
-    transition: stroke-dashoffset 1400ms ease-out 200ms;
-  }
-  .cf-crescent-inner {
-    stroke-width: 0.8;
-    opacity: 0.5;
-    transition-delay: 450ms;
-  }
-  .cf-stage[data-shown] .cf-crescent {
-    stroke-dashoffset: 0;
-  }
-  .cf-moon {
-    opacity: 0;
-    transition: opacity 700ms ease 1100ms;
-  }
-  .cf-stage[data-shown] .cf-moon {
-    opacity: 1;
-  }
-  .cf-moon-dark {
-    fill: rgb(182 154 103 / 0.14);
-    stroke: rgb(182 154 103 / 0.5);
-    stroke-width: 0.8;
-  }
-
-  /* the caption (handwritten for the moon and the polaroids), a fine gold rule beneath; small,
-     light arrows either side; under them, the moons — one for each photo, waxing to full */
-  .cf-controls {
-    display: grid;
-    grid-template-columns: 34px 1fr 34px;
-    align-items: center;
-    gap: 10px;
-    width: min(100% - 32px, 400px);
-    margin: 10px auto 0;
-  }
-  .cf-arrow {
-    display: grid;
-    place-items: center;
-    width: 34px;
-    height: 34px;
-    border: 1px solid rgb(182 154 103 / 0.4);
-    border-radius: 9999px;
-    background: transparent;
-    color: rgb(var(--gold-ink) / 0.7);
-    transition:
-      border-color 300ms ease,
-      color 300ms ease;
-  }
-  @media (hover: hover) {
-    .cf-arrow:hover {
-      border-color: rgb(182 154 103 / 0.8);
-      color: rgb(var(--gold-ink));
+  @keyframes ss-lift {
+    from {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateY(-36%);
+      opacity: 0;
     }
   }
-  .cf-arrow:focus-visible,
-  .cf-phase:focus-visible {
-    outline: 2px solid rgb(var(--gold-ink));
-    outline-offset: 2px;
+  /* or, in plain mode, simply fading */
+  .ss-fade-out {
+    z-index: 1;
+    animation: ss-fade 450ms linear both;
   }
-  .cf-caption {
-    display: flex;
-    min-height: 58px;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+  @keyframes ss-fade {
+    to {
+      opacity: 0;
+    }
   }
-  .cf-caption-text {
+  .ss-img[data-still] {
+    animation: none;
+  }
+  /* the caption, rising in once the photo is there; the dots — the one shown in deep navy */
+  .ss-caption {
+    margin-top: 14px;
+    min-height: 1.3em;
     font-family: var(--font-display);
     font-size: 22px;
     font-style: italic;
     font-weight: 500;
-    line-height: 1.2;
+    line-height: 1.25;
     color: rgb(var(--slate));
-    animation: cf-caption 600ms cubic-bezier(0.25, 0.8, 0.25, 1) both;
+    text-align: center;
+    animation: ss-caption 500ms ease-out 600ms both;
   }
-  .cf-caption-script {
-    font-family: var(--font-script);
-    font-size: 28px;
-    font-style: normal;
-    font-weight: 400;
-    color: #6b5330;
+  .ss-caption[data-still] {
+    animation: ss-fade-in 300ms linear both;
+  }
+  @keyframes ss-caption {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+  @keyframes ss-fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+  .ss-dots {
+    display: flex;
+    justify-content: center;
+    margin-top: 6px;
+  }
+  .ss-dot {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 32px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .ss-dot span {
+    width: 7px;
+    height: 7px;
+    border-radius: 9999px;
+    background: rgb(var(--navy) / 0.2);
+    transition:
+      background 400ms ease,
+      transform 400ms ease;
+  }
+  .ss-dot[data-on] span {
+    background: rgb(var(--navy));
+    transform: scale(1.2);
+  }
+  .ss-dot:focus-visible {
+    outline: 2px solid rgb(var(--gold-ink));
+    outline-offset: -4px;
+    border-radius: 9999px;
   }
   @keyframes cf-caption {
     from {
@@ -1862,41 +1603,6 @@
       opacity: 1;
       transform: none;
     }
-  }
-  .cf-caption-rule {
-    width: 64px;
-    height: 1px;
-    margin-top: 8px;
-    background: linear-gradient(90deg, transparent, rgb(182 154 103 / 0.8), transparent);
-  }
-  .cf-phases {
-    display: flex;
-    justify-content: center;
-    gap: 2px;
-    margin-top: 8px;
-  }
-  .cf-phase {
-    display: grid;
-    place-items: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 9999px;
-    opacity: 0.45;
-    transition:
-      opacity 400ms ease,
-      transform 400ms ease;
-  }
-  .cf-phase[data-on] {
-    opacity: 1;
-    transform: scale(1.3);
-  }
-  .cf-phase-dark {
-    fill: rgb(182 154 103 / 0.12);
-    stroke: rgb(182 154 103 / 0.65);
-    stroke-width: 0.7;
-  }
-  .cf-phase-lit {
-    fill: #c9a764;
   }
 
   /* full screen: the photo on a night-blue veil, its caption; turned to, it slides in from the side */
@@ -1946,12 +1652,6 @@
     color: rgb(var(--ivory) / 0.9);
     animation: cf-caption 500ms ease-out both;
   }
-  .cf-viewer-caption.cf-caption-script {
-    font-family: var(--font-script);
-    font-size: 30px;
-    font-style: normal;
-    color: #f3dca2;
-  }
   .cf-viewer-nav {
     display: flex;
     align-items: center;
@@ -1985,26 +1685,7 @@
     color: rgb(var(--ivory));
   }
 
-  /* reduced motion: places change at once, photos simply fade; nothing zooms, drifts or twinkles */
-  .cf-stage[data-still] .cf-card {
-    transition: opacity 250ms linear;
-  }
-  .cf-stage[data-still] .cf-reveal,
-  .cf-stage[data-still] .cf-reveal-in {
-    transform: none;
-    transition: opacity 250ms linear;
-  }
-  .cf-stage[data-still] .cf-card[data-active] .cf-img-sharp {
-    animation: none;
-  }
-  .cf-stage[data-still] .cf-crescent,
-  .cf-stage[data-still] .cf-moon,
-  .cf-stage[data-still] .cf-ornament,
-  .cf-stage[data-still] .cf-sky {
-    transition: none;
-  }
   @media (prefers-reduced-motion: reduce) {
-    .cf-caption-text,
     .cf-viewer-caption {
       animation: none;
     }
