@@ -418,11 +418,6 @@ export const wedding = {
     calendarLotusSize: { width: 240, height: 186 },
     /** Soft cloud bank (it parts for the countdown, and drifts over the Save the Date's peaks). */
     clouds: "/art/clouds.webp",
-    /**
-     * The gate's background, from the couple's design: a watercolour sky with clouds, a faint
-     * trishul, the crescent and the misty Himalaya at the foot (940 × 1672, shown to cover).
-     */
-    gateSky: "/art/gate-sky.webp",
   },
 
   /** An artwork credit shown at the very end, e.g. "Hands artwork © Artist name". Null shows none. */

@@ -4,7 +4,7 @@ import { ringGhanti } from "@/lib/templeBells";
 interface OpeningGateProps {
   /** The golden ॐ wax seal at its centre. */
   seal: string;
-  /** The watercolour sky behind it all (with its trishul, crescent and misty Himalaya). */
+  /** The sky behind it all: the opening's own sunrise over the Himalaya, so the gate fades into it unchanged. */
   sky: string;
   /** "You're invited", over the seal. */
   invited: string;
@@ -46,8 +46,8 @@ const DUST = [
 
 /**
  * Before the opening, every time the link opens — as in the couple's design: a
- * watercolour sky with soft clouds, a faint trishul and the crescent above, the
- * misty Himalaya at the foot; "You're invited" over a small gold lotus line;
+ * sunrise sky over the Himalaya (the opening's own, so the gate fades into the
+ * opening with the sky unchanged); "You're invited" over a small gold lotus line;
  * the golden ॐ wax seal, breathing, in a fine gold lotus mandala that turns
  * once in 40s, a warm glow behind it; and under it a hand in a gold circle,
  * gently pulsing, "Tap to open" and another lotus line. Gold dust rises.
@@ -148,7 +148,7 @@ export function OpeningGate({ seal, sky, invited, label, devanagari = false, red
         pointerEvents: phase === "leaving" ? "none" : undefined,
       }}
     >
-      {/* the sky: watercolour clouds, a faint trishul and the crescent, the Himalaya in mist at the foot */}
+      {/* the sky: the opening's sunrise over the Himalaya */}
       <img aria-hidden src={sky} alt="" draggable={false} className="gate-sky" />
 
       {/* gold dust rising */}

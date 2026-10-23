@@ -426,7 +426,7 @@ export function Invitation() {
       {gate !== "gone" && (
         <OpeningGate
           seal={assets.omSeal}
-          sky={assets.gateSky}
+          sky={assets.opening.sky}
           invited={t.youreInvited}
           label={t.touchToBegin}
           devanagari={hindi}
