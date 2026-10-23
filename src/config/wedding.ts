@@ -147,14 +147,15 @@ export const wedding = {
   },
 
   /**
-   * Section 07 — the gallery: seven photos along a crescent moon.
+   * Section 07 — the gallery: a coverflow of the couple's photos under a gold constellation.
    *
-   * Seven, in this order: the first is the main portrait, at the moon's widest part; the other six
-   * follow its curve from one horn to the other (three on each side of the portrait). Each is cropped
-   * to its frame (`focus` says which part stays in view), and the lightbox shows it whole with its
-   * `caption`. These seven are cut from the couple's shoot collage (public/photos/gallery-1..7.webp,
-   * each tile only ~240 px wide, enlarged 2x): the full-size originals will look sharper — put them
-   * in public/photos/ under the same names.
+   * The first photo starts in the centre; the arrows (or a swipe) turn through the rest in this
+   * order, and it loops — so the last one waits just to the left of the first. Each `caption` shows
+   * under the photo in the centre (keep them short). The photos are 3:4, shown whole in their
+   * frames; another shape is cropped to fit (`focus` says which part stays in view). These are cut
+   * from the couple's shoot collage (public/photos/gallery-1..7.webp, each tile only ~240 px wide,
+   * enlarged 2x): the full-size originals will look sharper — put them in public/photos/ under the
+   * same names.
    */
   gallery: {
     eyebrow: "Moments to Remember",
@@ -166,13 +167,6 @@ export const wedding = {
         alt: "The couple seated close on the old stone steps, she in a red silk saree, he in a white kurta",
         caption: "Side by side",
         focus: "52% 40%",
-      },
-      // along the crescent, from the upper horn …
-      {
-        src: "/photos/gallery-2.webp",
-        alt: "On a stone path by the ghat steps, they reach for each other's hands as if to dance",
-        caption: "A dance on the ghats",
-        focus: "50% 50%",
       },
       {
         src: "/photos/gallery-3.webp",
@@ -186,7 +180,6 @@ export const wedding = {
         caption: "Forehead to forehead",
         focus: "45% 40%",
       },
-      // … past the portrait, to the lower horn
       {
         src: "/photos/gallery-5.webp",
         alt: "He kisses her forehead as she smiles, by the old stone wall",
@@ -203,6 +196,12 @@ export const wedding = {
         src: "/photos/gallery-7.webp",
         alt: "Arm in arm, walking down the old stone steps",
         caption: "Walking on together",
+        focus: "50% 50%",
+      },
+      {
+        src: "/photos/gallery-2.webp",
+        alt: "On a stone path by the ghat steps, they reach for each other's hands as if to dance",
+        caption: "A dance on the ghats",
         focus: "50% 50%",
       },
     ]),

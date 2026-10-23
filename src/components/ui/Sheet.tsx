@@ -34,7 +34,13 @@ export function Sheet({ open, onClose, label, variant = "sheet", children }: She
     }
     setShown(false);
     if (!dialog.open) return;
-    const timer = window.setTimeout(() => dialog.close(), EXIT_MS);
+    const timer = window.setTimeout(() => {
+      // closing hands focus back to whatever opened it; if that has since moved (a gallery photo
+      // turned aside), the browser would scroll to it — keep the page where the guest left it
+      const y = window.scrollY;
+      dialog.close();
+      if (window.scrollY !== y) window.scrollTo({ top: y, behavior: "instant" });
+    }, EXIT_MS);
     return () => clearTimeout(timer);
   }, [open]);
 

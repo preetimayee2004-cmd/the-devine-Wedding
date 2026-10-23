@@ -679,135 +679,332 @@
     }
   }
 
-  /* ── Section 07: Gallery — "Crescent Moon Memories" ──
-     Seven photos on a fine gold crescent (Gallery.tsx lays them out). On phones the moon reaches a
-     little into the side gutters; from 1000px it lies on its back across a wider stage. */
-  .gallery-stage {
-    margin: 28px calc(12px - var(--gutter)) 0;
+  /* ── Section 07: Gallery — a celestial coverflow ──
+     The photos stand on a stage (a size container): the one in the centre large, the ones before and
+     after it tucked in on either side, a little smaller and turned in 3D; the rest wait out of sight.
+     Over them, a gold constellation. Only transform, opacity and the lines' dash move. */
+  .cf {
+    margin: 26px calc(var(--gutter) * -1) 0;
+    container-type: inline-size;
+    overflow-x: clip;
   }
-  @media (min-width: 1000px) {
-    .gallery-stage {
+  @media (min-width: 768px) {
+    .cf {
       margin-inline: calc((100% - min(92vw, 60rem)) / 2);
     }
   }
-  .gallery-moon {
+  .cf-stage {
+    --ease: cubic-bezier(0.25, 0.8, 0.25, 1);
+    /* a phone: the centre photo large, the two beside it peeking in at the screen's edges */
+    --card-w: 62cqw;
+    --band: 64px;
+    --shift1: 62%;
+    --shift2: 104%;
+    --shift3: 128%;
+    --scale1: 0.8;
+    --scale2: 0.66;
+    --rot1: 16deg;
+    --rot2: 22deg;
+    --side: 0.9;
     position: relative;
-    margin-inline: auto;
-    width: min(100%, 400px);
-    container-type: inline-size;
+    height: calc(var(--band) + var(--card-w) * 4 / 3 + 12px);
+    perspective: 900px;
+    touch-action: pan-y;
+    outline: none;
   }
-  .gallery-moon[data-layout="cradle"] {
-    width: min(100%, 1000px);
+  /* wider: the centre photo a little over half the composition, the turn deeper */
+  @container (min-width: 620px) {
+    .cf-stage {
+      --card-w: min(44cqw, 380px);
+      --band: 88px;
+      --shift1: 46%;
+      --shift2: 84%;
+      --shift3: 116%;
+      --rot1: 30deg;
+      --rot2: 38deg;
+      --side: 0.88;
+      perspective: 1300px;
+    }
   }
-  .gallery-moon-art {
+  .cf-stage:focus-visible {
+    outline: 2px solid rgb(var(--gold-ink) / 0.7);
+    outline-offset: 4px;
+    border-radius: 14px;
+  }
+  /* moonlight: a soft ivory halo behind the centre */
+  .cf-moonlight {
     position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    overflow: visible;
-  }
-  /* the outline draws itself from horn to horn; the pale body follows it in */
-  .gallery-moon-line {
-    stroke: #b69a67;
-    stroke-linecap: round;
-    stroke-dasharray: 1 1;
-    stroke-dashoffset: 1;
-    transition: stroke-dashoffset 1500ms cubic-bezier(0.45, 0, 0.25, 1);
-  }
-  .gallery-moon-body {
-    fill: rgb(255 251 243 / 0.62);
-    opacity: 0;
-    transition: opacity 1200ms ease-out 500ms;
-  }
-  /* last, the two horn tips catch a soft gold glint, and keep it */
-  .gallery-glint {
-    opacity: 0;
-    transition: opacity 900ms ease-out 2700ms;
-  }
-  .gallery-moon[data-shown] .gallery-moon-line {
-    stroke-dashoffset: 0;
-  }
-  .gallery-moon[data-shown] .gallery-moon-body,
-  .gallery-moon[data-shown] .gallery-glint {
-    opacity: 1;
+    left: 50%;
+    top: calc(var(--band) - var(--card-w) * 0.2);
+    width: calc(var(--card-w) * 1.9);
+    aspect-ratio: 1;
+    translate: -50% 0;
+    background: radial-gradient(closest-side, rgb(255 251 240 / 0.85), rgb(255 251 240 / 0.3) 58%, transparent);
+    pointer-events: none;
   }
 
-  /* a photo: a fine antique-gold edge, a narrow ivory mat; the six rise in one by one */
-  .gallery-frame {
+  /* a photo, where it stands */
+  .cf-card {
     position: absolute;
-    display: block;
-    padding: 3px;
-    border: 1px solid rgb(182 154 103 / 0.8);
-    border-radius: var(--r) var(--r) var(--foot) var(--foot);
-    background: #fbf7ef;
-    box-shadow: 0 14px 28px -20px rgb(23 59 86 / 0.5);
-    opacity: 0;
-    transform: translateY(14px);
+    left: 50%;
+    top: var(--band);
+    width: var(--card-w);
+    aspect-ratio: 3 / 4;
+    margin-left: calc(var(--card-w) / -2);
+    padding: 0;
+    border: 0;
+    background: none;
     transition:
-      opacity 700ms cubic-bezier(0.22, 1, 0.36, 1) var(--delay),
-      transform 700ms cubic-bezier(0.22, 1, 0.36, 1) var(--delay),
-      border-color 300ms ease;
+      transform 680ms var(--ease),
+      opacity 680ms var(--ease);
+    will-change: transform;
     -webkit-tap-highlight-color: transparent;
   }
-  .gallery-frame-inner {
+  .cf-card[data-pos="c"] {
+    z-index: 5;
+    transform: none;
+    cursor: zoom-in;
+  }
+  .cf-card[data-pos="l1"],
+  .cf-card[data-pos="r1"] {
+    z-index: 4;
+    opacity: var(--side);
+  }
+  .cf-card[data-pos="l1"] {
+    transform: translateX(calc(var(--shift1) * -1)) scale(var(--scale1)) rotateY(var(--rot1));
+  }
+  .cf-card[data-pos="r1"] {
+    transform: translateX(var(--shift1)) scale(var(--scale1)) rotateY(calc(var(--rot1) * -1));
+  }
+  .cf-card[data-pos="l2"],
+  .cf-card[data-pos="r2"],
+  .cf-card[data-pos="l3"],
+  .cf-card[data-pos="r3"] {
+    z-index: 3;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .cf-card[data-pos="l2"] {
+    transform: translateX(calc(var(--shift2) * -1)) scale(var(--scale2)) rotateY(var(--rot2));
+  }
+  .cf-card[data-pos="r2"] {
+    transform: translateX(var(--shift2)) scale(var(--scale2)) rotateY(calc(var(--rot2) * -1));
+  }
+  .cf-card[data-pos="l3"] {
+    z-index: 2;
+    transform: translateX(calc(var(--shift3) * -1)) scale(0.55) rotateY(var(--rot2));
+  }
+  .cf-card[data-pos="r3"] {
+    z-index: 2;
+    transform: translateX(var(--shift3)) scale(0.55) rotateY(calc(var(--rot2) * -1));
+  }
+  .cf-card:focus-visible {
+    outline: none;
+  }
+  .cf-card:focus-visible .cf-frame {
+    outline: 2px solid rgb(var(--gold-ink));
+    outline-offset: 3px;
+  }
+
+  /* the frame: a soft dome, a fine double antique-gold edge with a narrow ivory mat between */
+  .cf-frame {
+    position: absolute;
+    inset: 0;
+    display: block;
+    padding: 5px;
+    border: 1px solid rgb(182 154 103 / 0.9);
+    border-radius: 50% 50% 7% 7% / 30% 30% 5% 5%;
+    background: rgb(252 248 239 / 0.9);
+    box-shadow: 0 22px 40px -28px rgb(23 59 86 / 0.45);
+  }
+  .cf-photo {
     display: block;
     width: 100%;
     height: 100%;
     overflow: hidden;
-    border-radius: calc(var(--r) - 4px) calc(var(--r) - 4px) calc(var(--foot) - 4px) calc(var(--foot) - 4px);
-    /* behind a painting cut out of its sky: the site's mist */
+    border: 1px solid rgb(182 154 103 / 0.75);
+    border-radius: 50% 50% 6% 6% / 29% 29% 4.5% 4.5%;
     background: linear-gradient(rgb(var(--sky)), rgb(var(--sky-pale)));
   }
-  .gallery-frame-img {
+  .cf-photo img {
     display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
-  /* the portrait: it fades in, easing back from a slight zoom */
-  .gallery-frame-portrait {
-    transform: none;
+  /* the photo arriving in the centre: its frame catches a brief, soft gold glint */
+  .cf-stage[data-shown] .cf-card[data-active] .cf-frame {
+    animation: cf-glint 1200ms ease-out 420ms both;
+  }
+  @keyframes cf-glint {
+    0%,
+    100% {
+      border-color: rgb(182 154 103 / 0.9);
+      box-shadow:
+        0 22px 40px -28px rgb(23 59 86 / 0.45),
+        0 0 0 0 rgb(233 205 143 / 0);
+    }
+    35% {
+      border-color: #dcc08a;
+      box-shadow:
+        0 22px 40px -28px rgb(23 59 86 / 0.45),
+        0 0 22px 3px rgb(233 205 143 / 0.55);
+    }
+  }
+
+  /* the constellation: drawn once, star by star; the centre photo's star and its two lines glow */
+  .cf-sky {
+    position: absolute;
+    left: 0;
+    top: 0;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .cf-seg {
+    stroke: #b69a67;
+    stroke-width: 1;
+    stroke-linecap: round;
+    stroke-dasharray: 1 1;
+    stroke-dashoffset: 1;
+    opacity: 0.5;
     transition:
-      opacity 800ms ease-out var(--delay),
-      border-color 300ms ease;
+      stroke-dashoffset 520ms ease-out calc(var(--i) * 150ms + 200ms),
+      opacity 600ms ease,
+      stroke-width 600ms ease;
   }
-  .gallery-frame-portrait .gallery-frame-img {
-    transform: scale(1.07);
-    transition: transform 1100ms cubic-bezier(0.22, 1, 0.36, 1) var(--delay);
+  .cf-stage[data-shown] .cf-seg {
+    stroke-dashoffset: 0;
   }
-  .gallery-moon[data-shown] .gallery-frame {
+  .cf-seg[data-lit] {
+    opacity: 1;
+    stroke-width: 1.4;
+  }
+  .cf-star {
+    opacity: 0;
+    transition: opacity 500ms ease-out calc(var(--i) * 150ms + 380ms);
+  }
+  .cf-stage[data-shown] .cf-star {
+    opacity: 1;
+  }
+  .cf-star-dot {
+    fill: #b69a67;
+  }
+  .cf-star-glow,
+  .cf-star-spark {
+    opacity: 0;
+    transform: scale(0.4);
+    transform-box: fill-box;
+    transform-origin: center;
+    transition:
+      opacity 650ms ease,
+      transform 650ms var(--ease);
+  }
+  .cf-star-spark {
+    fill: #c9a764;
+  }
+  .cf-star[data-active] .cf-star-glow,
+  .cf-star[data-active] .cf-star-spark {
     opacity: 1;
     transform: none;
   }
-  .gallery-moon[data-shown] .gallery-frame-portrait .gallery-frame-img {
-    transform: none;
+
+  /* the arrows either side of the caption */
+  .cf-controls {
+    display: grid;
+    grid-template-columns: 44px 1fr 44px;
+    align-items: center;
+    gap: 10px;
+    width: min(100% - 32px, 400px);
+    margin: 14px auto 0;
+  }
+  .cf-arrow {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid rgb(182 154 103 / 0.8);
+    border-radius: 9999px;
+    background: rgb(255 250 238 / 0.55);
+    color: #8a6a2e;
+    transition:
+      background 300ms ease,
+      border-color 300ms ease;
   }
   @media (hover: hover) {
-    .gallery-frame:hover {
-      border-color: rgb(182 154 103);
+    .cf-arrow:hover {
+      border-color: #b69a67;
+      background: rgb(255 250 238 / 0.95);
     }
   }
-  .gallery-frame:focus-visible {
+  .cf-arrow:focus-visible {
     outline: 2px solid rgb(var(--gold-ink));
     outline-offset: 3px;
   }
-  /* reduced motion: all as finished, in a short fade */
-  .gallery-moon[data-still] .gallery-moon-line {
-    transition: none;
+  .cf-caption {
+    min-height: 54px;
+    text-align: center;
   }
-  .gallery-moon[data-still] .gallery-moon-body,
-  .gallery-moon[data-still] .gallery-glint,
-  .gallery-moon[data-still] .gallery-frame {
-    transform: none;
-    transition: opacity 300ms linear;
+  .cf-caption-text {
+    font-family: var(--font-display);
+    font-size: 19px;
+    font-style: italic;
+    font-weight: 500;
+    line-height: 1.25;
+    color: rgb(var(--slate));
+    animation: cf-caption 600ms var(--ease, ease-out) both;
   }
-  .gallery-moon[data-still] .gallery-frame-img {
-    transform: none;
-    transition: none;
+  @keyframes cf-caption {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
   }
-  /* a painting cut out of its sky shows on the site's mist in the lightbox too */
+  .cf-count {
+    margin-top: 5px;
+    font-family: var(--font-body);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    color: rgb(var(--gold-ink));
+  }
+  /* the lightbox: the photo on the site's mist, a soft fade between photos */
   .gallery-lightbox-img {
     background: linear-gradient(rgb(var(--sky)), rgb(var(--sky-pale)));
+    animation: cf-lightbox 320ms ease-out both;
+  }
+  @keyframes cf-lightbox {
+    from {
+      opacity: 0;
+      transform: scale(0.985);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* reduced motion: the photos change places at once; nothing glints, nothing rises */
+  .cf-stage[data-still] .cf-card {
+    transition: opacity 200ms linear;
+  }
+  .cf-stage[data-still] .cf-seg,
+  .cf-stage[data-still] .cf-star,
+  .cf-stage[data-still] .cf-star-glow,
+  .cf-stage[data-still] .cf-star-spark {
+    transition: none;
+  }
+  .cf-stage[data-still] .cf-card[data-active] .cf-frame {
+    animation: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cf-caption-text,
+    .gallery-lightbox-img {
+      animation: none;
+    }
   }
 
   /* ── The gate, before the opening (every time the link opens) — as in the couple's design ──
