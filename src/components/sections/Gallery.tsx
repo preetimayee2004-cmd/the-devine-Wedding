@@ -22,25 +22,28 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
  * seven small dots (the one shown in deep navy). A swipe or a dot changes the photo — and every
  * 4 seconds it changes by itself while on screen (a touch holds it until 8 seconds of quiet).
  *
- * The change: the photo shown splits into seven upright strips which lift away one by one, 70ms
- * apart — left to right going forward, right to left going back — showing the next photo beneath
- * (about 0.9s; swipes meanwhile are ignored). The new photo then zooms slowly (1 → 1.05 over 6s)
- * and its caption rises in. A tap opens it full screen. Transform and opacity only; the next
- * photo is loaded before it is needed. Reduced motion, or a slow phone: a plain crossfade.
+ * The change, a focus pull in golden light: the photo shown drifts out of focus as it fades and
+ * zooms a little (blur 0 → 14px, 1.05 → 1.12, 0.5s); a thin warm sweep of golden light crosses the
+ * frame (0.9s) — left to right going forward, right to left going back — and 0.3s in, the next
+ * photo comes into focus (blur 14px → 0, 1.12 → 1.05). About 1.2s in all; taps and swipes meanwhile
+ * are ignored. Then a slow Ken Burns zoom (1.05 → 1.1 over 4s) and the caption rises in. A tap
+ * opens the photo full screen. Blur, transform, opacity only (8px of blur on a mid-range phone);
+ * the next photo is loaded before it is needed. Reduced motion, or a slow phone: a crossfade.
  */
 
 type Shown = Photo & { src: string };
-const STRIPS = 7;
 const AUTO_MS = 4000;
 const IDLE_MS = 8000;
-/** The change (ms): the last strip lifts away by ~840ms. */
-const TURN_MS = 950;
+/** The change (ms): the new photo is in focus by ~1.05s, the caption rises after. */
+const TURN_MS = 1200;
 const FADE_MS = 450;
 
-/** A phone too slow for the strips gets the plain crossfade. */
-const slowDevice = () => {
+/** A phone too slow for the focus pull gets the plain crossfade; a mid-range one, a lighter blur. */
+const device = () => {
   const n = navigator as Navigator & { deviceMemory?: number };
-  return (n.hardwareConcurrency ?? 8) <= 2 || (n.deviceMemory ?? 8) <= 1;
+  const cores = n.hardwareConcurrency ?? 8;
+  const memory = n.deviceMemory ?? 8;
+  return { slow: cores <= 2 || memory <= 1, mid: cores <= 4 || memory <= 2 };
 };
 
 /** Load (and decode) a photo before it is shown. */
@@ -60,11 +63,13 @@ export function Gallery() {
   const seen = useInView(sectionRef, { threshold: 0.08 });
   const stageSeen = useInView(stageRef, { threshold: 0.2 });
   const reduced = usePrefersReducedMotion();
-  const [simple] = useState(() => slowDevice());
-  const plain = reduced || simple;
+  const [{ slow, mid }] = useState(device);
+  const plain = reduced || slow;
   const [active, setActive] = useState(0);
-  // a change under way: the photo that was, the way the strips go (1: left to right), its zoom then
+  // a change under way: the photo that was, the way the light sweeps (1: left to right), its zoom then
   const [turn, setTurn] = useState<{ from: number; dir: 1 | -1; n: number; scale: number } | null>(null);
+  // the photo shown came in by a change (so it comes into focus), not on first showing
+  const [entering, setEntering] = useState(false);
   const [viewing, setViewing] = useState<{ from: DOMRect } | null>(null);
   const busy = useRef(false);
   const count = useRef(0);
@@ -80,11 +85,12 @@ export function Gallery() {
       if (busy.current || n < 2 || to === from) return;
       busy.current = true;
       await ready(photos[to].src);
-      // the shown photo's slow zoom at this moment, so its strips start exactly where it is
+      // the shown photo's slow zoom at this moment, so it drifts out of focus from exactly there
       const m = imgRef.current ? new DOMMatrix(getComputedStyle(imgRef.current).transform) : null;
       count.current += 1;
       setTurn({ from, dir, n: count.current, scale: m ? m.a : 1 });
       setActive(to);
+      setEntering(true);
       window.setTimeout(
         () => {
           setTurn(null);
@@ -179,13 +185,13 @@ export function Gallery() {
           onPointerUp={onPointerUp}
           onPointerCancel={() => (touch.current = null)}
         >
-          <div className="ss-frame">
+          <div className="ss-frame" data-soft={mid || undefined}>
             <div className="ss-photo">
-              {/* the photo shown: zooming slowly */}
+              {/* the photo shown: coming into focus (after a change), then zooming slowly */}
               <img
                 key={active}
                 ref={imgRef}
-                className="ss-img"
+                className={`ss-img${entering && !plain ? " ss-in" : ""}`}
                 src={photo.src}
                 alt={photo.alt}
                 width={484}
@@ -195,27 +201,19 @@ export function Gallery() {
                 style={{ objectPosition: photo.focus ?? "50% 40%" }}
                 data-still={plain || undefined}
               />
-              {/* the photo that was: lifting away in strips (or simply fading) */}
+              {/* the photo that was: drifting out of focus; and the sweep of golden light */}
               {old && turn && !plain && (
-                <div key={`s${turn.n}`} aria-hidden className="ss-strips" style={{ transform: `scale(${turn.scale})` }}>
-                  {Array.from({ length: STRIPS }, (_, i) => {
-                    const order = turn.dir === 1 ? i : STRIPS - 1 - i;
-                    return (
-                      <span
-                        key={i}
-                        className="ss-strip"
-                        style={
-                          {
-                            left: `calc(${i} * 100% / ${STRIPS})`,
-                            backgroundImage: `url(${old.src})`,
-                            backgroundPosition: `calc(${i} * -100cqw / ${STRIPS}) ${(old.focus ?? "50% 40%").split(" ")[1] ?? "40%"}`,
-                            animationDelay: `${order * 70}ms`,
-                          } as CSSProperties
-                        }
-                      />
-                    );
-                  })}
-                </div>
+                <>
+                  <img
+                    key={`o${turn.n}`}
+                    aria-hidden
+                    className="ss-img ss-out"
+                    src={old.src}
+                    alt=""
+                    style={{ objectPosition: old.focus ?? "50% 40%", "--from": turn.scale } as CSSProperties}
+                  />
+                  <span key={`l${turn.n}`} aria-hidden className="ss-sweep" data-dir={turn.dir} />
+                </>
               )}
               {old && turn && plain && (
                 <img key={`f${turn.n}`} aria-hidden className="ss-img ss-fade-out" src={old.src} alt="" style={{ objectPosition: old.focus ?? "50% 40%" }} />
