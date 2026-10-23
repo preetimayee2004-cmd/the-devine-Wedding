@@ -197,61 +197,85 @@ export const wedding = {
   },
 
   /**
-   * Section 07 — the gallery: a slideshow of the couple's photos.
+   * Section 07 — the gallery: the couple's photos as a heart of fourteen tiles.
    *
-   * The first photo is shown first; a swipe, a dot or the autoplay turns through the rest in this
-   * order, and it loops. Each `caption` shows under the photo (keep them short). The photos are 3:4,
-   * shown whole in their frame; another shape is cropped to fit (`focus` says which part stays in
-   * view). These are cut from the couple's shoot collage (public/photos/gallery-1..7.webp, each tile only ~240 px wide,
-   * enlarged 2x): the full-size originals will look sharper — put them in public/photos/ under the
-   * same names.
+   * Which photo each tile shows, and the crop of it, is set by the tiles in Gallery.tsx (by `src`);
+   * five of these show twice, once as a close-up. A tap brings a tile forward with its `caption`
+   * (keep them short). The photos are 3:4; `thumb` is a small copy (360px wide) for the tiles, the
+   * full photo is loaded when one is tapped. More photos than the heart shows: every 3s a tile turns
+   * over to show one of the others (cropped to the tile, `focus` says which part stays in view).
+   * These are cut from the couple's shoot collage (public/photos/gallery-1..9.webp, each tile only
+   * ~240px wide, enlarged 2x): the full-size originals will look sharper — put them in
+   * public/photos/ under the same names (and their small copies in public/photos/thumbs/).
    */
   gallery: {
     eyebrow: "Moments to Remember",
     title: "Our Gallery",
     intro: "Moments we hold close, like the moon in Mahadev's locks.",
+    hint: "Tap a photo",
     photos: list<Photo>([
       {
         src: "/photos/gallery-1.webp",
+        thumb: "/photos/thumbs/gallery-1.webp",
         alt: "The couple seated close on the old stone steps, she in a red silk saree, he in a white kurta",
         caption: "Side by side",
         focus: "52% 40%",
       },
       {
         src: "/photos/gallery-3.webp",
+        thumb: "/photos/thumbs/gallery-3.webp",
         alt: "He holds her close on the steps; she smiles, eyes lowered",
         caption: "Held close",
         focus: "50% 40%",
       },
       {
         src: "/photos/gallery-4.webp",
+        thumb: "/photos/thumbs/gallery-4.webp",
         alt: "Forehead to forehead, his hand on her cheek",
         caption: "Forehead to forehead",
         focus: "45% 40%",
       },
       {
         src: "/photos/gallery-5.webp",
+        thumb: "/photos/thumbs/gallery-5.webp",
         alt: "He kisses her forehead as she smiles, by the old stone wall",
         caption: "A kiss on the forehead",
         focus: "55% 40%",
       },
       {
         src: "/photos/gallery-6.webp",
+        thumb: "/photos/thumbs/gallery-6.webp",
         alt: "Seated on the steps, she in front of him, both smiling",
         caption: "Smiles on the steps",
         focus: "50% 45%",
       },
       {
         src: "/photos/gallery-7.webp",
+        thumb: "/photos/thumbs/gallery-7.webp",
         alt: "Arm in arm, walking down the old stone steps",
         caption: "Walking on together",
         focus: "50% 50%",
       },
       {
         src: "/photos/gallery-2.webp",
+        thumb: "/photos/thumbs/gallery-2.webp",
         alt: "On a stone path by the ghat steps, they reach for each other's hands as if to dance",
         caption: "A dance on the ghats",
         focus: "50% 50%",
+      },
+      {
+        src: "/photos/gallery-8.webp",
+        thumb: "/photos/thumbs/gallery-8.webp",
+        alt: "On the old ghat steps, a few steps apart, smiling at each other",
+        caption: "A few steps apart",
+        focus: "50% 35%",
+      },
+      {
+        src: "/photos/gallery-9.webp",
+        thumb: "/photos/thumbs/gallery-9.webp",
+        alt: "By the stone ledge of the ghat, she leans on the wall as he looks on",
+        caption: "By the ghat wall",
+        focus: "50% 30%",
       },
     ]),
   },

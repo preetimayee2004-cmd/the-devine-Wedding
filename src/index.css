@@ -1432,313 +1432,239 @@
     animation: none;
   }
 
-  /* ── Section 07: Gallery — a simple slideshow ──
-     One large photo in a softly domed frame with a fine double gold edge (3:4, sized to the screen
-     so a real phone and the desktop's phone match); a change is a focus pull in a sweep of golden
-     light. Blur, transform and opacity only. */
-  .ss {
-    margin-top: 22px;
-    opacity: 0;
-    transition: opacity 900ms ease-out;
+  /* ── Section 07: Gallery — the photos as a heart ──
+     Fourteen tiles clipped to the heart curve, a thin cream gap between them, in 900px of
+     perspective: each lifted off the heart by its size and drawn back to its place at rest, so a
+     tilt shows the depth. Sized to the screen (20px from each edge, up to 440px) and in its own
+     width units (cqw), so a real phone and the desktop's phone match. Transform and opacity. */
+  .hc-wrap {
+    margin: 22px calc(20px - var(--gutter)) 0;
   }
-  .ss[data-shown] {
-    opacity: 1;
-  }
-  .ss-stage {
-    width: min(86vw, 360px);
+  .hc {
+    position: relative;
+    width: min(100%, 440px);
     margin-inline: auto;
+    container-type: inline-size;
+    perspective: 900px;
     touch-action: pan-y;
-    outline: none;
-    cursor: zoom-in;
     user-select: none;
     -webkit-user-select: none;
     -webkit-tap-highlight-color: transparent;
   }
-  .ss-stage:focus-visible .ss-frame {
-    outline: 2px solid rgb(var(--gold-ink) / 0.7);
-    outline-offset: 4px;
-  }
-  .ss-frame {
+  .hc-beat {
     position: relative;
-    aspect-ratio: 3 / 4;
-    padding: 6px;
-    border: 1px solid rgb(182 154 103 / 0.9);
-    border-radius: 50% 50% 7% 7% / 30% 30% 5% 5%;
-    background: rgb(252 248 239 / 0.92);
-    box-shadow: 0 24px 44px -30px rgb(23 59 86 / 0.45);
+    aspect-ratio: 1000 / 904;
+    transform-style: preserve-3d;
   }
-  .ss-photo {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    border: 1px solid rgb(182 154 103 / 0.75);
-    border-radius: 50% 50% 6% 6% / 29% 29% 4.5% 4.5%;
-    background: linear-gradient(rgb(var(--sky)), rgb(var(--sky-pale)));
-    container-type: inline-size;
-    transform: translateZ(0);
+  /* the heartbeat, once the tiles are home: 1 → 1.03 → 1 and a softer second beat, every 1.6s */
+  .hc[data-phase="done"]:not([data-plain]) .hc-beat {
+    animation: hc-beat 1.6s ease-in-out infinite;
   }
-  .ss-img {
+  .hc[data-open] .hc-beat {
+    animation-play-state: paused;
+  }
+  @keyframes hc-beat {
+    0%,
+    30%,
+    62%,
+    100% {
+      transform: scale(1);
+    }
+    15% {
+      transform: scale(1.03);
+    }
+    44% {
+      transform: scale(1.015);
+    }
+  }
+  .hc-tilt {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+  /* the cream mount behind the tiles: the gaps between them, a thin rim round the heart, its shadow */
+  .hc-mount {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    will-change: transform;
-    transform: scale(1.05);
-    /* the slow Ken Burns zoom while it is shown */
-    animation: ss-kb 4s ease-out 250ms forwards;
+    overflow: visible;
+    transform: translateZ(-1px);
+    filter: drop-shadow(0 12px 18px rgb(18 41 74 / 0.16));
+    transition: opacity 700ms ease-out;
   }
-  @keyframes ss-kb {
-    from {
-      transform: scale(1.05);
-    }
-    to {
-      transform: scale(1.1);
-    }
+  .hc-mount path {
+    fill: rgb(252 248 239);
+    stroke: rgb(252 248 239);
+    stroke-width: 1.6;
+    stroke-linejoin: round;
   }
-  /* a change: the photo that was drifts out of focus as it fades and zooms a little (0.5s)… */
-  .ss-frame {
-    --blur: 14px;
-  }
-  .ss-frame[data-soft] {
-    --blur: 8px;
-  }
-  .ss-out {
-    z-index: 1;
-    will-change: transform, opacity, filter;
-    animation: ss-out 500ms cubic-bezier(0.4, 0, 0.8, 0.6) both;
-  }
-  @keyframes ss-out {
-    from {
-      opacity: 1;
-      filter: blur(0);
-      transform: scale(var(--from, 1.05));
-    }
-    to {
-      opacity: 0;
-      filter: blur(var(--blur));
-      transform: scale(1.12);
-    }
-  }
-  /* … the next comes into focus from 0.3s (0.75s), then zooms slowly on */
-  .ss-img.ss-in {
-    will-change: transform, opacity, filter;
-    animation:
-      ss-in 750ms cubic-bezier(0.2, 0.6, 0.3, 1) 300ms both,
-      ss-kb 4s ease-out 1050ms forwards;
-  }
-  @keyframes ss-in {
-    from {
-      opacity: 0;
-      filter: blur(var(--blur));
-      transform: scale(1.12);
-    }
-    to {
-      opacity: 1;
-      filter: blur(0);
-      transform: scale(1.05);
-    }
-  }
-  /* … while a thin warm sweep of golden light crosses the frame (0.9s), the way the guest went */
-  .ss-sweep {
+  /* a tile: lifted by its size (--z) and drawn back to its place (--dx, --dy, --s) */
+  .hc-tile {
     position: absolute;
-    top: -12%;
-    bottom: -12%;
-    left: 0;
-    z-index: 2;
-    width: 30%;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: zoom-in;
     pointer-events: none;
-    mix-blend-mode: screen;
-    opacity: 0.55;
-    background: linear-gradient(90deg, rgb(255 206 120 / 0) 0%, rgb(255 210 130 / 0.55) 32%, rgb(255 236 190 / 0.95) 50%, rgb(255 210 130 / 0.55) 68%, rgb(255 206 120 / 0) 100%);
+    outline: none;
+    transform: translate(var(--dx), var(--dy)) translateZ(var(--z)) rotate(0deg) scale(var(--s));
+    filter: drop-shadow(0 1px 2.5px rgb(18 41 74 / 0.22));
     will-change: transform;
-    animation: ss-sweep-ltr 900ms cubic-bezier(0.45, 0, 0.35, 1) both;
+    transition:
+      transform 600ms cubic-bezier(0.3, 0.7, 0.2, 1),
+      filter 450ms ease,
+      opacity 450ms ease;
   }
-  .ss-sweep[data-dir="-1"] {
-    animation-name: ss-sweep-rtl;
+  /* its clip to the heart (only the photo takes taps, not the corners cut away) */
+  .hc-clip {
+    position: absolute;
+    inset: 0;
+    pointer-events: auto;
+    perspective: 600px;
   }
-  @keyframes ss-sweep-ltr {
+  /* the photo, inset for the gap, with its back for turning over */
+  .hc-card {
+    position: absolute;
+    inset: 0.45cqw;
+    transform-style: preserve-3d;
+    transition: transform 800ms cubic-bezier(0.45, 0, 0.25, 1);
+  }
+  .hc-side {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: 4px;
+    background: rgb(233 223 204);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+  .hc-side[data-back] {
+    transform: rotateY(180deg);
+  }
+  .hc-img {
+    position: absolute;
+    max-width: none;
+    height: auto;
+    pointer-events: none;
+    -webkit-user-drag: none;
+  }
+  /* the full photo, over the small one once it has loaded */
+  .hc-big {
+    opacity: 0;
+    transition: opacity 300ms ease;
+  }
+  .hc-big[data-ready] {
+    opacity: 1;
+  }
+  .hc-tile:focus-visible .hc-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 4px;
+    box-shadow: inset 0 0 0 2px rgb(var(--gold-ink));
+    transform: translateZ(1px);
+  }
+  /* seen: each tile flies in from an edge, turned (--fr), and springs into place; the mount fades in */
+  .hc[data-phase="before"] .hc-tile,
+  .hc[data-phase="before"] .hc-mount {
+    opacity: 0;
+  }
+  .hc[data-phase="in"] .hc-tile {
+    animation: hc-in 520ms cubic-bezier(0.2, 1.25, 0.35, 1) var(--d) both;
+  }
+  @keyframes hc-in {
     from {
-      transform: translateX(-120%) skewX(-12deg);
-    }
-    to {
-      transform: translateX(350%) skewX(-12deg);
-    }
-  }
-  @keyframes ss-sweep-rtl {
-    from {
-      transform: translateX(350%) skewX(-12deg);
-    }
-    to {
-      transform: translateX(-120%) skewX(-12deg);
-    }
-  }
-  /* or, in plain mode, simply fading */
-  .ss-fade-out {
-    z-index: 1;
-    animation: ss-fade 450ms linear both;
-  }
-  @keyframes ss-fade {
-    to {
       opacity: 0;
+      transform: translate(calc(var(--dx) + var(--fx)), calc(var(--dy) + var(--fy))) translateZ(var(--z)) rotate(var(--fr))
+        scale(var(--s));
+    }
+    35% {
+      opacity: 1;
     }
   }
-  .ss-img[data-still] {
-    animation: none;
+  /* tapped: forward to the middle, larger, a deep shadow; the others dim and blur */
+  .hc-tile[data-open] {
+    z-index: 2;
+    cursor: zoom-out;
+    transform: translate(var(--ox), var(--oy)) translateZ(var(--pz)) rotate(0deg) scale(var(--os));
+    filter: drop-shadow(0 8px 12px rgb(18 41 74 / 0.42));
+    transition-duration: 650ms, 450ms, 450ms;
+    transition-timing-function: cubic-bezier(0.25, 1.15, 0.4, 1), ease, ease;
   }
-  /* the caption, rising in once the photo is there; the dots — the one shown in deep navy */
-  .ss-caption {
-    margin-top: 14px;
-    min-height: 1.3em;
+  .hc[data-open] .hc-tile:not([data-open]) {
+    opacity: 0.7;
+    filter: drop-shadow(0 1px 2.5px rgb(18 41 74 / 0.22)) blur(3px) brightness(0.86);
+  }
+  /* its caption, under it */
+  .hc-caption {
+    position: absolute;
+    left: 50%;
+    z-index: 3;
+    width: max-content;
+    max-width: 88%;
+    margin: 0;
+    padding: 4px 16px 5px;
+    border-radius: 9999px;
+    background: rgb(252 248 239 / 0.95);
+    box-shadow: 0 6px 16px -8px rgb(18 41 74 / 0.35);
     font-family: var(--font-display);
-    font-size: 22px;
+    font-size: 19px;
     font-style: italic;
     font-weight: 500;
     line-height: 1.25;
-    color: rgb(var(--slate));
+    color: rgb(var(--navy));
     text-align: center;
-    animation: ss-caption 500ms ease-out 950ms both;
-  }
-  .ss-caption[data-still] {
-    animation: ss-fade-in 300ms linear both;
-  }
-  @keyframes ss-caption {
-    from {
-      opacity: 0;
-      transform: translateY(8px);
-    }
-  }
-  @keyframes ss-fade-in {
-    from {
-      opacity: 0;
-    }
-  }
-  .ss-dots {
-    display: flex;
-    justify-content: center;
-    margin-top: 6px;
-  }
-  .ss-dot {
-    display: grid;
-    place-items: center;
-    width: 28px;
-    height: 32px;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .ss-dot span {
-    width: 7px;
-    height: 7px;
-    border-radius: 9999px;
-    background: rgb(var(--navy) / 0.2);
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, 6px);
     transition:
-      background 400ms ease,
-      transform 400ms ease;
+      opacity 250ms ease,
+      transform 250ms ease;
   }
-  .ss-dot[data-on] span {
-    background: rgb(var(--navy));
-    transform: scale(1.2);
+  .hc-caption[data-on] {
+    opacity: 1;
+    transform: translate(-50%, 0);
+    transition-duration: 400ms;
+    transition-delay: 280ms;
   }
-  .ss-dot:focus-visible {
-    outline: 2px solid rgb(var(--gold-ink));
-    outline-offset: -4px;
-    border-radius: 9999px;
-  }
-  @keyframes cf-caption {
-    from {
-      opacity: 0;
-      transform: translateY(8px);
-    }
-    to {
-      opacity: 1;
-      transform: none;
-    }
-  }
-
-  /* full screen: the photo on a night-blue veil, its caption; turned to, it slides in from the side */
-  .cf-viewer-stage {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 56px 16px 24px;
-    touch-action: none;
-  }
-  .cf-viewer-img {
-    width: min(92vw, calc(68dvh * 0.75));
-    height: auto;
-    aspect-ratio: 3 / 4;
-    object-fit: cover;
-    border: 1px solid rgb(var(--gold) / 0.6);
-    border-radius: 16px;
-    will-change: transform;
-    user-select: none;
-  }
-  .cf-viewer-enter[data-dir="1"] {
-    animation: cf-from-right 320ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
-  }
-  .cf-viewer-enter[data-dir="-1"] {
-    animation: cf-from-left 320ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
-  }
-  @keyframes cf-from-right {
-    from {
-      opacity: 0;
-      transform: translateX(40px);
-    }
-  }
-  @keyframes cf-from-left {
-    from {
-      opacity: 0;
-      transform: translateX(-40px);
-    }
-  }
-  .cf-viewer-caption {
+  /* "Tap a photo", until the first tap */
+  .hc-hint {
     margin-top: 14px;
+    min-height: 1.4em;
     font-family: var(--font-display);
-    font-size: 20px;
+    font-size: 17px;
     font-style: italic;
-    color: rgb(var(--ivory) / 0.9);
-    animation: cf-caption 500ms ease-out both;
+    color: rgb(var(--gold-ink));
+    text-align: center;
+    opacity: 0;
+    transition: opacity 700ms ease;
   }
-  .cf-viewer-nav {
-    display: flex;
-    align-items: center;
-    gap: 22px;
-    margin-top: 12px;
+  .hc-hint[data-shown] {
+    opacity: 1;
   }
-  .cf-viewer-btn {
-    display: grid;
-    place-items: center;
-    width: 40px;
-    height: 40px;
-    border: 1px solid rgb(var(--gold) / 0.5);
-    border-radius: 9999px;
-    color: rgb(var(--gold));
+  .hc-hint[data-gone] {
+    opacity: 0;
   }
-  .cf-viewer-count {
-    font-family: var(--font-body);
-    font-size: 12px;
-    letter-spacing: 0.2em;
-    color: rgb(var(--ivory) / 0.65);
+  /* reduced motion, or a slow phone: flat; the tiles fade in where they are; a tap is a simple zoom */
+  .hc[data-plain] {
+    perspective: none;
   }
-  .cf-viewer-close {
-    position: absolute;
-    right: 12px;
-    z-index: 2;
-    display: grid;
-    place-items: center;
-    width: 44px;
-    height: 44px;
-    border-radius: 9999px;
-    color: rgb(var(--ivory));
+  .hc[data-plain][data-phase="in"] .hc-tile {
+    animation: hc-fade 450ms ease-out var(--fd) both;
   }
-
-  @media (prefers-reduced-motion: reduce) {
-    .cf-viewer-caption {
-      animation: none;
+  @keyframes hc-fade {
+    from {
+      opacity: 0;
     }
+  }
+  .hc[data-plain] .hc-tile {
+    transition-duration: 220ms;
+    transition-timing-function: ease-out;
+  }
+  .hc[data-plain][data-open] .hc-tile:not([data-open]) {
+    filter: drop-shadow(0 1px 2.5px rgb(18 41 74 / 0.22)) brightness(0.86);
   }
 
   /* ── The gate, before the opening (every time the link opens) — as in the couple's design ──

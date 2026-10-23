@@ -1,49 +1,175 @@
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-  type CSSProperties,
-  type KeyboardEvent,
-  type PointerEvent,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { wedding } from "@/config/wedding";
 import type { Photo } from "@/config/types";
 import { useInView } from "@/hooks/useInView";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
-import { useScrollLock } from "@/hooks/useScrollLock";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 
 /**
- * Section 07 — "Our Gallery": a simple slideshow.
+ * Section 07 — "Our Gallery": the couple's photos as a heart.
  *
- * One large photo in a softly domed frame with a fine double gold edge; under it its caption and
- * seven small dots (the one shown in deep navy). A swipe or a dot changes the photo — and every
- * 4 seconds it changes by itself while on screen (a touch holds it until 8 seconds of quiet).
+ * Fourteen photos of different sizes, a thin cream gap between them, together make a heart: its
+ * outline is the classic heart curve, each tile clipped to it, so the edge is smooth. Seen the
+ * first time, the tiles fly in from the edges (turned up to ±15°, 70ms apart, about 1.4s) and
+ * settle with a little spring; then the heart beats, softly (1 → 1.03 → 1, every 1.6s).
  *
- * The change, a focus pull in golden light: the photo shown drifts out of focus as it fades and
- * zooms a little (blur 0 → 14px, 1.05 → 1.12, 0.5s); a thin warm sweep of golden light crosses the
- * frame (0.9s) — left to right going forward, right to left going back — and 0.3s in, the next
- * photo comes into focus (blur 14px → 0, 1.12 → 1.05). About 1.2s in all; taps and swipes meanwhile
- * are ignored. Then a slow Ken Burns zoom (1.05 → 1.1 over 4s) and the caption rises in. A tap
- * opens the photo full screen. Blur, transform, opacity only (8px of blur on a mid-range phone);
- * the next photo is loaded before it is needed. Reduced motion, or a slow phone: a crossfade.
+ * In 3D: the heart sits in 900px of perspective, each tile lifted off it by its size (the largest
+ * 0, the smallest 40px), and it tilts — up to ±8° — with the phone's gyroscope (an iPhone asks
+ * on the first tap; until it is allowed, or if it is not, a sideways drag tilts it), or with the
+ * mouse on a computer; the small tiles move more than the large. At rest each tile is drawn back
+ * to its place, so the gaps stay even.
+ *
+ * A tap brings a tile forward to the middle (larger, the full photo loaded for it), with a deep
+ * shadow and its caption; the others dim and blur. A tap, on it or anywhere else, sends it back;
+ * a swipe while it is forward brings the next or the one before. With more photos than the heart
+ * shows, every 3s one tile turns over (rotateY 180°) to show one of the others — one at a time,
+ * never while a photo is forward or the heart is being tilted.
+ *
+ * Transform and opacity (and filters for the shadows and the blur). Reduced motion, or a slow
+ * phone: no tilt, turning or beat; the tiles fade in where they are; a tap is a simple zoom.
  */
 
 type Shown = Photo & { src: string };
-const AUTO_MS = 4000;
-const IDLE_MS = 8000;
-/** The change (ms): the new photo is in focus by ~1.05s, the caption rises after. */
-const TURN_MS = 1200;
-const FADE_MS = 450;
+/** A crop of a 3:4 photo: its left, top and width, as fractions of the photo; the height follows the tile's shape. */
+type Crop = readonly [x: number, y: number, w: number];
+/** What a tile shows: a photo (its place in the list) and, for the tile's own photo, the crop of it. */
+type Shot = { photo: number; crop?: Crop };
+type Card = { faces: [Shot, Shot | null]; turns: number };
 
-/** A phone too slow for the focus pull gets the plain crossfade; a mid-range one, a lighter blur. */
-const device = () => {
+/** The heart's height to its width. */
+const RATIO = 0.904;
+/** The perspective, the smallest tile's lift, and how far forward a tapped photo comes (px). */
+const PERSPECTIVE = 900;
+const LIFT = 40;
+const FORWARD = 120;
+/** The tilt at most (degrees). */
+const TILT = 8;
+/** The fly-in: each tile this long after the one before (ms); one tile's flight. */
+const STAGGER = 70;
+const FLIGHT = 520;
+/** A tile turns over every… (ms), when there are photos the heart does not show. */
+const FLIP_MS = 3000;
+
+/**
+ * The tiles: each a box in the heart (left, top, right, bottom, as fractions of its width and
+ * height), its photo (by `src`) and the crop of it. Five photos show twice, once as a close-up.
+ */
+const TILES: readonly { box: readonly [number, number, number, number]; photo: string; crop: Crop }[] = [
+  { box: [0, 0.03, 0.25, 0.3], photo: "/photos/gallery-1.webp", crop: [0, 0.02, 1] },
+  { box: [0.25, 0, 0.5, 0.3], photo: "/photos/gallery-4.webp", crop: [0, 0, 1] },
+  { box: [0.5, 0, 0.75, 0.14], photo: "/photos/gallery-1.webp", crop: [0.075, 0.075, 0.7] },
+  { box: [0.5, 0.14, 0.75, 0.3], photo: "/photos/gallery-2.webp", crop: [0, 0.08, 1] },
+  { box: [0.75, 0.03, 1, 0.3], photo: "/photos/gallery-6.webp", crop: [0, 0.05, 1] },
+  { box: [0, 0.3, 0.3, 0.46], photo: "/photos/gallery-9.webp", crop: [0.05, 0.12, 0.9] },
+  { box: [0, 0.46, 0.3, 0.62], photo: "/photos/gallery-5.webp", crop: [0.02, 0.07, 0.8] },
+  { box: [0.3, 0.3, 0.7, 0.62], photo: "/photos/gallery-3.webp", crop: [0, 0.03, 1] },
+  { box: [0.7, 0.3, 1, 0.46], photo: "/photos/gallery-8.webp", crop: [0.08, 0.25, 0.85] },
+  { box: [0.7, 0.46, 1, 0.62], photo: "/photos/gallery-6.webp", crop: [0, 0.1, 1] },
+  { box: [0.19, 0.62, 0.4, 0.78], photo: "/photos/gallery-7.webp", crop: [0, 0.12, 1] },
+  { box: [0.4, 0.62, 0.6, 0.78], photo: "/photos/gallery-5.webp", crop: [0, 0.02, 1] },
+  { box: [0.6, 0.62, 0.81, 0.78], photo: "/photos/gallery-7.webp", crop: [0.3, 0.15, 0.65] },
+  { box: [0.358, 0.78, 0.642, 1], photo: "/photos/gallery-4.webp", crop: [0.12, 0.06, 0.75] },
+];
+
+/** The classic heart curve, in the heart's box (0–1 each way), 240 points round. */
+const HEART = (() => {
+  const pts = Array.from({ length: 240 }, (_, i) => {
+    const t = (i / 240) * 2 * Math.PI;
+    return [16 * Math.sin(t) ** 3, 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)];
+  });
+  const ys = pts.map((p) => p[1]);
+  const [lo, hi] = [Math.min(...ys), Math.max(...ys)];
+  return pts.map(([x, y]) => [(x + 16) / 32, (hi - y) / (hi - lo)]);
+})();
+/** The heart as an SVG path in a 100 × 90.4 box, for the cream mount behind the tiles. */
+const HEART_PATH = `M${HEART.map(([x, y]) => `${(x * 100).toFixed(2)} ${(y * 100 * RATIO).toFixed(2)}`).join("L")}Z`;
+
+const area = (p: number[][]) =>
+  Math.abs(p.reduce((s, a, i) => s + a[0] * p[(i + 1) % p.length][1] - p[(i + 1) % p.length][0] * a[1], 0)) / 2;
+
+/** The part of the heart inside a box, as a CSS polygon in the box's own % — none if it is all inside. */
+function clipTo([x0, y0, x1, y1]: readonly number[]) {
+  const sides: [(p: number[]) => boolean, (a: number[], b: number[]) => number[]][] = [
+    [(p) => p[0] >= x0, (a, b) => [x0, a[1] + ((x0 - a[0]) / (b[0] - a[0])) * (b[1] - a[1])]],
+    [(p) => p[0] <= x1, (a, b) => [x1, a[1] + ((x1 - a[0]) / (b[0] - a[0])) * (b[1] - a[1])]],
+    [(p) => p[1] >= y0, (a, b) => [a[0] + ((y0 - a[1]) / (b[1] - a[1])) * (b[0] - a[0]), y0]],
+    [(p) => p[1] <= y1, (a, b) => [a[0] + ((y1 - a[1]) / (b[1] - a[1])) * (b[0] - a[0]), y1]],
+  ];
+  // Sutherland–Hodgman: the heart cut by each side of the box in turn
+  let poly = HEART;
+  for (const [inside, cross] of sides) {
+    const out: number[][] = [];
+    poly.forEach((b, i) => {
+      const a = poly[(i + poly.length - 1) % poly.length];
+      if (inside(b)) {
+        if (!inside(a)) out.push(cross(a, b));
+        out.push(b);
+      } else if (inside(a)) out.push(cross(a, b));
+    });
+    poly = out;
+  }
+  const [w, h] = [x1 - x0, y1 - y0];
+  if (area(poly) > w * h * 0.999) return undefined;
+  const local: number[][] = [];
+  for (const [x, y] of poly) {
+    const p = [((x - x0) / w) * 100, ((y - y0) / h) * 100];
+    const q = local[local.length - 1];
+    if (!q || Math.hypot(p[0] - q[0], p[1] - q[1]) > 1) local.push(p);
+  }
+  return `polygon(${local.map(([x, y]) => `${x.toFixed(2)}% ${y.toFixed(2)}%`).join(",")})`;
+}
+
+/** Each tile's shape and place: its size, centre, aspect (width / height) and clip. */
+const GEOMETRY = TILES.map(({ box }) => {
+  const [x0, y0, x1, y1] = box;
+  const [w, h] = [x1 - x0, y1 - y0];
+  return { x0, y0, w, h, cx: x0 + w / 2, cy: y0 + h / 2, size: w * h, aspect: w / (h * RATIO), clip: clipTo(box) };
+});
+type Geometry = (typeof GEOMETRY)[number];
+const SIZES = GEOMETRY.map((g) => g.size);
+const [SMALLEST, LARGEST] = [Math.min(...SIZES), Math.max(...SIZES)];
+const pct = (v: number) => `${(v * 100).toFixed(3)}%`;
+/** How large a tile shows when tapped (times its size): about 86% of the heart's width or height. */
+const view = (g: Geometry) => Math.min(0.86 / g.w, 0.86 / g.h, 3.2);
+
+/**
+ * A tile's place, depth and forward pose, as CSS variables. Its lift (`--z`) would carry it out
+ * from the middle and enlarge it in the perspective, so at rest it is drawn back (`--dx`, `--dy`)
+ * and scaled down (`--s`) to sit exactly in its place; tilted, the lift shows as parallax.
+ */
+function tileStyle(g: Geometry, flat: boolean): CSSProperties {
+  const z = flat ? 0 : LIFT * (1 - (g.size - SMALLEST) / (LARGEST - SMALLEST));
+  const k = z / PERSPECTIVE;
+  const v = view(g);
+  return {
+    left: pct(g.x0),
+    top: pct(g.y0),
+    width: pct(g.w),
+    height: pct(g.h),
+    "--dx": pct(-((g.cx - 0.5) / g.w) * k),
+    "--dy": pct(-((g.cy - 0.5) / g.h) * k),
+    "--z": `${z.toFixed(1)}px`,
+    "--s": (1 - k).toFixed(4),
+    "--ox": pct((0.5 - g.cx) / g.w),
+    "--oy": pct((0.5 - g.cy) / g.h),
+    "--pz": flat ? "0px" : `${FORWARD}px`,
+    "--os": (flat ? v : v * (1 - FORWARD / PERSPECTIVE)).toFixed(4),
+  } as CSSProperties;
+}
+
+/** Where a photo sits in its tile: the tile's own photo by its crop; any other, covering it. */
+function shotStyle(g: Geometry, shot: Shot, photo: Shown): CSSProperties {
+  if (!shot.crop) return { inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: photo.focus ?? "50% 40%" };
+  const [x, y, w] = shot.crop;
+  return { width: pct(1 / w), left: pct(-x / w), top: pct((-y * g.aspect) / (w * 0.75)) };
+}
+
+const face = (c: Card) => c.faces[c.turns % 2]!;
+
+/** A phone too slow for the 3D gets the plain heart. */
+const slowDevice = () => {
   const n = navigator as Navigator & { deviceMemory?: number };
-  const cores = n.hardwareConcurrency ?? 8;
-  const memory = n.deviceMemory ?? 8;
-  return { slow: cores <= 2 || memory <= 1, mid: cores <= 4 || memory <= 2 };
+  return (n.hardwareConcurrency ?? 8) <= 2 || (n.deviceMemory ?? 8) <= 1;
 };
 
 /** Load (and decode) a photo before it is shown. */
@@ -53,430 +179,379 @@ function ready(src: string) {
   return im.decode().catch(() => undefined);
 }
 
+type Orientation = typeof DeviceOrientationEvent & { requestPermission?: () => Promise<string> };
+
 export function Gallery() {
   const { gallery } = wedding;
-  const photos = gallery.photos.filter((p): p is Shown => Boolean(p.src));
+  const photos = useMemo(() => gallery.photos.filter((p): p is Shown => Boolean(p.src)), [gallery.photos]);
   const n = photos.length;
   const sectionRef = useRef<HTMLElement>(null);
-  const stageRef = useRef<HTMLDivElement>(null);
-  const imgRef = useRef<HTMLImageElement>(null);
+  const heartRef = useRef<HTMLDivElement>(null);
+  const tiltRef = useRef<HTMLDivElement>(null);
+  const tileRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const seen = useInView(sectionRef, { threshold: 0.08 });
-  const stageSeen = useInView(stageRef, { threshold: 0.2 });
+  const heartSeen = useInView(heartRef, { threshold: 0.25 });
   const reduced = usePrefersReducedMotion();
-  const [{ slow, mid }] = useState(device);
+  const [slow] = useState(slowDevice);
   const plain = reduced || slow;
-  const [active, setActive] = useState(0);
-  // a change under way: the photo that was, the way the light sweeps (1: left to right), its zoom then
-  const [turn, setTurn] = useState<{ from: number; dir: 1 | -1; n: number; scale: number } | null>(null);
-  // the photo shown came in by a change (so it comes into focus), not on first showing
-  const [entering, setEntering] = useState(false);
-  const [viewing, setViewing] = useState<{ from: DOMRect } | null>(null);
-  const busy = useRef(false);
-  const count = useRef(0);
-  const lastTouch = useRef(0);
-  const visible = useRef(false);
-  const touch = useRef<{ x: number; y: number; moved: boolean } | null>(null);
-  const activeRef = useRef(active);
-  activeRef.current = active;
-
-  const go = useCallback(
-    async (to: number, dir: 1 | -1) => {
-      const from = activeRef.current;
-      if (busy.current || n < 2 || to === from) return;
-      busy.current = true;
-      await ready(photos[to].src);
-      // the shown photo's slow zoom at this moment, so it drifts out of focus from exactly there
-      const m = imgRef.current ? new DOMMatrix(getComputedStyle(imgRef.current).transform) : null;
-      count.current += 1;
-      setTurn({ from, dir, n: count.current, scale: m ? m.a : 1 });
-      setActive(to);
-      setEntering(true);
-      window.setTimeout(
-        () => {
-          setTurn(null);
-          busy.current = false;
-        },
-        plain ? FADE_MS : TURN_MS,
-      );
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [n, plain],
+  const [phase, setPhase] = useState<"before" | "in" | "done">("before");
+  // the tile brought forward, and the one going back (unclipped until it is home)
+  const [open, setOpen] = useState<number | null>(null);
+  const [settling, setSettling] = useState<number | null>(null);
+  const [tapped, setTapped] = useState(false);
+  // the full photos loaded in, by "tile:photo"
+  const [big, setBig] = useState<ReadonlySet<string>>(() => new Set());
+  // an iPhone's gyroscope, once allowed
+  const [motion, setMotion] = useState(false);
+  const [cards, setCards] = useState<Card[]>(() =>
+    TILES.map((t, i) => {
+      const k = photos.findIndex((p) => p.src === t.photo);
+      return { faces: [k >= 0 ? { photo: k, crop: t.crop } : { photo: i % Math.max(n, 1) }, null], turns: 0 };
+    }),
   );
-  const step = useCallback((dir: 1 | -1) => go((activeRef.current + dir + n) % n, dir), [go, n]);
-  const touched = () => (lastTouch.current = Date.now());
+  const openRef = useRef(open);
+  openRef.current = open;
+  const cardsRef = useRef(cards);
+  cardsRef.current = cards;
+  const visible = useRef(false);
+  const drag = useRef<{ x: number; y: number; moved: boolean } | null>(null);
+  // when a swipe or a drag ended: the click that follows it is not a tap
+  const swallowed = useRef(0);
+  const asked = useRef(false);
+  const gyro = useRef(0);
+  const lastFlip = useRef(-1);
+  const lastOpen = useRef(0);
+  if (open != null) lastOpen.current = open;
 
-  // the next photo, loaded ahead
-  useEffect(() => {
-    if (n > 1) void ready(photos[(active + 1) % n].src);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [active, n]);
+  // the fly-in: each tile from a random edge, turned up to ±15°, in a random order
+  const [fly] = useState(() => {
+    const order = TILES.map((_, i) => i);
+    for (let i = order.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [order[i], order[j]] = [order[j], order[i]];
+    }
+    return GEOMETRY.map((g, i) => {
+      const edge = Math.floor(Math.random() * 4);
+      const far = 22 + Math.random() * 18;
+      const drift = () => (Math.random() - 0.5) * 30;
+      const fx = edge === 0 ? -(g.cx * 100 + far) : edge === 1 ? (1 - g.cx) * 100 + far : drift();
+      const fy = edge === 2 ? -(g.cy * 100 * RATIO + far) : edge === 3 ? (1 - g.cy) * 100 * RATIO + far : drift();
+      const at = order.indexOf(i);
+      return {
+        "--fx": `${fx.toFixed(1)}cqw`,
+        "--fy": `${fy.toFixed(1)}cqw`,
+        "--fr": `${(Math.random() * 30 - 15).toFixed(1)}deg`,
+        "--d": `${at * STAGGER}ms`,
+        "--fd": `${at * 35}ms`,
+      } as CSSProperties;
+    });
+  });
+  const styles = useMemo(() => GEOMETRY.map((g) => tileStyle(g, plain)), [plain]);
+  // more photos than the tiles show: some can turn over
+  const [flippable] = useState(() => {
+    const own = new Set(cards.map((c) => face(c).photo));
+    return photos.some((_, k) => !own.has(k));
+  });
 
-  // on screen? (for the autoplay)
+  // seen: the tiles fly in, then the heart beats
+  const started = useRef(false);
   useEffect(() => {
-    const stage = stageRef.current;
-    if (!stage || !("IntersectionObserver" in window)) return;
-    const io = new IntersectionObserver(([e]) => (visible.current = e.isIntersecting), { threshold: 0.4 });
-    io.observe(stage);
+    if (!heartSeen || started.current) return;
+    started.current = true;
+    setPhase("in");
+    window.setTimeout(() => setPhase("done"), plain ? 13 * 35 + 450 : 13 * STAGGER + FLIGHT + 60);
+  }, [heartSeen, plain]);
+
+  // the tilt: eased toward its aim each frame, written straight to the tilting layer
+  const tilt = useRef({ x: 0, y: 0, tx: 0, ty: 0, raf: 0, moved: 0 });
+  const aim = useCallback((x: number, y: number) => {
+    const t = tilt.current;
+    const clamp = (v: number) => Math.max(-TILT, Math.min(TILT, v));
+    const [tx, ty] = openRef.current == null ? [clamp(x), clamp(y)] : [0, 0];
+    if (Math.abs(tx - t.tx) + Math.abs(ty - t.ty) > 0.4) t.moved = Date.now();
+    [t.tx, t.ty] = [tx, ty];
+    if (t.raf) return;
+    const frame = () => {
+      t.x += (t.tx - t.x) * 0.12;
+      t.y += (t.ty - t.y) * 0.12;
+      const still = Math.abs(t.tx - t.x) < 0.02 && Math.abs(t.ty - t.y) < 0.02;
+      if (still) [t.x, t.y] = [t.tx, t.ty];
+      const el = tiltRef.current;
+      if (el) el.style.transform = t.x || t.y ? `rotateX(${t.x.toFixed(2)}deg) rotateY(${t.y.toFixed(2)}deg)` : "";
+      t.raf = still ? 0 : requestAnimationFrame(frame);
+    };
+    t.raf = requestAnimationFrame(frame);
+  }, []);
+  useEffect(() => () => cancelAnimationFrame(tilt.current.raf), []);
+
+  // on screen? (for the gyroscope and the turning); scrolled away, a photo forward goes back
+  useEffect(() => {
+    const el = heartRef.current;
+    if (!el || !("IntersectionObserver" in window)) return;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        visible.current = e.isIntersecting;
+        if (!e.isIntersecting && openRef.current != null) {
+          openRef.current = null;
+          setOpen(null);
+        }
+      },
+      { threshold: 0.3 },
+    );
+    io.observe(el);
     return () => io.disconnect();
   }, []);
-  // every 4s while on screen; a touch holds it until 8s of quiet
-  useEffect(() => {
-    if (n < 2) return;
-    const timer = window.setInterval(() => {
-      if (!visible.current || viewing || document.hidden || touch.current) return;
-      if (Date.now() - lastTouch.current < IDLE_MS) return;
-      step(1);
-    }, AUTO_MS);
-    return () => clearInterval(timer);
-  }, [n, viewing, step]);
 
-  // a swipe: left for the next, right for the one before; a tap opens the photo full screen
+  // the gyroscope: the heart tilts with the phone (from how it was held, slowly re-centring)
+  useEffect(() => {
+    const D = window.DeviceOrientationEvent as Orientation | undefined;
+    if (plain || phase !== "done" || !D) return;
+    if (typeof D.requestPermission === "function" && !motion) return;
+    let base: [number, number] | null = null;
+    const on = (e: DeviceOrientationEvent) => {
+      if (e.beta == null || e.gamma == null || !visible.current) return;
+      base = base ? [base[0] + (e.beta - base[0]) * 0.01, base[1] + (e.gamma - base[1]) * 0.01] : [e.beta, e.gamma];
+      gyro.current = Date.now();
+      aim(-(e.beta - base[0]) * 0.6, (e.gamma - base[1]) * 0.6);
+    };
+    window.addEventListener("deviceorientation", on);
+    return () => window.removeEventListener("deviceorientation", on);
+  }, [plain, phase, motion, aim]);
+
+  // an iPhone asks for the gyroscope on the first tap; refused, the drag still tilts
+  const askMotion = () => {
+    const D = window.DeviceOrientationEvent as Orientation | undefined;
+    if (asked.current || plain || typeof D?.requestPermission !== "function") return;
+    asked.current = true;
+    D.requestPermission()
+      .then((r) => r === "granted" && setMotion(true))
+      .catch(() => undefined);
+  };
+
+  const loadBig = (i: number) => {
+    const key = `${i}:${face(cardsRef.current[i]).photo}`;
+    setBig((b) => (b.has(key) ? b : new Set(b).add(key)));
+  };
+  const settle = (was: number) => {
+    setSettling(was);
+    window.setTimeout(() => setSettling((s) => (s === was ? null : s)), plain ? 260 : 650);
+  };
+  const show = (i: number) => {
+    openRef.current = i;
+    setOpen(i);
+    setTapped(true);
+    aim(0, 0);
+    loadBig(i);
+    // the neighbours' full photos, ready for a swipe
+    for (const j of [i + 1, i + TILES.length - 1]) void ready(photos[face(cardsRef.current[j % TILES.length]).photo].src);
+  };
+  const close = useCallback(() => {
+    const was = openRef.current;
+    if (was == null) return;
+    openRef.current = null;
+    setOpen(null);
+    settle(was);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [plain]);
+  const step = useCallback(
+    (dir: 1 | -1) => {
+      const was = openRef.current;
+      if (was == null) return;
+      const to = (was + dir + TILES.length) % TILES.length;
+      openRef.current = to;
+      setOpen(to);
+      settle(was);
+      loadBig(to);
+      tileRefs.current[to]?.focus({ preventScroll: true });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [plain],
+  );
+
+  // while a photo is forward: a tap anywhere else sends it back (and does nothing more); keys too
+  useEffect(() => {
+    if (open == null) return;
+    const onClick = (e: MouseEvent) => {
+      if (tileRefs.current[open]?.contains(e.target as Node)) return;
+      e.stopPropagation();
+      e.preventDefault();
+      if (Date.now() - swallowed.current > 450) close();
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") close();
+      else if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+        e.preventDefault();
+        step(e.key === "ArrowRight" ? 1 : -1);
+      }
+    };
+    document.addEventListener("click", onClick, true);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("click", onClick, true);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open, close, step]);
+
+  // every 3s, one tile turns over to show a photo not shown — not while one is forward or tilting
+  const flip = useCallback(async () => {
+    const cs = cardsRef.current;
+    const showing = new Set(cs.map((c) => face(c).photo));
+    const pool = photos.map((_, k) => k).filter((k) => !showing.has(k));
+    const tiles = cs.map((_, i) => i).filter((i) => i !== openRef.current && i !== lastFlip.current);
+    if (!pool.length || !tiles.length) return;
+    const i = tiles[Math.floor(Math.random() * tiles.length)];
+    const p = pool[Math.floor(Math.random() * pool.length)];
+    lastFlip.current = i;
+    await ready(photos[p].thumb ?? photos[p].src);
+    if (openRef.current === i) return;
+    // the hidden face takes the photo, then (a frame on) the tile turns to it
+    setCards((cur) =>
+      cur.map((c, k) => (k !== i ? c : { ...c, faces: c.turns % 2 ? [{ photo: p }, c.faces[1]] : [c.faces[0], { photo: p }] })),
+    );
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => setCards((cur) => cur.map((c, k) => (k === i ? { ...c, turns: c.turns + 1 } : c)))),
+    );
+  }, [photos]);
+  useEffect(() => {
+    if (plain || phase !== "done" || !flippable) return;
+    const id = window.setInterval(() => {
+      if (!visible.current || document.hidden || openRef.current != null || drag.current) return;
+      if (Date.now() - tilt.current.moved < 1500) return;
+      void flip();
+    }, FLIP_MS);
+    return () => clearInterval(id);
+  }, [plain, phase, flippable, flip]);
+
+  // the pointer: the mouse tilts the heart toward it; a drag turns it (without a gyroscope);
+  // while a photo is forward, a swipe brings the next or the one before
   const onPointerDown = (e: PointerEvent) => {
-    touched();
-    touch.current = { x: e.clientX, y: e.clientY, moved: false };
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    drag.current = { x: e.clientX, y: e.clientY, moved: false };
   };
   const onPointerMove = (e: PointerEvent) => {
-    const t = touch.current;
-    if (t && (Math.abs(e.clientX - t.x) > 10 || Math.abs(e.clientY - t.y) > 10)) t.moved = true;
+    const d = drag.current;
+    if (d && (Math.abs(e.clientX - d.x) > 8 || Math.abs(e.clientY - d.y) > 8)) d.moved = true;
+    if (plain || phase !== "done" || openRef.current != null) return;
+    if (e.pointerType === "mouse") {
+      const r = heartRef.current!.getBoundingClientRect();
+      aim(((e.clientY - r.top) / r.height - 0.5) * 2 * TILT, -((e.clientX - r.left) / r.width - 0.5) * 2 * TILT);
+    } else if (d && Date.now() - gyro.current > 1000) aim(-(e.clientY - d.y) * 0.1, (e.clientX - d.x) * 0.1);
   };
   const onPointerUp = (e: PointerEvent) => {
-    const t = touch.current;
-    touch.current = null;
-    touched();
-    if (!t) return;
-    const dx = e.clientX - t.x;
-    const dy = e.clientY - t.y;
-    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) step(dx < 0 ? 1 : -1);
-    else if (!t.moved && !busy.current) {
-      const r = stageRef.current?.querySelector(".ss-photo")?.getBoundingClientRect();
-      if (r) setViewing({ from: r });
-    }
+    const d = drag.current;
+    drag.current = null;
+    if (!d) return;
+    const [dx, dy] = [e.clientX - d.x, e.clientY - d.y];
+    if (e.pointerType !== "mouse" && Date.now() - gyro.current > 1000) aim(0, 0);
+    if (openRef.current != null && Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+      swallowed.current = Date.now();
+      step(dx < 0 ? 1 : -1);
+    } else if (d.moved) swallowed.current = Date.now();
   };
-  const onKey = (e: KeyboardEvent) => {
-    if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
-      e.preventDefault();
-      touched();
-      step(e.key === "ArrowLeft" ? -1 : 1);
-    } else if (e.key === "Enter") {
-      const r = stageRef.current?.querySelector(".ss-photo")?.getBoundingClientRect();
-      if (r) setViewing({ from: r });
-    }
+  const onPointerCancel = (e: PointerEvent) => {
+    drag.current = null;
+    if (e.pointerType !== "mouse" && Date.now() - gyro.current > 1000) aim(0, 0);
+  };
+  const onTile = (i: number) => {
+    if (Date.now() - swallowed.current < 450) return;
+    askMotion();
+    if (phase !== "done") return;
+    if (openRef.current === i) close();
+    else if (openRef.current == null) show(i);
   };
 
   if (!n) return null;
-  const photo = photos[active];
-  const old = turn ? photos[turn.from] : null;
+  const capTile = open ?? lastOpen.current;
+  const capPhoto = photos[face(cards[capTile]).photo];
+  const capG = GEOMETRY[capTile];
 
   return (
-    <section id="gallery" ref={sectionRef} aria-labelledby="gallery-heading" className="relative px-[var(--gutter)] pb-4 pt-[var(--section-gap)]">
+    <section id="gallery" ref={sectionRef} aria-labelledby="gallery-heading" className="relative overflow-x-clip px-[var(--gutter)] pb-4 pt-[var(--section-gap)]">
       <SectionHeading id="gallery-heading" eyebrow={gallery.eyebrow} title={gallery.title} intro={`“${gallery.intro}”`} show={seen} />
 
-      <div className="ss" data-shown={stageSeen || reduced || undefined}>
+      <div className="hc-wrap">
         <div
-          ref={stageRef}
-          className="ss-stage"
-          role="region"
-          aria-roledescription="slideshow"
-          aria-label={`${gallery.title}: swipe, or use the arrow keys; Enter opens the photo`}
-          tabIndex={0}
-          onKeyDown={onKey}
+          ref={heartRef}
+          className="hc"
+          data-phase={phase}
+          data-plain={plain || undefined}
+          data-open={open != null || undefined}
+          role="group"
+          aria-label={`${gallery.title}: ${TILES.length} photos in a heart. Tap one to see it larger; the arrow keys bring the next.`}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
-          onPointerCancel={() => (touch.current = null)}
+          onPointerCancel={onPointerCancel}
+          onPointerLeave={(e) => e.pointerType === "mouse" && aim(0, 0)}
         >
-          <div className="ss-frame" data-soft={mid || undefined}>
-            <div className="ss-photo">
-              {/* the photo shown: coming into focus (after a change), then zooming slowly */}
-              <img
-                key={active}
-                ref={imgRef}
-                className={`ss-img${entering && !plain ? " ss-in" : ""}`}
-                src={photo.src}
-                alt={photo.alt}
-                width={484}
-                height={646}
-                decoding="async"
-                draggable={false}
-                style={{ objectPosition: photo.focus ?? "50% 40%" }}
-                data-still={plain || undefined}
-              />
-              {/* the photo that was: drifting out of focus; and the sweep of golden light */}
-              {old && turn && !plain && (
-                <>
-                  <img
-                    key={`o${turn.n}`}
-                    aria-hidden
-                    className="ss-img ss-out"
-                    src={old.src}
-                    alt=""
-                    style={{ objectPosition: old.focus ?? "50% 40%", "--from": turn.scale } as CSSProperties}
-                  />
-                  <span key={`l${turn.n}`} aria-hidden className="ss-sweep" data-dir={turn.dir} />
-                </>
-              )}
-              {old && turn && plain && (
-                <img key={`f${turn.n}`} aria-hidden className="ss-img ss-fade-out" src={old.src} alt="" style={{ objectPosition: old.focus ?? "50% 40%" }} />
-              )}
+          <div className="hc-beat">
+            <div ref={tiltRef} className="hc-tilt">
+              {/* the cream mount: the gaps between the tiles, and a thin rim round the heart */}
+              <svg className="hc-mount" viewBox="0 0 100 90.4" preserveAspectRatio="none" aria-hidden>
+                <path d={HEART_PATH} />
+              </svg>
+              {TILES.map((_, i) => {
+                const g = GEOMETRY[i];
+                const card = cards[i];
+                const p = photos[face(card).photo];
+                return (
+                  <button
+                    key={i}
+                    ref={(el) => (tileRefs.current[i] = el)}
+                    type="button"
+                    className="hc-tile"
+                    style={{ ...styles[i], ...fly[i] }}
+                    data-open={open === i || undefined}
+                    aria-label={p.caption ? `${p.caption}: ${p.alt}` : p.alt}
+                    aria-pressed={open === i}
+                    onClick={() => onTile(i)}
+                  >
+                    <span className="hc-clip" style={{ clipPath: open === i || settling === i ? undefined : g.clip }}>
+                      <span className="hc-card" style={card.turns ? { transform: `rotateY(${card.turns * 180}deg)` } : undefined}>
+                        {card.faces.map((shot, f) => {
+                          if (!shot) return null;
+                          const ph = photos[shot.photo];
+                          const at = shotStyle(g, shot, ph);
+                          return (
+                            <span key={f} className="hc-side" data-back={f === 1 || undefined}>
+                              <img className="hc-img" src={ph.thumb ?? ph.src} alt="" width={484} height={648} loading="lazy" decoding="async" draggable={false} style={at} />
+                              {big.has(`${i}:${shot.photo}`) && (
+                                <img
+                                  className="hc-img hc-big"
+                                  src={ph.src}
+                                  alt=""
+                                  width={484}
+                                  height={648}
+                                  decoding="async"
+                                  draggable={false}
+                                  style={at}
+                                  onLoad={(e) => (e.currentTarget.dataset.ready = "")}
+                                />
+                              )}
+                            </span>
+                          );
+                        })}
+                      </span>
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
+          {/* the caption, under the photo brought forward */}
+          <p
+            className="hc-caption"
+            data-on={open != null || undefined}
+            aria-live="polite"
+            style={{ top: `calc(50% + ${(view(capG) * capG.h * 50).toFixed(2)}% + 12px)` }}
+          >
+            {capPhoto.caption ?? capPhoto.alt}
+          </p>
         </div>
-
-        <p key={active} className="ss-caption" aria-live="polite" data-still={plain || undefined}>
-          {photo.caption ?? photo.alt}
+        <p className="hc-hint" data-shown={phase === "done" || undefined} data-gone={tapped || undefined} aria-hidden>
+          {gallery.hint}
         </p>
-        <div className="ss-dots">
-          {photos.map((p, i) => (
-            <button
-              key={p.src}
-              type="button"
-              className="ss-dot"
-              data-on={i === active || undefined}
-              aria-label={`Photo ${i + 1} of ${n}: ${p.caption ?? p.alt}`}
-              aria-current={i === active || undefined}
-              onClick={() => {
-                touched();
-                go(i, i > active ? 1 : -1);
-              }}
-            >
-              <span />
-            </button>
-          ))}
-        </div>
       </div>
-
-      {viewing && (
-        <Viewer
-          photos={photos}
-          index={active}
-          from={viewing.from}
-          reduced={plain}
-          onStep={(dir) => {
-            touched();
-            step(dir);
-          }}
-          target={() => stageRef.current?.querySelector(".ss-photo")?.getBoundingClientRect() ?? null}
-          onClosed={() => {
-            touched();
-            setViewing(null);
-          }}
-        />
-      )}
     </section>
-  );
-}
-
-/**
- * Full screen, on a deep night-blue veil: the photo grows out of its frame; a swipe sideways turns
- * to the next (the carousel turns with it), a swipe down — or ×, or Escape — closes it back into
- * the frame. Focus returns, the page keeps its place.
- */
-function Viewer({
-  photos,
-  index,
-  from,
-  reduced,
-  onStep,
-  target,
-  onClosed,
-}: {
-  photos: Shown[];
-  index: number;
-  from: DOMRect;
-  reduced: boolean;
-  onStep: (dir: 1 | -1) => void;
-  target: () => DOMRect | null;
-  onClosed: () => void;
-}) {
-  const dialogRef = useRef<HTMLDialogElement>(null);
-  const imgRef = useRef<HTMLImageElement>(null);
-  const veilRef = useRef<HTMLDivElement>(null);
-  const [dir, setDir] = useState<1 | -1 | 0>(0);
-  const closing = useRef(false);
-  const touch = useRef<{ x: number; y: number; dy: number; mode: "" | "x" | "y" } | null>(null);
-  useScrollLock(true);
-  const photo = photos[index];
-
-  /** The transform that lays the full-screen photo over a frame's rectangle. */
-  const onto = (rect: DOMRect | null) => {
-    const img = imgRef.current;
-    if (!img || !rect) return "scale(0.92)";
-    // measured where it rests, without whatever drag or flight it is in
-    const [t, tr] = [img.style.transform, img.style.transition];
-    img.style.transition = "none";
-    img.style.transform = "none";
-    const to = img.getBoundingClientRect();
-    img.style.transform = t;
-    void img.offsetWidth;
-    img.style.transition = tr;
-    const s = rect.width / to.width;
-    const x = rect.left + rect.width / 2 - (to.left + to.width / 2);
-    const y = rect.top + rect.height / 2 - (to.top + to.height / 2);
-    return `translate(${x}px, ${y}px) scale(${s})`;
-  };
-
-  // open: show the dialog, start the photo over its frame, then let it grow to full size
-  useLayoutEffect(() => {
-    const dialog = dialogRef.current;
-    const img = imgRef.current;
-    if (!dialog || !img) return;
-    if (!dialog.open) dialog.showModal();
-    const veil = veilRef.current!;
-    if (reduced) {
-      img.style.opacity = "0";
-      veil.style.opacity = "0";
-      requestAnimationFrame(() => {
-        img.style.transition = veil.style.transition = "opacity 250ms linear";
-        img.style.opacity = veil.style.opacity = "1";
-      });
-      return;
-    }
-    img.style.transition = "none";
-    img.style.transform = onto(from);
-    veil.style.opacity = "0";
-    void img.offsetWidth;
-    requestAnimationFrame(() => {
-      img.style.transition = "transform 460ms cubic-bezier(0.22, 1, 0.36, 1)";
-      img.style.transform = "none";
-      veil.style.transition = "opacity 360ms ease-out";
-      veil.style.opacity = "1";
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const close = useCallback(() => {
-    if (closing.current) return;
-    closing.current = true;
-    const img = imgRef.current;
-    const veil = veilRef.current;
-    const dialog = dialogRef.current;
-    const done = () => {
-      const y = window.scrollY;
-      dialog?.close();
-      if (window.scrollY !== y) window.scrollTo({ top: y, behavior: "instant" });
-      onClosed();
-    };
-    if (!img || !veil || reduced) {
-      if (img) img.style.opacity = "0";
-      if (veil) veil.style.opacity = "0";
-      window.setTimeout(done, reduced ? 220 : 0);
-      return;
-    }
-    img.style.transition = "transform 380ms cubic-bezier(0.4, 0, 0.2, 1), opacity 380ms ease";
-    img.style.transform = onto(target());
-    veil.style.transition = "opacity 340ms ease";
-    veil.style.opacity = "0";
-    window.setTimeout(done, 380);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reduced, onClosed]);
-
-  const step = useCallback(
-    (d: 1 | -1) => {
-      if (photos.length < 2) return;
-      setDir(d);
-      onStep(d);
-    },
-    [onStep, photos.length],
-  );
-
-  useEffect(() => {
-    const onKey = (e: globalThis.KeyboardEvent) => {
-      if (e.key === "ArrowRight") step(1);
-      if (e.key === "ArrowLeft") step(-1);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [step]);
-
-  // swipe sideways for the next, down to close (the photo follows the finger down, the veil thins)
-  const down = (e: PointerEvent) => (touch.current = { x: e.clientX, y: e.clientY, dy: 0, mode: "" });
-  const move = (e: PointerEvent) => {
-    const t = touch.current;
-    const img = imgRef.current;
-    const veil = veilRef.current;
-    if (!t || !img || !veil) return;
-    const dx = e.clientX - t.x;
-    const dy = e.clientY - t.y;
-    if (!t.mode) {
-      if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
-      t.mode = Math.abs(dy) > Math.abs(dx) && dy > 0 ? "y" : "x";
-    }
-    if (t.mode === "y" && !reduced) {
-      t.dy = Math.max(0, dy);
-      img.style.transition = "none";
-      img.style.transform = `translateY(${t.dy}px) scale(${1 - Math.min(0.12, t.dy / 1600)})`;
-      veil.style.transition = "none";
-      veil.style.opacity = String(Math.max(0.3, 1 - t.dy / 420));
-    }
-  };
-  const up = (e: PointerEvent) => {
-    const t = touch.current;
-    touch.current = null;
-    if (!t) return;
-    const dx = e.clientX - t.x;
-    if (t.mode === "y") {
-      if (t.dy > 90) close();
-      else {
-        const img = imgRef.current!;
-        const veil = veilRef.current!;
-        img.style.transition = "transform 260ms ease-out";
-        img.style.transform = "none";
-        veil.style.transition = "opacity 260ms ease-out";
-        veil.style.opacity = "1";
-      }
-    } else if (t.mode === "x" && Math.abs(dx) > 40) step(dx < 0 ? 1 : -1);
-  };
-
-  return (
-    <dialog
-      ref={dialogRef}
-      aria-label="Photo"
-      onCancel={(e) => {
-        e.preventDefault();
-        close();
-      }}
-      className="cf-viewer fixed inset-0 m-0 h-[100dvh] max-h-none w-screen max-w-none overflow-hidden bg-transparent p-0 backdrop:bg-transparent"
-    >
-      <div ref={veilRef} aria-hidden className="absolute inset-0 bg-navy-deep/[0.93]" onClick={close} />
-      <figure className="cf-viewer-stage" onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={() => (touch.current = null)}>
-        {/* turned to, the photo slides in from the side the swipe came from */}
-        <img
-          key={index}
-          ref={imgRef}
-          src={photo.src}
-          alt={photo.alt}
-          width={484}
-          height={646}
-          draggable={false}
-          className={`cf-viewer-img${dir !== 0 && !reduced ? " cf-viewer-enter" : ""}`}
-          data-dir={dir}
-        />
-        <figcaption key={index} className="cf-viewer-caption">
-          {photo.caption}
-        </figcaption>
-        {photos.length > 1 && (
-          <div className="cf-viewer-nav">
-            <button type="button" onClick={() => step(-1)} aria-label="Previous photo" className="cf-viewer-btn">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                <path d="M14.5 5.5L8 12l6.5 6.5" />
-              </svg>
-            </button>
-            <span aria-live="polite" className="cf-viewer-count">
-              {index + 1} / {photos.length}
-            </span>
-            <button type="button" onClick={() => step(1)} aria-label="Next photo" className="cf-viewer-btn">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                <path d="M9.5 5.5L16 12l-6.5 6.5" />
-              </svg>
-            </button>
-          </div>
-        )}
-      </figure>
-      <button type="button" onClick={close} aria-label="Close" className="cf-viewer-close" style={{ top: "calc(var(--status-bar, 0px) + 14px)" }}>
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden>
-          <path d="M4.5 4.5l9 9M13.5 4.5l-9 9" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-        </svg>
-      </button>
-    </dialog>
   );
 }

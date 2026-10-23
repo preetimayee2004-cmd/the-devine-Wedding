@@ -8,6 +8,8 @@ export interface Photo {
   caption?: string;
   /** Which part stays in view when a frame crops it (CSS object-position), e.g. "50% 25%". */
   focus?: string;
+  /** Gallery only: a small copy for the heart's tiles (the full `src` is loaded when one is tapped). */
+  thumb?: string;
 }
 
 export type Motif = "lotus" | "diya" | "kalash" | "crescent" | "knot";
