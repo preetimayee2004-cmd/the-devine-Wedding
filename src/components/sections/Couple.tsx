@@ -133,7 +133,7 @@ export function Couple() {
       <div className="couple-welcome relative z-[1] flex w-full flex-col items-center px-[var(--gutter)] text-center">
         <p
           lang={hindi ? "hi" : undefined}
-          className={`text-[30px] font-semibold leading-none text-gold-ink ${hindi ? "font-deva" : "font-display italic"}`}
+          className={`couple-welcome-word text-[30px] font-semibold leading-none ${hindi ? "font-deva" : "font-display italic"}`}
           style={appear(0)}
         >
           {hindi ? copy.hindi.welcome : copy.welcome}
