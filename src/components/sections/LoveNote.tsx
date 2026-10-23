@@ -46,17 +46,6 @@ export function LoveNote() {
       aria-labelledby="note-heading"
       className="relative px-[var(--gutter)] pb-14 pt-[var(--section-gap)]"
     >
-      {/* the sky settles back to the pale blue of the opening */}
-      <div
-        aria-hidden
-        className="pointer-events-none fixed inset-0 -z-[1]"
-        style={{
-          background: "linear-gradient(rgb(184 236 254 / 0.75), rgb(206 241 254 / 0.6))",
-          opacity: seen ? 1 : 0,
-          transition: "opacity 1800ms ease",
-        }}
-      />
-
       <div className="relative mx-auto w-[min(88vw,350px)]">
         {/* the envelope, centred over where the note will be */}
         <div

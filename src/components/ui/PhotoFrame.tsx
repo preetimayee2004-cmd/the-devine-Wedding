@@ -12,7 +12,7 @@ const SHAPES: Record<FrameShape, { outer: string; inner: string }> = {
 
 /** Soft watercolour washes for photo slots that are still waiting for a photo. */
 const WASHES = [
-  "radial-gradient(circle at 28% 24%, #fff 0, transparent 55%), radial-gradient(circle at 72% 78%, rgb(168 227 247 / 0.95), transparent 62%), #e6f5fc",
+  "radial-gradient(circle at 28% 24%, #fff 0, transparent 55%), radial-gradient(circle at 72% 78%, rgb(var(--sky) / 0.95), transparent 62%), rgb(var(--sky-pale))",
   "radial-gradient(circle at 70% 26%, #fff 0, transparent 52%), radial-gradient(circle at 28% 76%, rgb(246 205 196 / 0.9), transparent 62%), #fbefe9",
   "radial-gradient(circle at 30% 70%, #fff 0, transparent 50%), radial-gradient(circle at 72% 30%, rgb(240 214 160 / 0.85), transparent 62%), #fbf3e3",
   "radial-gradient(circle at 66% 70%, #fff 0, transparent 52%), radial-gradient(circle at 30% 30%, rgb(196 222 200 / 0.9), transparent 62%), #edf5ec",

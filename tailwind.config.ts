@@ -6,7 +6,7 @@ import { EASE } from "./src/lib/motion";
  * Colours live as RGB channels in CSS variables (src/index.css) so Tailwind
  * opacity modifiers like `bg-ivory/70` work.
  *
- *  sky / sky-pale  the supplied sky image behind everything
+ *  sky / sky-pale  the Himalayan mist-blue behind everything (it warms into ivory)
  *  navy            every main heading and the couple's names (#12294A)
  *  gold-ink        supporting text in gold: mantra, date, labels, signature (#A8741F)
  *  slate           body text (#1F3A5C)

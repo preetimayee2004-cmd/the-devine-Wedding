@@ -5,8 +5,8 @@
 @layer base {
   :root {
     /* ── Colours (RGB channels for Tailwind alpha support) ── */
-    --sky: 32 181 235; /* #20B5EB — upper sky */
-    --sky-pale: 168 227 247; /* #A8E3F7 — lower sky */
+    --sky: 218 232 242; /* #DAE8F2 — Himalayan mist-blue, the top of the background */
+    --sky-pale: 230 237 241; /* #E6EDF1 — the paler mist it warms from, into ivory */
     /* the text colours are the couple section's, everywhere */
     --navy: 18 41 74; /* #12294A — headings and names */
     --navy-deep: 15 42 62; /* #0F2A3E — pressed buttons */
@@ -99,6 +99,7 @@
     background: rgb(10 22 40 / 0.35);
   }
 
+  /* Behind every section: a soft Himalayan mist-blue that warms into ivory, as in Our Story. */
   .sky-backdrop {
     position: fixed;
     top: 0;
@@ -108,11 +109,8 @@
     height: 100lvh;
     z-index: -1;
     pointer-events: none;
-    background-color: #8fd8fb;
-    background-image: var(--sky-image), linear-gradient(#2ebdfe, #69cefe 25%, #ace4ff 50%, #b8ecfe 76%, #c0eafe);
-    background-size: cover, 100% 100%;
-    background-position: center top;
-    background-repeat: no-repeat;
+    background-color: rgb(236 238 236);
+    background-image: linear-gradient(rgb(218 232 242), rgb(230 237 241) 38%, rgb(251 246 236) 76%, rgb(251 246 236));
   }
 
   /* The couple's names, stacked (Invitation). */
@@ -568,25 +566,6 @@
     text-shadow: 0 0 10px rgb(255 255 255 / 0.5);
   }
 
-  /* the air: from the sky above into a soft Himalayan mist-blue, warming into ivory, and back to
-     the sky below — the full width of the screen, whatever the column */
-  .story-mist {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 50%;
-    width: 100vw;
-    translate: -50% 0;
-    background: linear-gradient(
-      to bottom,
-      rgb(218 232 242 / 0) 0,
-      rgb(218 232 242) 150px,
-      rgb(230 237 241) 38%,
-      rgb(var(--story-ivory)) 76%,
-      rgb(var(--story-ivory)) calc(100% - 130px),
-      rgb(var(--story-ivory) / 0) 100%
-    );
-  }
   /* two still wisps of mist */
   .story-cloud {
     position: absolute;

@@ -429,7 +429,7 @@ function ArchDefs() {
 
 /** Soft watercolour washes for photos still to come. */
 const WASHES = [
-  "radial-gradient(circle at 28% 24%, #fff 0, transparent 55%), radial-gradient(circle at 72% 78%, rgb(168 227 247 / 0.95), transparent 62%), #e6f5fc",
+  "radial-gradient(circle at 28% 24%, #fff 0, transparent 55%), radial-gradient(circle at 72% 78%, rgb(var(--sky) / 0.95), transparent 62%), rgb(var(--sky-pale))",
   "radial-gradient(circle at 70% 26%, #fff 0, transparent 52%), radial-gradient(circle at 28% 76%, rgb(246 205 196 / 0.9), transparent 62%), #fbefe9",
   "radial-gradient(circle at 30% 70%, #fff 0, transparent 50%), radial-gradient(circle at 72% 30%, rgb(240 214 160 / 0.85), transparent 62%), #fbf3e3",
   "radial-gradient(circle at 66% 70%, #fff 0, transparent 52%), radial-gradient(circle at 30% 30%, rgb(196 222 200 / 0.9), transparent 62%), #edf5ec",
@@ -467,14 +467,13 @@ function Onward() {
 }
 
 /**
- * The section's air: a Himalayan mist that warms into ivory (wider than the page column, so it
- * reaches the screen's edges), Mahadev's crescent, two still wisps of cloud, and at the foot the
- * faintest line of peaks — all well clear of the cards and words. SVG and CSS only.
+ * Around the section, on the site's Himalayan mist: Mahadev's crescent, two still wisps of
+ * cloud, and at the foot the faintest line of peaks — all well clear of the cards and words.
+ * SVG and CSS only.
  */
 function Backdrop() {
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
-      <div className="story-mist" />
       {/* the crescent, 76px down in the right corner (below the bell button, beyond the heading's end) */}
       <svg className="absolute right-[2px] top-[76px] h-8 w-8 text-gold-ink" viewBox="0 0 40 40">
         <path d="M27 5a15 15 0 1 0 8 25A13 13 0 0 1 27 5Z" fill="rgb(var(--gold) / 0.16)" stroke="currentColor" strokeWidth="0.9" opacity="0.6" />

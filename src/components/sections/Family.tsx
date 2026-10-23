@@ -122,7 +122,7 @@ function Side({ side, show, reduced, delay }: { side: FamilySide; show: boolean;
               className="flex h-full w-full items-center justify-center"
               style={{
                 background:
-                  "radial-gradient(circle at 50% 28%, #fff 0, transparent 52%), radial-gradient(circle at 50% 85%, rgb(168 227 247 / 0.9), transparent 65%), #e9f6fc",
+                  "radial-gradient(circle at 50% 28%, #fff 0, transparent 52%), radial-gradient(circle at 50% 85%, rgb(var(--sky) / 0.9), transparent 65%), rgb(var(--sky-pale))",
               }}
             >
               <Icon name="kalash" className="h-[30%] w-[30%] text-gold-ink/55" strokeWidth={1} />
