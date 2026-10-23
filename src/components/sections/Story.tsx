@@ -7,37 +7,37 @@ import { useLang } from "@/lib/lang";
 import { Icon } from "@/components/art/Icons";
 
 /**
- * Section 04 — "A Love Written in the Stars", on the site's own sky.
+ * Section 04 — "A Love Written in the Stars".
  *
- * Four milestones, each a photo in a cream polaroid frame with its title, year
- * and one line, joined by a fine gold constellation: on a phone the cards
- * alternate left and right and the line runs down behind them through a star
- * beside each one; from 768px they stand in a row over a dotted line through
- * four stars. Around them, faintly: Mahadev's crescent, soft clouds, thin
- * constellations at the edges and Kailash drawn in gold at the foot.
+ * A soft Himalayan mist that warms into ivory, the faintest line of peaks at
+ * the foot, and four milestones: each a warm ivory card with a fine gold
+ * edge, its photo in a gently pointed temple arch, then the year, the title
+ * and one line. On a phone the cards are staggered left and right on either
+ * side of one continuous, gently curving gold line, a small gold lotus on it
+ * beside each card; from 768px they stand in a row with the line curving
+ * beneath them through the four lotuses. The line never crosses a photo or a
+ * word.
  *
- * Once only: the heading fades in; the line draws itself (on a phone, on to
- * each card as it scrolls into view) and each star glows as the line reaches
- * it; the cards fade in and rise 18px, 140ms apart. Afterwards just a rare
- * twinkle and very slow clouds. Only transform and opacity move (and the
- * line's dash). Reduced motion: everything as finished, in a 200ms fade.
+ * As the guest scrolls, the line draws itself and each lotus turns gold as it
+ * is reached; each card fades up with its photo easing back from a slight
+ * zoom, then its year, title and line follow. Only transform and opacity move
+ * (and the line's dash). Reduced motion: everything as finished, in a 200ms
+ * fade.
  */
 
-const DRAW_MS = 2200; // the whole line
-const STAGGER_MS = 140;
 const N = 4;
+const EASE_CARD = "cubic-bezier(.22,.61,.36,1)";
 
-interface Star {
+interface Point {
   x: number;
   y: number;
 }
 interface Geometry {
   w: number;
   h: number;
-  /** the line's points, start to end (the stars among them) */
-  points: Star[];
-  stars: Star[];
-  /** how far along the line (0–1) each star sits */
+  d: string;
+  marks: Point[];
+  /** how far along the line (0–1) each lotus sits */
   at: number[];
   row: boolean;
 }
@@ -50,15 +50,16 @@ export function Story() {
   const headRef = useRef<HTMLElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const cards = useRef<Array<HTMLElement | null>>([]);
+  const lineRef = useRef<SVGPathElement>(null);
+  const markRefs = useRef<Array<HTMLSpanElement | null>>([]);
   const headSeen = useInView(headRef, { threshold: 0.25 });
   const sectionSeen = useInView(sectionRef, { threshold: 0 });
   const [geo, setGeo] = useState<Geometry | null>(null);
-  // how many cards have been revealed, and how many had been before the latest reveal
-  const [shown, setShown] = useState({ count: 0, from: 0 });
+  const [shown, setShown] = useState<boolean[]>(() => Array(N).fill(false));
 
   const t = hindi ? story.hindi : story;
 
-  // ── the constellation is laid out from the cards' real places, and again whenever they reflow ──
+  // ── the line is laid out from the cards' real places, and again whenever they reflow ──
   useLayoutEffect(() => {
     const list = listRef.current;
     if (!list) return;
@@ -68,25 +69,39 @@ export function Story() {
       const boxes = cards.current.filter((c): c is HTMLElement => c !== null);
       if (boxes.length !== N) return;
       const row = window.matchMedia("(min-width: 768px)").matches;
-      let stars: Star[];
-      let points: Star[];
+      // the photo's middle in each card (its arch is 100:140, inside 8px of card)
+      const photoMid = (b: HTMLElement) => b.offsetTop + 8 + ((b.offsetWidth - 16) * 1.4) / 2;
+      let marks: Point[];
+      let pts: Point[];
+      let d: string;
       if (row) {
-        // a gentle arc of stars under the row, joined end to end
-        const below = Math.max(...boxes.map((b) => b.offsetTop + b.offsetHeight)) + 34;
-        stars = boxes.map((b, i) => ({ x: b.offsetLeft + b.offsetWidth / 2, y: below + (i === 1 || i === 2 ? 14 : 0) }));
-        points = stars;
+        // under the row: a gentle curve through a lotus under each card
+        const below = Math.max(...boxes.map((b) => b.offsetTop + b.offsetHeight)) + 30;
+        marks = boxes.map((b, i) => ({ x: b.offsetLeft + b.offsetWidth / 2, y: below + (i === 1 || i === 2 ? 12 : 0) }));
+        pts = marks;
+        d = `M${pts[0].x} ${pts[0].y}`;
+        for (let i = 1; i < pts.length; i++) {
+          const a = pts[i - 1], b = pts[i], k = (b.x - a.x) / 2;
+          d += `C${a.x + k} ${a.y} ${b.x - k} ${b.y} ${b.x} ${b.y}`;
+        }
       } else {
-        // a star in the open sky beside each card (right of a left card, left of a right one),
-        // the line coming down from the heading and going on to the foot
-        stars = boxes.map((b, i) => ({ x: i % 2 === 0 ? w * 0.72 : w * 0.28, y: b.offsetTop + b.offsetHeight * 0.38 }));
-        points = [{ x: w / 2, y: 0 }, ...stars, { x: w / 2, y: h }];
+        // down the middle, in the lane between the left and right cards: one continuous line,
+        // swaying very gently from side to side, a lotus on it beside each card's photo
+        const cx = w / 2;
+        marks = boxes.map((b) => ({ x: cx, y: photoMid(b) }));
+        pts = [{ x: cx, y: 0 }, ...marks, { x: cx, y: h + 36 }];
+        d = `M${cx} 0`;
+        for (let i = 1; i < pts.length; i++) {
+          const a = pts[i - 1], b = pts[i];
+          d += `Q${cx + (i % 2 ? 7 : -7)} ${(a.y + b.y) / 2} ${b.x} ${b.y}`;
+        }
       }
-      const lengths = points.slice(1).map((p, i) => Math.hypot(p.x - points[i].x, p.y - points[i].y));
-      const total = lengths.reduce((a, b) => a + b, 0) || 1;
+      // where each lotus falls along the line (the line is nearly straight between them)
+      const lengths = pts.slice(1).map((p, i) => Math.hypot(p.x - pts[i].x, p.y - pts[i].y));
+      const total = lengths.reduce((s, l) => s + l, 0) || 1;
       let run = 0;
       const along = [0, ...lengths.map((l) => (run += l) / total)];
-      const at = stars.map((s) => along[points.indexOf(s)]);
-      setGeo({ w, h, points, stars, at, row });
+      setGeo({ w, h, d, marks, at: marks.map((m) => along[pts.indexOf(m)]), row });
     };
     measure();
     const ro = new ResizeObserver(measure);
@@ -94,24 +109,59 @@ export function Story() {
     return () => ro.disconnect();
   }, []);
 
-  // ── the cards reveal as they come into view (all at once in the row), once each ──
+  // ── the line draws with the scroll; each lotus turns gold as the line reaches it ──
+  useEffect(() => {
+    const line = lineRef.current;
+    const list = listRef.current;
+    if (!line || !list || !geo) return;
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const r = list.getBoundingClientRect();
+      const vh = window.innerHeight;
+      let p: number;
+      if (reduced) p = 1;
+      else if (geo.row) {
+        // the row's line draws as it rises from the lower part of the screen to the middle
+        const y = r.top + geo.marks[0].y;
+        p = (vh * 0.9 - y) / (vh * 0.4);
+      } else {
+        // down the cards, a little ahead of the reader
+        p = (vh * 0.72 - r.top) / (r.height + 36);
+      }
+      p = Math.min(1, Math.max(0, p));
+      line.style.strokeDashoffset = String(1 - p);
+      geo.at.forEach((a, i) => {
+        const el = markRefs.current[i];
+        if (el) el.toggleAttribute("data-lit", p >= a - 0.005);
+      });
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [geo, reduced]);
+
+  // ── each card reveals as it comes into view, once ──
   useEffect(() => {
     const els = cards.current.filter((c): c is HTMLElement => c !== null);
     if (!("IntersectionObserver" in window)) {
-      setShown({ count: N, from: 0 });
+      setShown(Array(N).fill(true));
       return;
     }
     const io = new IntersectionObserver(
       (entries) => {
-        let furthest = -1;
-        for (const e of entries) {
-          if (!e.isIntersecting) continue;
-          furthest = Math.max(furthest, els.indexOf(e.target as HTMLElement));
-          io.unobserve(e.target);
-        }
-        if (furthest < 0) return;
-        // a card further down brings the ones above it with it
-        setShown((s) => (furthest + 1 > s.count ? { count: furthest + 1, from: s.count } : s));
+        const now = entries.filter((e) => e.isIntersecting).map((e) => els.indexOf(e.target as HTMLElement));
+        if (!now.length) return;
+        now.forEach((i) => io.unobserve(els[i]));
+        setShown((s) => s.map((v, i) => v || now.includes(i)));
       },
       { threshold: 0.25 },
     );
@@ -119,26 +169,15 @@ export function Story() {
     return () => io.disconnect();
   }, []);
 
-  // reduced motion: everything as finished, once the section is reached
-  const count = reduced ? (sectionSeen ? N : 0) : shown.count;
-  const from = reduced ? 0 : shown.from;
-
-  // how far the line is drawn: to the furthest revealed star — or, with all four, to its end
-  const reach = (n: number) => (!geo || n === 0 ? 0 : n >= N ? 1 : geo.at[n - 1]);
-  const drawn = reach(count);
-  const drawMs = reduced ? 0 : Math.round((drawn - reach(from)) * DRAW_MS);
-
-  const lineD = geo ? geo.points.map((p, i) => `${i ? "L" : "M"}${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join("") : "";
-
-  const fade = (show: boolean, delay: number, rise: number): CSSProperties =>
+  const headShown = reduced ? sectionSeen : headSeen;
+  const fade = (show: boolean, delay: number): CSSProperties =>
     reduced
       ? { opacity: show ? 1 : 0, transition: "opacity 200ms linear" }
       : {
           opacity: show ? 1 : 0,
-          transform: show ? "none" : `translateY(${rise}px)`,
-          transition: `opacity 700ms ease-out ${delay}ms, transform 700ms ease-out ${delay}ms`,
+          transform: show ? "none" : "translateY(10px)",
+          transition: `opacity 800ms ${EASE_CARD} ${delay}ms, transform 800ms ${EASE_CARD} ${delay}ms`,
         };
-  const headShown = reduced ? sectionSeen : headSeen;
 
   return (
     <section
@@ -146,18 +185,19 @@ export function Story() {
       ref={sectionRef}
       aria-labelledby="story-heading"
       lang={hindi ? "hi" : undefined}
-      className="story relative px-[var(--gutter)] pt-12"
-      data-seen={sectionSeen || undefined}
+      className="story relative px-[clamp(16px,5vw,24px)]"
+      style={{ paddingTop: "calc(var(--status-bar) + 48px)" }}
       data-still={reduced || undefined}
     >
       <Backdrop />
+      <ArchDefs />
 
-      <div className="relative">
+      <div className="relative z-[1]">
         {/* ── the heading ── */}
-        <header ref={headRef} className="story-head relative z-[2] flex flex-col items-center text-center">
+        <header ref={headRef} className="story-head flex flex-col items-center text-center">
           <p
-            className={`text-gold-ink ${hindi ? "font-deva text-[14px]" : "font-sans text-[12px] font-medium uppercase tracking-[0.3em]"}`}
-            style={fade(headShown, 0, 8)}
+            className={`story-gold ${hindi ? "font-deva text-[14px]" : "font-sans text-[12px] font-medium uppercase tracking-[0.3em]"}`}
+            style={fade(headShown, 0)}
           >
             <span aria-hidden className="mr-2 text-[10px]">✦</span>
             {t.eyebrow}
@@ -165,24 +205,24 @@ export function Story() {
           </p>
           <h2
             id="story-heading"
-            className={`mt-3 text-balance leading-[1.15] text-navy [font-size:clamp(28px,8vw,38px)] ${hindi ? "font-deva font-semibold" : "font-display font-semibold"}`}
-            style={fade(headShown, 120, 8)}
+            className={`story-blue mt-3 max-w-full text-balance leading-[1.18] [font-size:clamp(26px,7.2vw,34px)] ${hindi ? "font-deva font-semibold" : "font-display font-semibold"}`}
+            style={fade(headShown, 140)}
           >
             {t.title}
           </h2>
           <p
-            className={`mt-2 max-w-[21rem] text-balance text-[17px] leading-snug text-slate ${hindi ? "font-deva" : "font-display font-medium italic"}`}
-            style={fade(headShown, 240, 8)}
+            className={`story-brown mt-2 max-w-[20rem] text-balance text-[16.5px] leading-snug ${hindi ? "font-deva" : "font-display font-medium italic"}`}
+            style={fade(headShown, 280)}
           >
             {t.subtitle}
           </p>
-          <span aria-hidden className="mt-4 block text-gold-ink" style={fade(headShown, 360, 0)}>
+          <span aria-hidden className="story-gold mt-3.5 block" style={fade(headShown, 420)}>
             <Flourish />
           </span>
         </header>
 
-        {/* ── the four milestones on their constellation ── */}
-        <div ref={listRef} className="story-list relative mt-8">
+        {/* ── the four milestones and their line ── */}
+        <div ref={listRef} className="relative mt-9">
           {geo && (
             <svg
               aria-hidden
@@ -192,61 +232,56 @@ export function Story() {
               viewBox={`0 0 ${geo.w} ${geo.h}`}
             >
               <defs>
-                <mask id="story-draw" maskUnits="userSpaceOnUse" x={-20} y={-20} width={geo.w + 40} height={geo.h + 80}>
+                <mask id="story-draw" maskUnits="userSpaceOnUse" x={-20} y={-20} width={geo.w + 40} height={geo.h + 100}>
                   <path
-                    d={lineD}
+                    ref={lineRef}
+                    d={geo.d}
                     fill="none"
                     stroke="#fff"
-                    strokeWidth="8"
+                    strokeWidth="10"
                     strokeLinecap="round"
-                    strokeLinejoin="round"
                     pathLength={1}
                     strokeDasharray="1 1"
-                    style={{
-                      strokeDashoffset: 1 - drawn,
-                      transition: drawMs ? `stroke-dashoffset ${drawMs}ms ease-in-out` : "none",
-                    }}
+                    strokeDashoffset="1"
                   />
                 </mask>
+                <linearGradient id="story-line-gold" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stopColor="#c9a25a" />
+                  <stop offset="1" stopColor="#a8741f" />
+                </linearGradient>
               </defs>
-              <path
-                d={lineD}
-                mask="url(#story-draw)"
-                className={geo.row ? "story-line story-line-dots" : "story-line"}
-                strokeLinejoin="round"
-              />
+              <path d={geo.d} mask="url(#story-draw)" className={geo.row ? "story-line story-line-dots" : "story-line"} />
             </svg>
           )}
 
-          {/* the stars on the line: each glows as the line reaches it, then now and then twinkles */}
-          {geo?.stars.map((s, i) => {
-            const lit = i < count;
-            const delay = reduced || i < from ? 0 : Math.max(0, Math.round((geo.at[i] - reach(from)) * DRAW_MS));
-            return (
-              <span
-                key={i}
-                aria-hidden
-                className="story-star"
-                data-lit={lit || undefined}
-                style={{ left: s.x, top: s.y, "--glow-delay": `${delay}ms`, "--twinkle": `${TWINKLE[i][0]}s`, "--twinkle-delay": `${delay / 1000 + TWINKLE[i][1]}s` } as CSSProperties}
-              >
-                <span className="story-star-glow" />
-                <svg className="story-star-core" viewBox="0 0 20 20" width="18" height="18">
-                  <path d="M10 1c.6 4.6 2.4 7.4 9 9c-6.6 1.6-8.4 4.4-9 9c-.6-4.6-2.4-7.4-9-9c6.6-1.6 8.4-4.4 9-9Z" fill="currentColor" />
-                </svg>
-              </span>
-            );
-          })}
+          {/* a small gold lotus on the line beside each card */}
+          {geo?.marks.map((m, i) => (
+            <span
+              key={i}
+              ref={(el) => {
+                markRefs.current[i] = el;
+              }}
+              aria-hidden
+              className="story-mark"
+              style={{ left: m.x, top: m.y }}
+            >
+              <svg viewBox="0 0 24 18" width="20" height="15">
+                <path
+                  fill="currentColor"
+                  d="M12 1c2.3 2.4 3.2 5.2 2.6 8.3c-.4 2-1.3 3.6-2.6 5c-1.3-1.4-2.2-3-2.6-5C8.8 6.2 9.7 3.4 12 1Zm-6.6 5.2c2.6.4 4.4 2 5.3 4.6c.5 1.4.6 2.8.3 4.1c-2.3-.3-4-1.6-5-3.6c-.7-1.6-.9-3.3-.6-5.1Zm13.2 0c.3 1.8.1 3.5-.6 5.1c-1 2-2.7 3.3-5 3.6c-.3-1.3-.2-2.7.3-4.1c.9-2.6 2.7-4.2 5.3-4.6ZM2 12.6c2.2-.4 4.2.1 5.8 1.6c-1.7 1.2-3.7 1.6-5.8 1Zm20 0c0 .9 0 1.7 0 2.6c-2.1.6-4.1.2-5.8-1c1.6-1.5 3.6-2 5.8-1.6Z"
+                />
+              </svg>
+            </span>
+          ))}
 
-          <ol className="story-cards relative z-[1] flex flex-col md:grid md:grid-cols-4 md:gap-4 md:pb-16">
+          <ol className="story-cards relative z-[1]">
             {story.moments.map((m, i) => (
               <Milestone
                 key={m.title}
                 moment={m}
                 index={i}
                 hindi={hindi}
-                show={i < count}
-                delay={reduced ? 0 : Math.max(0, i - from) * STAGGER_MS}
+                show={reduced ? sectionSeen : shown[i]}
                 reduced={reduced}
                 cardRef={(el) => {
                   cards.current[i] = el;
@@ -263,20 +298,11 @@ export function Story() {
   );
 }
 
-/** Each milestone star's twinkle: [cycle s, extra delay s] — a different, unhurried rhythm for each. */
-const TWINKLE: Array<[number, number]> = [
-  [7.2, 6.4],
-  [8.6, 8.1],
-  [6.4, 7.3],
-  [9, 6.9],
-];
-
 function Milestone({
   moment,
   index,
   hindi,
   show,
-  delay,
   reduced,
   cardRef,
 }: {
@@ -284,7 +310,6 @@ function Milestone({
   index: number;
   hindi: boolean;
   show: boolean;
-  delay: number;
   reduced: boolean;
   cardRef: (el: HTMLElement | null) => void;
 }) {
@@ -292,57 +317,113 @@ function Milestone({
   const [settled, setSettled] = useState(false);
   const title = hindi ? moment.hindi.title : moment.title;
   const line = hindi ? moment.hindi.line : moment.line;
-  const style: CSSProperties = reduced
+
+  const card: CSSProperties = reduced
     ? { opacity: show ? 1 : 0, transition: "opacity 200ms linear" }
     : {
         opacity: show ? 1 : 0,
         transform: show ? "none" : "translateY(18px)",
-        transition: `opacity 700ms cubic-bezier(.22,.61,.36,1) ${delay}ms, transform 700ms cubic-bezier(.22,.61,.36,1) ${delay}ms`,
+        transition: `opacity 800ms ${EASE_CARD}, transform 800ms ${EASE_CARD}`,
         willChange: settled ? "auto" : "transform, opacity",
       };
+  // the photo eases back from a slight zoom as the card arrives
+  const photo: CSSProperties = reduced
+    ? {}
+    : {
+        transform: show ? "none" : "scale(1.07)",
+        transition: `transform 1400ms ${EASE_CARD} 80ms`,
+        willChange: settled ? "auto" : "transform",
+      };
+  // then its year, title and line, one after another
+  const word = (step: number): CSSProperties =>
+    reduced
+      ? {}
+      : {
+          opacity: show ? 1 : 0,
+          transform: show ? "none" : "translateY(6px)",
+          transition: `opacity 600ms ${EASE_CARD} ${250 + step * 110}ms, transform 600ms ${EASE_CARD} ${250 + step * 110}ms`,
+        };
+
   return (
     <li
       ref={cardRef}
-      className={`story-card w-[47%] md:w-auto md:self-auto ${index % 2 ? "self-end" : "self-start"} ${index ? "-mt-[88px]" : ""} ${index === 1 || index === 2 ? "md:mt-5" : "md:mt-0"}`}
-      style={style}
+      className="story-card"
+      style={card}
       onTransitionEnd={(e) => {
         if (show && e.target === e.currentTarget && e.propertyName === "transform") setSettled(true);
       }}
     >
-      <article className="story-polaroid">
-        <div className="story-photo">
-          {moment.photo.src ? (
-            <img
-              src={moment.photo.src}
-              alt={moment.photo.alt}
-              width={480}
-              height={600}
-              loading="lazy"
-              decoding="async"
-              draggable={false}
-              className="h-full w-full object-cover"
-              style={{ objectPosition: moment.photo.focus }}
-            />
-          ) : (
-            <div
-              role="img"
-              aria-label={`${moment.photo.alt} (photo to come)`}
-              className="flex h-full w-full items-center justify-center"
-              style={{ background: WASHES[index % WASHES.length] }}
-            >
-              <Icon name="lotus" className="h-[24%] w-[24%] text-gold-ink/55" strokeWidth={1} />
-            </div>
-          )}
+      <article className="story-card-body">
+        {/* the photo in a temple arch, edged in fine gold */}
+        <div className="story-arch">
+          {/* the clip holds still while the photo inside it eases back from its zoom */}
+          <div className="story-arch-photo">
+            {moment.photo.src ? (
+              <img
+                src={moment.photo.src}
+                alt={moment.photo.alt}
+                width={400}
+                height={560}
+                loading="lazy"
+                decoding="async"
+                draggable={false}
+                className="h-full w-full object-cover"
+                style={{ objectPosition: moment.photo.focus ?? "50% 30%", ...photo }}
+              />
+            ) : (
+              <div
+                role="img"
+                aria-label={`${moment.photo.alt} (photo to come)`}
+                className="flex h-full w-full items-center justify-center"
+                style={{ background: WASHES[index % WASHES.length], ...photo }}
+              >
+                <Icon name="lotus" className="h-[24%] w-[24%] text-gold-ink/55" strokeWidth={1} />
+              </div>
+            )}
+          </div>
+          <svg aria-hidden className="story-arch-line" viewBox="0 0 100 140" preserveAspectRatio="none">
+            <path d={ARCH} fill="none" stroke="url(#story-arch-gold)" strokeWidth="1.4" vectorEffect="non-scaling-stroke" />
+          </svg>
         </div>
-        <h3 className={`mt-2.5 text-[18px] leading-tight text-navy ${hindi ? "font-deva font-semibold" : "font-display font-semibold"}`}>
+        {/* the year, the title, one line */}
+        <p className="story-gold mt-2.5 font-sans text-[11px] font-semibold tracking-[0.22em]" style={word(0)}>
+          {moment.year}
+        </p>
+        <h3
+          className={`story-blue mt-1 text-balance text-[17px] leading-tight ${hindi ? "font-deva font-semibold" : "font-display font-semibold"}`}
+          style={word(1)}
+        >
           {title}
         </h3>
-        <p className="mt-1 font-sans text-[14px] font-medium tracking-[0.1em] text-gold-ink">{moment.year}</p>
-        <p className={`mt-1 text-[14px] leading-snug text-slate ${hindi ? "font-deva" : "font-display font-medium italic"}`}>
+        <p
+          className={`story-brown mx-auto mt-1.5 line-clamp-3 text-[13.5px] leading-snug ${hindi ? "font-deva" : "font-display font-medium italic"}`}
+          style={word(2)}
+        >
           {line}
         </p>
       </article>
     </li>
+  );
+}
+
+/** The temple arch: gently pointed at the top, a straight base (on a 100 × 140 box). */
+const ARCH = "M4 136V56C4 38 18 28 50 4C82 28 96 38 96 56V136Z";
+
+/** The arch's clip (in the photo's own box, 0–1) and its antique-gold edge, defined once. */
+function ArchDefs() {
+  return (
+    <svg aria-hidden width="0" height="0" className="absolute">
+      <defs>
+        <clipPath id="story-arch-clip" clipPathUnits="objectBoundingBox">
+          <path d={ARCH} transform="scale(0.01 0.0071428571)" />
+        </clipPath>
+        <linearGradient id="story-arch-gold" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#e8c97a" />
+          <stop offset="0.5" stopColor="#b8893a" />
+          <stop offset="1" stopColor="#e8c97a" />
+        </linearGradient>
+      </defs>
+    </svg>
   );
 }
 
@@ -354,18 +435,18 @@ const WASHES = [
   "radial-gradient(circle at 66% 70%, #fff 0, transparent 52%), radial-gradient(circle at 30% 30%, rgb(196 222 200 / 0.9), transparent 62%), #edf5ec",
 ];
 
-/** A small gold flourish under the heading: two fine scrolls and a star. */
+/** A small, understated gold flourish under the heading. */
 function Flourish() {
   return (
-    <svg width="148" height="18" viewBox="0 0 148 18" fill="none" stroke="currentColor" strokeWidth="0.9" strokeLinecap="round">
-      <path d="M4 9h44c6 0 8-5 12-5s5 4 2 5.5" opacity="0.8" />
-      <path d="M144 9h-44c-6 0-8-5-12-5s-5 4-2 5.5" opacity="0.8" />
-      <path d="M74 2.5c.5 3.6 1.8 5.4 6.5 6.5c-4.7 1.1-6 2.9-6.5 6.5c-.5-3.6-1.8-5.4-6.5-6.5c4.7-1.1 6-2.9 6.5-6.5Z" fill="currentColor" stroke="none" />
+    <svg width="120" height="14" viewBox="0 0 120 14" fill="none" stroke="currentColor" strokeWidth="0.8" strokeLinecap="round">
+      <path d="M6 7h36c5 0 6-4 10-4s4 3 2 4.5" opacity="0.75" />
+      <path d="M114 7H78c-5 0-6-4-10-4s-4 3-2 4.5" opacity="0.75" />
+      <circle cx="60" cy="7" r="1.6" fill="currentColor" stroke="none" />
     </svg>
   );
 }
 
-/** The way on: a fine gold line and a double arrow, gliding to the ceremonies — then Kailash, drawn in fine gold. */
+/** The way on: a fine gold line and a double arrow, gliding to the ceremonies. */
 function Onward() {
   const go = (e: MouseEvent) => {
     const next = document.getElementById("events");
@@ -374,48 +455,36 @@ function Onward() {
     next.scrollIntoView();
   };
   return (
-    <div className="relative z-[2] flex flex-col items-center pb-[calc(env(safe-area-inset-bottom,0px)+8px)] pt-10 text-gold-ink">
-      <span aria-hidden className="h-px w-16 bg-gradient-to-r from-transparent via-gold-ink/70 to-transparent" />
+    <div className="story-gold relative flex flex-col items-center pt-10">
+      <span aria-hidden className="h-px w-16 bg-gradient-to-r from-transparent via-current to-transparent opacity-70" />
       <a href="#events" onClick={go} aria-label="On to the ceremonies" className="mt-2 flex h-11 w-11 items-center justify-center">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
           <path d="M7 6.5l5 5 5-5M7 12.5l5 5 5-5" />
         </svg>
       </a>
-      <svg aria-hidden className="mt-3 w-[min(78%,380px)]" viewBox="0 0 300 92" fill="none" stroke="currentColor" strokeWidth="0.8" strokeLinejoin="round" opacity="0.45">
-        <path d="M0 90l40-26 22 10 30-26 18 10 22-30c4-8 8-14 18-16c10 2 14 8 18 16l22 30 18-10 30 26 22-10 40 26" />
-        <path d="M150 4v18M140 12l-6 20M160 12l6 20M144 38l-10 18M156 38l10 18" opacity="0.6" />
-      </svg>
     </div>
   );
 }
 
 /**
- * Faint, around the section: Mahadev's crescent, soft clouds drifting very slowly and thin
- * constellations at the edges (Kailash is drawn at the foot, under the way on). SVG and CSS only.
+ * The section's air: a Himalayan mist that warms into ivory (wider than the page column, so it
+ * reaches the screen's edges), Mahadev's crescent, two still wisps of cloud, and at the foot the
+ * faintest line of peaks — all well clear of the cards and words. SVG and CSS only.
  */
 function Backdrop() {
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
-      {/* the crescent (top left, clear of the bell button in the corner) */}
-      <svg className="absolute left-[6%] top-5 h-11 w-11 text-gold-ink" viewBox="0 0 40 40">
-        <path d="M27 5a15 15 0 1 0 8 25A13 13 0 0 1 27 5Z" fill="rgb(var(--gold) / 0.18)" stroke="currentColor" strokeWidth="0.9" opacity="0.75" />
+      <div className="story-mist" />
+      {/* the crescent, 76px down in the right corner (below the bell button, beyond the heading's end) */}
+      <svg className="absolute right-[2px] top-[76px] h-8 w-8 text-gold-ink" viewBox="0 0 40 40">
+        <path d="M27 5a15 15 0 1 0 8 25A13 13 0 0 1 27 5Z" fill="rgb(var(--gold) / 0.16)" stroke="currentColor" strokeWidth="0.9" opacity="0.6" />
       </svg>
-      {/* soft clouds */}
-      <span className="story-cloud left-[-14%] top-[2%] h-24 w-[62%]" />
-      <span className="story-cloud right-[-18%] top-[42%] h-20 w-[56%] [animation-delay:-30s]" />
-      <span className="story-cloud bottom-[7%] left-[-10%] h-24 w-[60%] [animation-delay:-55s]" />
-      {/* constellations at the edges */}
-      <svg className="absolute left-2 top-[150px] h-24 w-20 text-gold-ink" viewBox="0 0 80 96" opacity="0.5">
-        <path d="M6 10L28 24L22 50L48 62L70 88" fill="none" stroke="currentColor" strokeWidth="0.6" />
-        {[[6, 10], [28, 24], [22, 50], [48, 62], [70, 88]].map(([x, y]) => (
-          <circle key={`${x}${y}`} cx={x} cy={y} r="1.6" fill="currentColor" />
-        ))}
-      </svg>
-      <svg className="absolute right-1 top-[56%] h-24 w-16 text-gold-ink" viewBox="0 0 64 96" opacity="0.45">
-        <path d="M56 6L40 30L52 52L22 72L34 92" fill="none" stroke="currentColor" strokeWidth="0.6" />
-        {[[56, 6], [40, 30], [52, 52], [22, 72], [34, 92]].map(([x, y]) => (
-          <circle key={`${x}${y}`} cx={x} cy={y} r="1.5" fill="currentColor" />
-        ))}
+      <span className="story-cloud left-[-16%] top-[3%] h-24 w-[64%]" />
+      <span className="story-cloud right-[-18%] top-[40%] h-20 w-[56%]" />
+      {/* the Himalaya, drawn in the finest line at the foot */}
+      <svg className="story-peaks" viewBox="0 0 560 56" fill="none" strokeLinejoin="round" strokeLinecap="round">
+        <path d="M0 55L46 38L70 44L104 24L124 32L150 18L176 32L214 16L240 26L266 8C272 4 276 2 280 2C284 2 288 4 294 8L320 26L346 16L384 32L410 18L436 32L456 24L490 44L514 38L560 55" />
+        <path d="M280 10v10M272 14l-4 10M288 14l4 10M150 24l-3 8M410 24l3 8" opacity="0.7" />
       </svg>
     </div>
   );

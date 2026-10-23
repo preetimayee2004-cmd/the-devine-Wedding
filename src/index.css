@@ -541,127 +541,177 @@
     }
   }
 
-  /* ── Section 04: "A Love Written in the Stars" (on the site's own sky) ── */
+  /* ── Section 04: "A Love Written in the Stars" — a Himalayan mist warming into ivory ── */
+  .story {
+    --story-blue: #2b4a6a; /* deep muted blue: the headings */
+    --story-brown: #6b4e37; /* warm brown: the words */
+    --story-gold: #8a5a10; /* antique gold: small type and accents */
+    --story-ivory: 251 246 236;
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 76px);
+  }
   /* from 768px the four cards stand in one row, so the section reaches out past the column */
   @media (min-width: 768px) {
     .story {
       margin-inline: calc((100% - min(92vw, 60rem)) / 2);
     }
   }
+  .story-blue {
+    color: var(--story-blue);
+  }
+  .story-brown {
+    color: var(--story-brown);
+  }
+  .story-gold {
+    color: var(--story-gold);
+  }
   .story-head {
-    text-shadow: 0 0 10px rgb(255 255 255 / 0.55);
+    text-shadow: 0 0 10px rgb(255 255 255 / 0.5);
   }
-  /* the constellation line: a fine antique-gold thread (dotted under the row) */
-  .story-line {
-    fill: none;
-    stroke: rgb(var(--gold-ink));
-    stroke-width: 1;
-    opacity: 0.7;
-  }
-  .story-line-dots {
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-dasharray: 0.01 7;
-    opacity: 0.75;
-  }
-  /* a milestone star: dim until the line reaches it, then a soft glow */
-  .story-star {
+
+  /* the air: from the sky above into a soft Himalayan mist-blue, warming into ivory, and back to
+     the sky below — the full width of the screen, whatever the column */
+  .story-mist {
     position: absolute;
-    z-index: 2;
-    width: 0;
-    height: 0;
-    color: rgb(var(--gold-ink));
-  }
-  .story-star-core,
-  .story-star-glow {
-    position: absolute;
-    left: 0;
     top: 0;
-    translate: -50% -50%;
+    bottom: 0;
+    left: 50%;
+    width: 100vw;
+    translate: -50% 0;
+    background: linear-gradient(
+      to bottom,
+      rgb(218 232 242 / 0) 0,
+      rgb(218 232 242) 150px,
+      rgb(230 237 241) 38%,
+      rgb(var(--story-ivory)) 76%,
+      rgb(var(--story-ivory)) calc(100% - 130px),
+      rgb(var(--story-ivory) / 0) 100%
+    );
   }
-  .story-star-core {
-    opacity: 0.35;
-    transition: opacity 600ms ease-out var(--glow-delay, 0ms);
-  }
-  .story-star-glow {
-    width: 34px;
-    height: 34px;
-    border-radius: 9999px;
-    background: radial-gradient(circle, rgb(255 236 180 / 0.95) 0%, rgb(232 196 106 / 0.45) 38%, rgb(232 196 106 / 0) 70%);
-    opacity: 0;
-    transition: opacity 700ms ease-out var(--glow-delay, 0ms);
-  }
-  .story-star[data-lit] .story-star-core {
-    opacity: 1;
-  }
-  .story-star[data-lit] .story-star-glow {
-    opacity: 0.7;
-    /* now and then, a gentle twinkle */
-    animation: star-twinkle var(--twinkle, 8s) ease-in-out var(--twinkle-delay, 7s) infinite;
-  }
-  @keyframes star-twinkle {
-    0%,
-    80%,
-    100% {
-      opacity: 0.7;
-    }
-    88% {
-      opacity: 1;
-    }
-    94% {
-      opacity: 0.5;
-    }
-  }
-  /* the cream polaroid: a fine gold double frame around a 4:5 photo */
-  .story-polaroid {
-    position: relative;
-    padding: 8px 8px 12px;
-    border: 1px solid rgb(var(--gold) / 0.75);
-    border-radius: 6px;
-    background: #fffaf0;
-    outline: 1px solid rgb(var(--gold) / 0.5);
-    outline-offset: -6px;
-    text-align: center;
-    box-shadow:
-      0 18px 34px -22px rgb(18 41 74 / 0.45),
-      0 2px 6px -2px rgb(18 41 74 / 0.12);
-  }
-  .story-photo {
-    aspect-ratio: 4 / 5;
-    overflow: hidden;
-    border-radius: 3px;
-    border: 1px solid rgb(var(--gold) / 0.55);
-  }
-  /* soft clouds, drifting very slowly once the section has been reached */
+  /* two still wisps of mist */
   .story-cloud {
     position: absolute;
     background:
       radial-gradient(ellipse 34% 48% at 30% 62%, rgb(255 255 255 / 0.8), transparent 70%),
       radial-gradient(ellipse 30% 56% at 55% 44%, rgb(255 255 255 / 0.85), transparent 70%),
       radial-gradient(ellipse 30% 44% at 78% 64%, rgb(255 255 255 / 0.75), transparent 70%);
-    opacity: 0.8;
+    opacity: 0.55;
   }
-  .story[data-seen] .story-cloud {
-    animation: story-cloud 80s ease-in-out infinite;
+  /* the Himalaya at the foot, in the finest line */
+  .story-peaks {
+    position: absolute;
+    left: 50%;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 6px);
+    width: min(100vw, 560px);
+    height: auto;
+    translate: -50% 0;
+    stroke: rgb(138 90 16 / 0.22);
+    stroke-width: 0.8;
   }
-  @keyframes story-cloud {
-    0%,
-    100% {
-      transform: translateX(0);
+
+  /* the line: one continuous thread of antique gold (dotted under the row) */
+  .story-line {
+    fill: none;
+    stroke: url(#story-line-gold);
+    stroke-width: 1.2;
+    opacity: 0.85;
+  }
+  .story-line-dots {
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-dasharray: 0.01 7;
+  }
+  /* a small gold lotus on the line: pale until the line reaches it */
+  .story-mark {
+    position: absolute;
+    z-index: 2;
+    display: flex;
+    width: 28px;
+    height: 28px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    background: rgb(var(--story-ivory));
+    box-shadow: 0 0 0 1px rgb(168 116 31 / 0.35);
+    color: #a8741f;
+    translate: -50% -50%;
+    opacity: 0.4;
+    transition: opacity 500ms ease-out;
+  }
+  .story-mark[data-lit] {
+    opacity: 1;
+  }
+
+  /* the cards: staggered left and right of the line on a phone (never touching it, the edges or
+     each other), a row from 768px */
+  .story-cards {
+    display: flex;
+    flex-direction: column;
+  }
+  .story-card {
+    width: calc((100% - 28px) / 2);
+  }
+  .story-card:nth-child(even) {
+    align-self: flex-end;
+  }
+  /* each tucks up beside the one before, on the other side of the line */
+  .story-card + .story-card {
+    margin-top: calc((100% - 28px) * -0.33);
+  }
+  @media (min-width: 768px) {
+    .story-cards {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
+      padding-bottom: 64px;
     }
-    50% {
-      transform: translateX(6vw);
+    .story-card {
+      width: auto;
+    }
+    .story-card:nth-child(even) {
+      align-self: auto;
+    }
+    .story-card + .story-card {
+      margin-top: 0;
+    }
+    .story-card:nth-child(2),
+    .story-card:nth-child(3) {
+      margin-top: 20px;
     }
   }
-  /* reduced motion: no twinkle, no drifting */
-  .story[data-still] .story-cloud,
-  .story[data-still] .story-star[data-lit] .story-star-glow {
-    animation: none;
+  /* warm ivory, a fine antique-gold edge, a soft shadow — and little padding */
+  .story-card-body {
+    padding: 8px 10px 14px;
+    border: 1px solid rgb(168 116 31 / 0.45);
+    border-radius: 14px;
+    background: rgb(var(--story-ivory));
+    text-align: center;
+    box-shadow:
+      0 14px 28px -20px rgb(70 50 25 / 0.4),
+      0 2px 6px -3px rgb(70 50 25 / 0.12);
   }
-  .story[data-still] .story-star-core,
-  .story[data-still] .story-star-glow {
-    transition-duration: 200ms;
-    transition-delay: 0ms;
+  /* the photo in its temple arch (100:140), the arch edged in fine gold */
+  .story-arch {
+    position: relative;
+    margin-inline: -2px;
+    aspect-ratio: 100 / 140;
+  }
+  .story-arch-photo {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    -webkit-clip-path: url(#story-arch-clip);
+    clip-path: url(#story-arch-clip);
+  }
+  .story-arch-line {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .story[data-still] .story-mark {
+    transition: none;
   }
 
   /* ── The gate, before the opening (first visit in a session) ──
