@@ -11,17 +11,19 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 /**
  * Section 06 — two families, one celebration (PRD §4).
  *
- * The sacred thread arrives at the centre and parts into two, leading into a
- * pair of gold arches. Each arch draws its outline first, then the family
- * photograph eases in from a slight zoom, then the names. The two sides
- * take turns, so the eye moves from one family to the other.
+ * Each family in an ornate frame of gilded scrolls on deep blue: the frame appears, then the
+ * family photograph inside it (shown whole, everyone in it, a soft blur of itself filling the
+ * frame above and below), then the names. On a phone the two families stand one above the other,
+ * a gold thread dropping from the heading; on a wider screen they stand side by side and the
+ * thread parts in two, one strand to each. The two sides take turns, so the eye moves from one
+ * family to the other.
  */
 export function Family() {
   const { family } = wedding;
   const sectionRef = useRef<HTMLElement>(null);
   const pairRef = useRef<HTMLDivElement>(null);
   const seen = useInView(sectionRef, { threshold: 0.1 });
-  const pairSeen = useInView(pairRef, { threshold: 0.25 });
+  const pairSeen = useInView(pairRef, { threshold: 0.15 });
   const reduced = usePrefersReducedMotion();
 
   return (
@@ -35,8 +37,8 @@ export function Family() {
       />
 
       <div ref={pairRef} className="relative mt-6">
-        {/* the thread parts in two, one strand to each family */}
-        <svg aria-hidden viewBox="0 0 100 30" preserveAspectRatio="none" className="block h-10 w-full">
+        {/* the thread: dropping to the first family on a phone; parting in two beside each other */}
+        <svg aria-hidden viewBox="0 0 100 30" preserveAspectRatio="none" className="fam-thread-two h-10 w-full">
           <path
             d="M50 0V8C50 20 25 14 25 30M50 8C50 20 75 14 75 30"
             fill="none"
@@ -47,7 +49,10 @@ export function Family() {
             style={draw(pairSeen, reduced, 0, 900)}
           />
         </svg>
-        <div className="grid grid-cols-2 gap-x-4">
+        <svg aria-hidden viewBox="0 0 10 30" preserveAspectRatio="none" className="fam-thread-one mx-auto h-8 w-3">
+          <path d="M5 0V30" fill="none" stroke="rgb(var(--gold))" strokeWidth="1.4" vectorEffect="non-scaling-stroke" pathLength={1} style={draw(pairSeen, reduced, 0, 700)} />
+        </svg>
+        <div className="fam-pair">
           {family.sides.map((side, i) => (
             <Side key={side.title} side={side} show={pairSeen} reduced={reduced} delay={reduced ? 0 : 500 + i * 320} />
           ))}
@@ -72,49 +77,45 @@ function draw(show: boolean, reduced: boolean, delay: number, duration: number):
       };
 }
 
+/** The frame's opening, in % of the frame picture (a hair under its inner gold edge). */
+const OPENING = { left: 23.99, top: 21.7, width: 51.87, height: 57.7 };
+
 function Side({ side, show, reduced, delay }: { side: FamilySide; show: boolean; reduced: boolean; delay: number }) {
   const { photo } = side;
-  const photoIn = delay + (reduced ? 0 : 700);
+  const { familyFrame, familyFrameSize } = wedding.assets;
+  const photoIn = delay + (reduced ? 0 : 500);
+  const appear = (ms: number, extra?: CSSProperties): CSSProperties =>
+    reduced
+      ? { opacity: show ? 1 : 0, transition: "opacity 500ms linear" }
+      : { opacity: show ? 1 : 0, transition: `opacity 900ms ease-out ${ms}ms, transform 1100ms ${EASE.silk} ${ms}ms`, ...extra };
 
   return (
     <div className="flex flex-col items-center text-center">
-      {/* the arch: outline first, then the photograph inside it */}
-      <div className="relative aspect-[3/4] w-full">
-        <svg
-          aria-hidden
-          viewBox="0 0 300 400"
-          preserveAspectRatio="none"
-          className="absolute inset-0 h-full w-full overflow-visible"
-        >
-          <g fill="none" stroke="rgb(var(--gold))" strokeWidth="1.2" vectorEffect="non-scaling-stroke">
-            <path
-              pathLength={1}
-              style={draw(show, reduced, delay, 1300)}
-              d="M150 1A149 149 0 0 0 1 150V376Q1 399 24 399H150"
-            />
-            <path
-              pathLength={1}
-              style={draw(show, reduced, delay, 1300)}
-              d="M150 1A149 149 0 0 1 299 150V376Q299 399 276 399H150"
-            />
-          </g>
-        </svg>
+      {/* the frame: the photograph in its opening, the gilded frame over it */}
+      <div
+        className="fam-frame relative"
+        style={{ aspectRatio: `${familyFrameSize.width} / ${familyFrameSize.height}`, ...appear(delay, { transform: show || reduced ? "none" : "scale(0.96)" }) }}
+      >
         <div
-          className="absolute inset-[6px] overflow-hidden rounded-b-[17px] rounded-t-full"
-          style={{ opacity: show ? 1 : 0, transition: `opacity 900ms ease-out ${photoIn}ms` }}
+          className="absolute overflow-hidden bg-sky-pale"
+          style={{ left: `${OPENING.left}%`, top: `${OPENING.top}%`, width: `${OPENING.width}%`, height: `${OPENING.height}%`, ...appear(photoIn) }}
         >
           {photo.src ? (
-            <img
-              src={photo.src}
-              alt={photo.alt}
-              loading="lazy"
-              decoding="async"
-              className="h-full w-full object-cover"
-              style={{
-                transform: show ? "scale(1)" : "scale(1.08)",
-                transition: `transform 1600ms ${EASE.silk} ${photoIn}ms`,
-              }}
-            />
+            <>
+              {/* a soft blur of the photo fills the opening; the photo itself, whole, over it */}
+              <img aria-hidden src={photo.src} alt="" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full scale-125 object-cover opacity-80 blur-md" />
+              <img
+                src={photo.src}
+                alt={photo.alt}
+                loading="lazy"
+                decoding="async"
+                className="absolute inset-0 h-full w-full object-contain"
+                style={{
+                  transform: show || reduced ? "scale(1)" : "scale(1.06)",
+                  transition: reduced ? undefined : `transform 1600ms ${EASE.silk} ${photoIn}ms`,
+                }}
+              />
+            </>
           ) : (
             <div
               role="img"
@@ -129,6 +130,17 @@ function Side({ side, show, reduced, delay }: { side: FamilySide; show: boolean;
             </div>
           )}
         </div>
+        <img
+          aria-hidden
+          src={familyFrame}
+          alt=""
+          width={familyFrameSize.width}
+          height={familyFrameSize.height}
+          loading="lazy"
+          decoding="async"
+          draggable={false}
+          className="pointer-events-none absolute inset-0 h-full w-full select-none"
+        />
       </div>
 
       <Reveal show={show} delay={photoIn + 200}>
