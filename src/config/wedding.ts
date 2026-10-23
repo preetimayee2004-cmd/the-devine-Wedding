@@ -288,11 +288,11 @@ export const wedding = {
    * Section 07 — the gallery: seven photos along a crescent moon.
    *
    * Seven, in this order: the first is the main portrait, at the moon's widest part; the other six
-   * follow its curve from one horn to the other (three on each side of the portrait). Any size works:
-   * each is cropped to its frame (`focus` says which part stays in view), and the lightbox shows it
-   * whole with its `caption`. For now these are the illustrations already on the site — the couple's
-   * own story pictures and the Shiv–Parvati paintings; replace any with a real photo (WebP in
-   * public/photos/) and keep the `alt` describing it.
+   * follow its curve from one horn to the other (three on each side of the portrait). Each is cropped
+   * to its frame (`focus` says which part stays in view), and the lightbox shows it whole with its
+   * `caption`. These seven are cut from the couple's shoot collage (public/photos/gallery-1..7.webp,
+   * each tile only ~240 px wide, enlarged 2x): the full-size originals will look sharper — put them
+   * in public/photos/ under the same names.
    */
   gallery: {
     eyebrow: "Moments to Remember",
@@ -300,43 +300,48 @@ export const wedding = {
     intro: "Moments we hold close, like the moon in Mahadev's locks.",
     photos: list<Photo>([
       {
-        src: "/photos/gallery-shivling.webp",
-        alt: "Preeti and Shivasish offering water at the Shivling",
-        caption: "Blessed beginnings",
-        focus: "50% 40%",
+        src: "/photos/gallery-1.webp",
+        alt: "The couple seated close on the old stone steps, she in a red silk saree, he in a white kurta",
+        caption: "Side by side",
+        focus: "52% 40%",
       },
       // along the crescent, from the upper horn …
-      { src: "/art/shiva-parvati-seated.webp", alt: "Shiva and Parvati seated together", caption: "Shiv & Shakti", focus: "56% 40%" },
       {
-        src: "/art/shiva-parvati-blessing.jpg",
-        alt: "Mahadev blessing Maa Parvati before the snowy Himalaya",
-        caption: "Mahadev's blessing",
-        focus: "50% 22%",
+        src: "/photos/gallery-2.webp",
+        alt: "On a stone path by the ghat steps, they reach for each other's hands as if to dance",
+        caption: "A dance on the ghats",
+        focus: "50% 50%",
       },
       {
-        src: "/photos/story-1.webp",
-        alt: "Illustration: he watches her from the balcony as she turns, a hand in her hair",
-        caption: "The first spark",
-        focus: "50% 24%",
+        src: "/photos/gallery-3.webp",
+        alt: "He holds her close on the steps; she smiles, eyes lowered",
+        caption: "Held close",
+        focus: "50% 40%",
+      },
+      {
+        src: "/photos/gallery-4.webp",
+        alt: "Forehead to forehead, his hand on her cheek",
+        caption: "Forehead to forehead",
+        focus: "45% 40%",
       },
       // … past the portrait, to the lower horn
       {
-        src: "/photos/story-2.webp",
-        alt: "Illustration: he kisses her cheek in the afternoon sun, she in a lavender saree",
-        caption: "Growing closer",
-        focus: "50% 16%",
+        src: "/photos/gallery-5.webp",
+        alt: "He kisses her forehead as she smiles, by the old stone wall",
+        caption: "A kiss on the forehead",
+        focus: "55% 40%",
       },
       {
-        src: "/photos/story-3.webp",
-        alt: "Illustration: a warm embrace before a wall of soft lights, she in a red saree",
-        caption: "Our promise",
-        focus: "50% 40%",
+        src: "/photos/gallery-6.webp",
+        alt: "Seated on the steps, she in front of him, both smiling",
+        caption: "Smiles on the steps",
+        focus: "50% 45%",
       },
       {
-        src: "/photos/story-4.webp",
-        alt: "Illustration: their hands joined and the gathbandhan knot tied, at the wedding fire",
-        caption: "The sacred knot",
-        focus: "50% 42%",
+        src: "/photos/gallery-7.webp",
+        alt: "Arm in arm, walking down the old stone steps",
+        caption: "Walking on together",
+        focus: "50% 50%",
       },
     ]),
   },

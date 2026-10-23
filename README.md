@@ -20,7 +20,7 @@ Everything a family changes lives in **`src/config/wedding.ts`**. Every value ma
 | `story.moments` | Your own moments, dates, words and photos. |
 | `events.list` | The final ceremony schedule (times are at the venue). |
 | `family.sides` | Real names, relations and family photos. |
-| `gallery.photos` | Seven photos: the first is the main portrait, the other six follow the crescent from one horn to the other. Each is cropped to its frame (`focus` keeps the right part in view); the lightbox shows it whole with its `caption`. For now they are the site's own illustrations — swap in real photos any time. |
+| `gallery.photos` | Seven photos: the first is the main portrait, the other six follow the crescent from one horn to the other. Each is cropped to its frame (`focus` keeps the right part in view); the lightbox shows it whole with its `caption`. Now seven tiles cut from the couple's shoot collage (`public/photos/gallery-1..7.webp`); full-size originals under the same names will look sharper. |
 | `rsvp.whatsapp` | The family's WhatsApp number, e.g. `"919876543210"`. |
 | `wishes.samples` | The starting wishes. Remove them once real wishes arrive. |
 | `travel` | Verified stations, pickup plan, travel contacts with phone numbers, and the actual hotels with phone numbers or booking links. |
