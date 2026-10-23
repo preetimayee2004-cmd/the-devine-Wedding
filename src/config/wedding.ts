@@ -12,7 +12,6 @@ import {
   type Photo,
   type Stay,
   type TravelPoint,
-  type WeddingEvent,
   type Wish,
 } from "./types";
 
@@ -114,78 +113,10 @@ export const wedding = {
     after: { title: "Happily Married", line: "With the blessings of Mahadev and Maa Parvati." },
   },
 
-  /** Section 05 — the ceremonies, in order. SAMPLE: the final schedule replaces this. */
+  /** Section 05 — the wedding events: the heading and one quote above the couple's arch. */
   events: {
-    eyebrow: "The Wedding Ceremonies",
-    title: "Sacred Celebrations",
-    intro: "Every ritual, a blessing; every moment, a memory we hope to share with you.",
-    list: list<WeddingEvent>([
-      {
-        id: "mehendi",
-        name: "Mehendi",
-        icon: "mehendi",
-        when: "2027-02-10T16:00",
-        about: "Henna, music and laughter as the bride's hands bloom with colour.",
-      },
-      {
-        id: "sangeet",
-        name: "Sangeet",
-        icon: "sangeet",
-        when: "2027-02-10T20:00",
-        about: "An evening of song and dance with both families.",
-        venue: "The Lawn, Kailash Vatika",
-      },
-      {
-        id: "mangana",
-        name: "Mangana",
-        icon: "haldi",
-        when: "2027-02-11T10:00",
-        about: "Turmeric and blessings for the bride and groom.",
-      },
-      {
-        id: "barajatri",
-        name: "Barajatri",
-        icon: "baraat",
-        when: "2027-02-12T18:00",
-        about: "The groom's procession sets out with drums and dancing.",
-      },
-      {
-        id: "batabarana",
-        name: "Batabarana",
-        icon: "welcome",
-        when: "2027-02-12T19:00",
-        about: "The bride's family welcomes the baraat with aarti.",
-      },
-      {
-        id: "hasta-ganthi",
-        name: "Hasta Ganthi",
-        icon: "knot",
-        when: "2027-02-12T19:30",
-        about: "The couple's hands are tied together in the sacred knot.",
-      },
-      {
-        id: "sindoor-daan",
-        name: "Sindoor Daan",
-        icon: "sindoor",
-        when: "2027-02-12T23:00",
-        about: "The vermilion that seals a lifetime's promise.",
-      },
-      {
-        id: "bidaai",
-        name: "Bidaai",
-        icon: "bidaai",
-        when: "2027-02-13T06:00",
-        about: "A tearful, joyful farewell as the bride begins her new home.",
-      },
-      {
-        id: "reception",
-        name: "Reception",
-        icon: "reception",
-        when: "2027-02-14T19:30",
-        about: "Dinner and celebration with everyone we love.",
-        venue: "The Grand Pavilion, Varanasi",
-      },
-    ]),
+    title: "Wedding Events",
+    quote: "Every ritual, a blessing; every moment, a memory we hope to share with you.",
   },
 
   /** Section 06 — two families. SAMPLE: real names and photos replace these. */
@@ -424,6 +355,13 @@ export const wedding = {
      * index.css. A larger original of the same painting will look sharper:
      * replace the file and update its pixel size here.
      */
+    /**
+     * Section 05: the couple's gold temple arch, wreathed in lotus and banana leaves, with tabla,
+     * veena, harmonium, a painted gramophone and a festive elephant at its foot. Its white was made
+     * transparent (and the editing app's checkerboard blob removed), so the site's sky shows through.
+     */
+    eventsArch: "/art/events-arch.webp",
+    eventsArchSize: { width: 1098, height: 1228 },
     saveTheDateArt: "/art/shiva-parvati-blessing.jpg",
     saveTheDateArtSize: { width: 572, height: 1024 },
     /**

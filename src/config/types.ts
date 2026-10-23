@@ -15,19 +15,6 @@ export type Motif = "lotus" | "diya" | "kalash" | "crescent" | "knot";
 export type EventIcon =
   "mehendi" | "sangeet" | "haldi" | "baraat" | "welcome" | "knot" | "sindoor" | "bidaai" | "reception";
 
-export interface WeddingEvent {
-  id: string;
-  name: string;
-  /** Hindi / Odia name, shown small (optional). */
-  local?: string;
-  icon: EventIcon;
-  /** Venue's local time, "YYYY-MM-DDTHH:MM". */
-  when: string;
-  about: string;
-  /** Only when it differs from the main venue. */
-  venue?: string;
-}
-
 export interface FamilyMember {
   relation: string;
   name: string;

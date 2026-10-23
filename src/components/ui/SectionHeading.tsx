@@ -2,7 +2,8 @@ import { Reveal } from "@/components/ui/Reveal";
 
 interface SectionHeadingProps {
   id: string;
-  eyebrow: string;
+  /** The small gold line above the title (optional). */
+  eyebrow?: string;
   title: string;
   intro?: string;
   show: boolean;
@@ -13,16 +14,18 @@ interface SectionHeadingProps {
 export function SectionHeading({ id, eyebrow, title, intro, show, delay = 0 }: SectionHeadingProps) {
   return (
     <header className="flex flex-col items-center text-center">
-      <Reveal
-        show={show}
-        delay={delay}
-        as="p"
-        className="font-sans text-[11px] font-medium uppercase tracking-eyebrow text-gold-ink"
-      >
-        {eyebrow}
-      </Reveal>
+      {eyebrow && (
+        <Reveal
+          show={show}
+          delay={delay}
+          as="p"
+          className="font-sans text-[11px] font-medium uppercase tracking-eyebrow text-gold-ink"
+        >
+          {eyebrow}
+        </Reveal>
+      )}
       <Reveal show={show} delay={delay + 120}>
-        <h2 id={id} className="mt-2 text-balance text-[clamp(32px,9.4vw,40px)]">
+        <h2 id={id} className={`${eyebrow ? "mt-2 " : ""}text-balance text-[clamp(32px,9.4vw,40px)]`}>
           {title}
         </h2>
       </Reveal>

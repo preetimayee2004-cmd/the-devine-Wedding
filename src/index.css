@@ -201,9 +201,23 @@
     }
   }
 
-  /* Events: the sacred thread (kalava), two golds twisted together. */
-  .sacred-thread {
-    background: repeating-linear-gradient(-50deg, rgb(var(--gold)) 0 3px, rgb(var(--gold-ink) / 0.8) 3px 5px);
+  /* Events: the couple's arch, edge to edge on a phone (its banana leaves run off the left side);
+     it rises in gently, once. */
+  .events-arch {
+    margin: 22px calc(var(--gutter) * -1) 0;
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+      opacity 1000ms ease-out,
+      transform 1100ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .events-arch[data-shown] {
+    opacity: 1;
+    transform: none;
+  }
+  .events-arch[data-still] {
+    transform: none;
+    transition: opacity 400ms linear;
   }
 
   /* RSVP: the seal's glow, ring and scatter of gold. */
