@@ -4,7 +4,16 @@ import { useMemo, type CSSProperties } from "react";
  * A few motes of gold light that drift outward from where the hands touched
  * and fade — a quiet release, not a burst. Each drifts once.
  */
-export function GoldMotes({ count = 14, pace = 1 }: { count?: number; pace?: number }) {
+export function GoldMotes({
+  count = 14,
+  pace = 1,
+  at,
+}: {
+  count?: number;
+  pace?: number;
+  /** Where they start, within the parent (by default the middle of the screen, 46% down). */
+  at?: { left: string; top: string };
+}) {
   const motes = useMemo(() => {
     let seed = 7;
     const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
@@ -23,7 +32,11 @@ export function GoldMotes({ count = 14, pace = 1 }: { count?: number; pace?: num
   }, [count]);
 
   return (
-    <div aria-hidden className="pointer-events-none absolute left-1/2 top-[46dvh] z-[6] h-0 w-0">
+    <div
+      aria-hidden
+      className={`pointer-events-none absolute z-[6] h-0 w-0 ${at ? "" : "left-1/2 top-[46dvh]"}`}
+      style={at}
+    >
       {motes.map((m, i) => (
         <span
           key={i}

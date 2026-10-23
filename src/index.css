@@ -873,11 +873,6 @@
       opacity: 0;
     }
   }
-  /* the words fade away on the tap */
-  .gate-words[data-go] {
-    opacity: 0;
-    transition: opacity 250ms ease-out;
-  }
   .gate-hint {
     opacity: 0.85;
     animation: gate-hint 2.4s ease-in-out infinite;
@@ -890,11 +885,6 @@
     50% {
       opacity: 0.45;
     }
-  }
-  .gate-hint[data-go] {
-    animation: none;
-    opacity: 0;
-    transition: opacity 250ms ease-out;
   }
 
   /* the seal's stage: the mandala's square, the seal in its middle two-thirds */
@@ -919,19 +909,6 @@
       opacity: 1;
     }
   }
-  .gate-glow[data-go] {
-    animation: gate-glow-go 800ms ease-out forwards;
-  }
-  @keyframes gate-glow-go {
-    30% {
-      opacity: 1;
-      transform: scale(1.35);
-    }
-    100% {
-      opacity: 0;
-      transform: scale(1.6);
-    }
-  }
   .gate-mandala {
     position: absolute;
     inset: 0;
@@ -948,15 +925,8 @@
       transform: rotate(360deg);
     }
   }
-  .gate-mandala[data-go] {
-    opacity: 0;
-    scale: 1.2;
-    transition:
-      opacity 500ms ease-out,
-      scale 600ms cubic-bezier(0.22, 1, 0.36, 1);
-  }
 
-  /* the seal breathes (1 → 1.03, 2.6s), and keeps breathing as it opens, so nothing jumps */
+  /* the seal breathes (1 → 1.03, 2.6s) */
   .gate-tilt {
     transition: transform 300ms ease-out;
   }
@@ -974,117 +944,12 @@
       transform: scale(1.03);
     }
   }
-  .gate-seal,
-  .gate-half {
+  .gate-seal {
     display: block;
     width: 100%;
     height: auto;
     user-select: none;
     -webkit-user-drag: none;
-  }
-  .gate-seal[data-go] {
-    opacity: 0;
-  }
-  /* the two halves, cracked down the middle: hidden until the tap, then they part */
-  .gate-half {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-  }
-  .gate-half-l {
-    clip-path: polygon(0 0, 51% 0, 47% 14%, 54% 29%, 46% 45%, 55% 60%, 47% 76%, 53% 90%, 49% 100%, 0 100%);
-  }
-  .gate-half-r {
-    clip-path: polygon(51% 0, 100% 0, 100% 100%, 49% 100%, 53% 90%, 47% 76%, 55% 60%, 46% 45%, 54% 29%, 47% 14%);
-  }
-  .gate-half[data-go] {
-    opacity: 1;
-    animation: 600ms cubic-bezier(0.3, 0, 0.4, 1) 200ms forwards;
-  }
-  .gate-half-l[data-go] {
-    animation-name: gate-half-l;
-  }
-  .gate-half-r[data-go] {
-    animation-name: gate-half-r;
-  }
-  @keyframes gate-half-l {
-    0% {
-      opacity: 1;
-      transform: none;
-    }
-    60% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 0;
-      transform: translate(-30%, 6%) rotate(-12deg);
-    }
-  }
-  @keyframes gate-half-r {
-    0% {
-      opacity: 1;
-      transform: none;
-    }
-    60% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 0;
-      transform: translate(30%, 6%) rotate(12deg);
-    }
-  }
-  /* the ॐ flashes once as the seal is touched */
-  .gate-flash {
-    position: absolute;
-    left: 15%;
-    top: 15%;
-    width: 70%;
-    height: 70%;
-    border-radius: 9999px;
-    background: radial-gradient(circle, rgb(255 251 230 / 0.95) 0%, rgb(255 228 150 / 0.6) 38%, rgb(255 228 150 / 0) 70%);
-    mix-blend-mode: screen;
-    opacity: 0;
-    pointer-events: none;
-  }
-  .gate-flash[data-go] {
-    animation: gate-flash 380ms ease-out forwards;
-  }
-  @keyframes gate-flash {
-    30% {
-      opacity: 1;
-      transform: scale(1.08);
-    }
-    100% {
-      opacity: 0;
-      transform: scale(1.2);
-    }
-  }
-  /* golden light bursting out of the crack */
-  .gate-burst {
-    position: absolute;
-    width: var(--seal);
-    height: var(--seal);
-    border-radius: 9999px;
-    background: radial-gradient(circle, rgb(255 250 228) 0%, rgb(255 222 140 / 0.85) 30%, rgb(240 190 90 / 0.35) 55%, rgb(240 190 90 / 0) 72%);
-    opacity: 0;
-    transform: scale(0.2);
-    pointer-events: none;
-  }
-  .gate-burst[data-go] {
-    animation: gate-burst 900ms cubic-bezier(0.22, 1, 0.36, 1) 180ms forwards;
-  }
-  @keyframes gate-burst {
-    0% {
-      opacity: 0;
-      transform: scale(0.2);
-    }
-    30% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 0;
-      transform: scale(3.2);
-    }
   }
   /* a soft shine on the seal that follows the phone's tilt (moved from the orientation) */
   .gate-shine {
@@ -1105,36 +970,6 @@
       transform 300ms ease-out,
       opacity 600ms ease-out;
   }
-  .gate-shine[data-go] {
-    opacity: 0;
-  }
-  /* the golden ripple, from the seal out over the whole screen */
-  .gate-ripple {
-    position: absolute;
-    width: var(--seal);
-    height: var(--seal);
-    border-radius: 9999px;
-    border: 2px solid #e8c97a;
-    box-shadow:
-      0 0 18px rgb(232 201 122 / 0.65),
-      inset 0 0 12px rgb(232 201 122 / 0.45);
-    opacity: 0;
-    pointer-events: none;
-  }
-  .gate-ripple[data-go] {
-    animation: gate-ripple 1000ms ease-out 120ms forwards;
-  }
-  @keyframes gate-ripple {
-    from {
-      opacity: 0.95;
-      transform: scale(0.8);
-    }
-    to {
-      opacity: 0;
-      transform: scale(9);
-    }
-  }
-
   /* "tap here": a hand in a fine gold circle, pressing gently, a ring pulsing out from it (1.8s) */
   .gate-tap {
     display: flex;
@@ -1204,40 +1039,23 @@
 
   /* ── Opening ── */
 
-  /* The hands' artboard (792 × 581, both hands on one board so they meet
-     exactly), floating over the first screen. Large, and turned 45° about the
-     point where the fingertips meet (52.8%, 46.6% of the board) — which sits
-     at the screen's centre — so Shiva's hand comes down from the top-left and
-     Parvati's rises from the bottom-right, as in the reference. */
-  .opening-stage {
-    --stage-w: clamp(520px, 150vw, 1000px);
+  /* The opening: the couple's picture (852 × 1846, a phone screen) covering the first screen — its
+     sunrise sky and the two hands on their own layers in one frame, so they always line up. */
+  .opening-scene {
     position: absolute;
+    inset: 0;
     z-index: 5;
-    width: var(--stage-w);
-    aspect-ratio: 792 / 581;
-    left: calc(50% - var(--stage-w) * 0.528);
-    top: calc(46vh - var(--stage-w) * 0.3418);
-    top: calc(46dvh - var(--stage-w) * 0.3418);
-    transform: rotate(45deg);
-    transform-origin: 52.8% 46.6%;
+    overflow: hidden;
     pointer-events: none;
   }
-
-  /* The far ends of the arm and the sleeve melt into the sky, so no cut edge
-     of the artwork ever shows — the bride's sleeve is cut on two sides. */
-  .opening-fade-shiva {
-    -webkit-mask-image: linear-gradient(to right, transparent 1%, rgb(0 0 0 / 0.55) 9%, #000 16%);
-    mask-image: linear-gradient(to right, transparent 1%, rgb(0 0 0 / 0.55) 9%, #000 16%);
-  }
-  .opening-fade-bride {
-    -webkit-mask-image:
-      linear-gradient(#000 72%, transparent 96%),
-      linear-gradient(to left, transparent, #000 10%);
-    -webkit-mask-composite: source-in;
-    mask-image:
-      linear-gradient(#000 72%, transparent 96%),
-      linear-gradient(to left, transparent, #000 10%);
-    mask-composite: intersect;
+  .opening-frame {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max(100%, 100vh * 852 / 1846);
+    width: max(100%, 100svh * 852 / 1846);
+    aspect-ratio: 852 / 1846;
+    translate: -50% -50%;
   }
 
   .opening-layer {
@@ -1254,11 +1072,11 @@
   /* The light where the hands touch: warm and soft, never a flash. */
   .opening-glow {
     position: absolute;
-    left: 52.8%;
-    top: 46.6%;
-    width: 30%;
+    left: 54.6%;
+    top: 54.2%;
+    width: 44%;
     aspect-ratio: 1;
-    margin: -15% 0 0 -15%;
+    margin: -22% 0 0 -22%;
     border-radius: 9999px;
     pointer-events: none;
     background: radial-gradient(

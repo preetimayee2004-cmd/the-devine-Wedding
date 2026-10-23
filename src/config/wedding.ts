@@ -427,9 +427,14 @@ export const wedding = {
      */
     desktopBackdrop: "/art/kailash-desktop.webp",
     /** The opening's two hands, reaching from either side (same artboard, so they meet exactly). */
+    /**
+     * The opening, from the couple's own picture (852 × 1846, a phone screen): a sunrise sky with clouds
+     * and the Himalaya, and the two hands on their own layers — all the same size, so they line up.
+     */
     opening: {
-      shivaHand: "/art/opening/hand-shiva.webp",
-      parvatiHand: "/art/opening/hand-parvati.webp",
+      sky: "/art/opening/opening-sky.webp",
+      shivaHand: "/art/opening/opening-shiva.webp",
+      parvatiHand: "/art/opening/opening-parvati.webp",
     },
     /**
      * The Save the Date's painting — Mahadev blessing Maa Parvati before the

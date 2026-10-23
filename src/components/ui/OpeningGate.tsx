@@ -21,8 +21,7 @@ interface OpeningGateProps {
   onGone: () => void;
 }
 
-// The tap, in all about 1.2s: the ॐ flashes and the seal cracks open (800ms), then the gate fades (400ms).
-const OPEN_MS = 800;
+// The tap simply fades the gate (400ms) as the opening's hands begin beneath it.
 const FADE_MS = 400;
 const REDUCED_FADE_MS = 300;
 
@@ -56,13 +55,12 @@ const DUST = [
  * allows it without asking). No names or date here.
  *
  * A tap: a tiny buzz (and a temple ghanti, if the guest turned the sound on in
- * the corner), the ॐ flashes, the seal cracks down the middle and its halves
- * part on a burst of golden light while a golden ripple spreads over the
- * screen — then the gate fades and the hands begin. Skip goes straight to the
- * card. Only transform and opacity move; reduced motion gets a plain fade.
+ * the corner), and the gate simply fades away as the opening's hands begin
+ * beneath it. Skip goes straight to the card. Only transform and opacity move;
+ * reduced motion gets a plain fade.
  */
 export function OpeningGate({ seal, sky, invited, label, devanagari = false, reduced, onBegin, onSkip, onGone }: OpeningGateProps) {
-  const [phase, setPhase] = useState<"waiting" | "opening" | "leaving">("waiting");
+  const [phase, setPhase] = useState<"waiting" | "leaving">("waiting");
   const [sound, setSound] = useState(false);
   const timers = useRef<number[]>([]);
   const root = useRef<HTMLDivElement>(null);
@@ -113,18 +111,9 @@ export function OpeningGate({ seal, sky, invited, label, devanagari = false, red
       // some browsers refuse vibration — no matter
     }
     if (sound) ringGhanti();
-    if (reduced) {
-      setPhase("leaving");
-      onBegin();
-      later(REDUCED_FADE_MS, onGone);
-      return;
-    }
-    setPhase("opening");
-    later(OPEN_MS, () => {
-      setPhase("leaving");
-      onBegin();
-    });
-    later(OPEN_MS + FADE_MS, onGone);
+    setPhase("leaving");
+    onBegin();
+    later(reduced ? REDUCED_FADE_MS : FADE_MS, onGone);
   };
 
   const skip = () => {
@@ -141,7 +130,6 @@ export function OpeningGate({ seal, sky, invited, label, devanagari = false, red
     }
   };
 
-  const go = phase !== "waiting" || undefined;
   const still = reduced || undefined;
   const words = devanagari ? "font-deva" : "font-display font-semibold uppercase";
   return (
@@ -179,51 +167,41 @@ export function OpeningGate({ seal, sky, invited, label, devanagari = false, red
       {/* ── the invitation ── */}
       <p
         className={`gate-words gate-gold relative ${devanagari ? "font-deva text-[17px]" : `${words} text-[15px] tracking-[0.32em]`}`}
-        data-go={go}
+       
       >
         {invited}
       </p>
-      <LotusRule className="gate-words relative mt-2.5" go={go} />
+      <LotusRule className="gate-words relative mt-2.5" />
 
       <div className="gate-stage relative mt-4 flex items-center justify-center">
         {/* warm light behind it all */}
-        <span aria-hidden className="gate-glow" data-still={still} data-go={go} />
+        <span aria-hidden className="gate-glow" data-still={still} />
         {/* the fine gold lotus mandala, turning once in 40s */}
-        <svg aria-hidden className="gate-mandala" viewBox="0 0 200 200" data-still={still} data-go={go}>
+        <svg aria-hidden className="gate-mandala" viewBox="0 0 200 200" data-still={still}>
           <Mandala />
         </svg>
         {/* its four small diamonds stay where they are, at the top, the foot and either side */}
-        <svg aria-hidden className="gate-mandala gate-mandala-marks" viewBox="0 0 200 200" data-go={go}>
+        <svg aria-hidden className="gate-mandala gate-mandala-marks" viewBox="0 0 200 200">
           {[0, 90, 180, 270].map((deg) => (
             <path key={deg} transform={`rotate(${deg} 100 100)`} d="M100 -9l3 4.5l-3 4.5l-3-4.5Z" fill="#b08b47" opacity="0.9" />
           ))}
         </svg>
-        {/* the golden ripple that spreads over the screen on the tap */}
-        {!reduced && <span aria-hidden className="gate-ripple" data-go={go} />}
-        {/* the light that bursts out of the opening seal */}
-        {!reduced && <span aria-hidden className="gate-burst" data-go={go} />}
 
         <div ref={tilt} className="gate-tilt relative">
           <div className="gate-seal-box" data-still={still}>
-            {/* whole until the tap; then two halves, cracked down the middle, part */}
-            <img src={seal} alt="" draggable={false} className="gate-seal" data-go={go} />
+            <img src={seal} alt="" draggable={false} className="gate-seal" />
+            {/* a soft shine across the seal, following the phone's tilt */}
             {!reduced && (
-              <>
-                <img src={seal} alt="" aria-hidden draggable={false} className="gate-half gate-half-l" data-go={go} />
-                <img src={seal} alt="" aria-hidden draggable={false} className="gate-half gate-half-r" data-go={go} />
-                <span aria-hidden className="gate-flash" data-go={go} />
-                {/* a soft shine across the seal, following the phone's tilt */}
-                <span aria-hidden className="gate-shine" style={{ WebkitMaskImage: `url(${seal})`, maskImage: `url(${seal})` }} data-go={go}>
-                  <span ref={shine} />
-                </span>
-              </>
+              <span aria-hidden className="gate-shine" style={{ WebkitMaskImage: `url(${seal})`, maskImage: `url(${seal})` }}>
+                <span ref={shine} />
+              </span>
             )}
           </div>
         </div>
       </div>
 
       {/* a hand in a gold circle, gently tapping: "tap here" */}
-      <span aria-hidden className="gate-words gate-tap relative mt-6" data-go={go}>
+      <span aria-hidden className="gate-words gate-tap relative mt-6">
         {!reduced && <span className="gate-tap-ring" />}
         <svg className="gate-hand" data-still={still} viewBox="0 0 44 54" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" strokeLinecap="round">
           <path d="M17 6.5a3.5 3.5 0 0 1 7 0V21a3.2 3.2 0 0 1 6 1.4a3.2 3.2 0 0 1 5.6 2a3 3 0 0 1 4.4 2.6V36c0 7-5.6 12.6-12.6 12.6h-3c-3.6 0-7-1.7-9.2-4.6l-7.6-10.2a3.2 3.2 0 0 1 5-4L17 31Z" />
@@ -233,11 +211,11 @@ export function OpeningGate({ seal, sky, invited, label, devanagari = false, red
       <p
         className={`gate-hint gate-gold relative mt-3.5 ${devanagari ? "font-deva text-[16px]" : `${words} text-[14px] tracking-[0.3em]`}`}
         data-still={still}
-        data-go={go}
+       
       >
         {label}
       </p>
-      <LotusRule className="gate-words relative mt-2" go={go} />
+      <LotusRule className="gate-words relative mt-2" />
 
       {/* the sound of the tap: off unless the guest turns it on */}
       <button
@@ -273,9 +251,9 @@ export function OpeningGate({ seal, sky, invited, label, devanagari = false, red
 }
 
 /** A short gold line either side of a small lotus. */
-function LotusRule({ className = "", go }: { className?: string; go?: true }) {
+function LotusRule({ className = "" }: { className?: string }) {
   return (
-    <span aria-hidden className={`gate-gold flex items-center gap-2 ${className}`} data-go={go}>
+    <span aria-hidden className={`gate-gold flex items-center gap-2 ${className}`}>
       <span className="h-px w-14 bg-gradient-to-r from-transparent to-current opacity-70" />
       <svg width="16" height="10" viewBox="0 0 24 14" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round">
         <path d="M12 1.5c2 2 2.6 5 0 9c-2.6-4-2-7 0-9ZM12 10.5c-2-3-5-4.6-8.5-4.2c.6 3.4 4 5.4 8.5 4.2ZM12 10.5c2-3 5-4.6 8.5-4.2c-.6 3.4-4 5.4-8.5 4.2ZM5 12.5h14" />

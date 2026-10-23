@@ -19,14 +19,16 @@ import { PetalShower } from "@/components/ui/PetalShower";
  * Sections 00 + 01 — the opening, which becomes the Save the Date. One
  * continuous, quiet moment:
  *
- *   arrive   both hands begin partly off the screen — Shiva's at the upper
- *            left, palm down; the bride's at the lower right, palm up — and
- *            glide slowly toward the centre
- *   meet     Shiva's hand settles over the bride's open hand and they rest
- *            there, a soft shadow where they touch, a warm gold glow between
+ *   arrive   on a sunrise sky with clouds and the Himalaya, both hands begin
+ *            partly off the screen — Shiva's at the upper left, reaching
+ *            down; the bride's at the lower right, palm up — and glide
+ *            slowly toward each other
+ *   meet     their fingertips all but touch and rest there, a warm gold glow
+ *            between them
  *   release  the glow widens and fades, a few gold motes drift outward, and
- *            the hands fade gently into the sky
- *   reveal   the card rises in, top to bottom: the names, the date and the
+ *            the hands fade gently into the sky; then the sky melts away
+ *   reveal   only once the hands are gone, the card rises in, top to bottom:
+ *            the names, the date and the
  *            venue (a map link); then the painting of Mahadev blessing Maa
  *            Parvati before the Himalaya, down to the very foot of the
  *            screen, with the blessing line and "View the Invitation" over
@@ -36,8 +38,9 @@ import { PetalShower } from "@/components/ui/PetalShower";
  * gently as the guest scrolls, the moon in Mahadev's hair glows softly, and
  * the bell in the corner plays a soft temple dhun — only when tapped.
  *
- * The hands are the painted artwork, only moved and faded — never stretched
- * or redrawn. Never a gate: Skip is always there, a guest who already watched
+ * The scene is the couple's own picture (`assets.opening`): its sky and the
+ * two hands as separate layers that line up exactly, only moved and faded —
+ * never stretched or redrawn. Never a gate: Skip is always there, a guest who already watched
  * it this visit gets a quicker version, and reduced motion shows the finished
  * card. Once read, the page glides on to the next section.
  */
@@ -45,19 +48,16 @@ import { PetalShower } from "@/components/ui/PetalShower";
 const SEEN_KEY = "dw:opening-seen";
 
 /** The beats, in order, and when each begins (ms, full version). */
-const BEATS = { arrive: 0, meet: 3900, release: 5200, reveal: 6000, done: 8100 } as const;
+// (the hands are fully gone 1100ms after release, so the card waits until then)
+const BEATS = { arrive: 0, meet: 3900, release: 5200, reveal: 6300, done: 8400 } as const;
 type Beat = keyof typeof BEATS;
 const ORDER = Object.keys(BEATS) as Beat[];
 
-/** How far out along its side each hand starts (% of the board): partly off the screen. */
-const START = 40;
 /**
- * Where each hand comes to rest (% of the board). Together they put Shiva's
- * hand 13.6% right and 4.8% lower than in the painting, so it lies over the
- * bride's open hand instead of touching fingertips. Hers travels the most,
- * which keeps the cut end of his forearm off the screen.
+ * Where each hand starts (% of the scene): out along its own side, partly off the screen. They
+ * glide to their places in the picture, where the fingertips all but touch.
  */
-const REST = { shiva: { x: 2.8, y: 1 }, bride: { x: -10.8, y: -3.8 } };
+const START = { shiva: { x: -30, y: -26 }, bride: { x: 30, y: 24 } };
 const GLIDE_MS = 3800;
 
 type Mode = "full" | "short" | "still";
@@ -78,6 +78,7 @@ export function Invitation() {
   const stage = useRef<HTMLDivElement>(null);
   const shiva = useRef<HTMLImageElement>(null);
   const parvati = useRef<HTMLImageElement>(null);
+  const sky = useRef<HTMLImageElement>(null);
 
   const still = mode === "still";
   const quiet = still || skipped;
@@ -96,7 +97,7 @@ export function Invitation() {
     let cancelled = false;
     const timers: number[] = [];
     (async () => {
-      const hands = [shiva.current, parvati.current].filter((i): i is HTMLImageElement => i !== null);
+      const hands = [sky.current, shiva.current, parvati.current].filter((i): i is HTMLImageElement => i !== null);
       await Promise.race([
         Promise.all(hands.map((img) => img.decode().catch(() => undefined))),
         new Promise((r) => setTimeout(r, MAX_ART_WAIT)),
@@ -219,30 +220,26 @@ export function Invitation() {
   };
 
   // Shiva's hand comes from the upper left, the bride's from the lower right
-  const hand = (who: keyof typeof REST): CSSProperties => {
+  const hand = (who: keyof typeof START): CSSProperties => {
     if (quiet) return { opacity: 0 };
     const moving = reached("arrive");
-    const rest = REST[who];
+    const start = START[who];
     return {
       opacity: moving ? 1 : 0,
-      transform: moving ? `translate(${rest.x}%, ${rest.y}%)` : `translate(${who === "shiva" ? -START : START}%, 0)`,
+      transform: moving ? "none" : `translate(${start.x}%, ${start.y}%)`,
       transition: `transform ${GLIDE_MS * pace}ms ${EASE.glide}, opacity ${700 * pace}ms ${EASE.breath}`,
     };
+  };
+  // the sunrise behind them: there from the tap, melting away after the hands, as the card rises
+  const skyStyle: CSSProperties = {
+    opacity: quiet || reached("release") ? 0 : 1,
+    transition: quiet ? "opacity 300ms ease-out" : `opacity ${1500 * pace}ms ${EASE.breath} ${600 * pace}ms`,
   };
   // ...and they fade away together, as one picture, so neither shows through the other
   const handsOut = quiet || reached("release");
   const together: CSSProperties = {
     opacity: handsOut ? 0 : 1,
     transition: `opacity ${(quiet ? 300 : 1100 * pace)}ms ${EASE.breath}`,
-  };
-  // where Shiva's hand rests on hers, a soft shadow (it falls only on her hand)
-  const touch: CSSProperties = {
-    WebkitMaskImage: `url(${assets.opening.parvatiHand})`,
-    maskImage: `url(${assets.opening.parvatiHand})`,
-    WebkitMaskSize: "100% 100%",
-    maskSize: "100% 100%",
-    opacity: reached("meet") ? 0.3 : 0,
-    transition: `opacity ${900 * pace}ms ease`,
   };
   const glow: CSSProperties = reached("release")
     ? {
@@ -446,38 +443,26 @@ export function Invitation() {
       {/* soft temple bells, off until tapped — in the corner once the opening is over */}
       <MusicToggle visible={!locked} />
 
-      {/* ── the two hands: they glide in, Shiva's settles over the bride's, then both fade into the sky ── */}
+      {/* ── the opening: on a sunrise sky, the two hands glide in until their fingertips all but touch,
+          then fade into the sky, and the sky melts away as the card rises ── */}
       <div
         ref={stage}
         aria-hidden
-        className="opening-stage"
+        className="opening-scene"
         style={skipped ? { opacity: 0, transition: "opacity 300ms ease-out" } : undefined}
       >
-        <div className="opening-layer" style={together}>
-          <div className="opening-layer opening-fade-bride" style={hand("bride")}>
-            <img ref={parvati} src={assets.opening.parvatiHand} alt="" className="opening-layer" />
-            <div className="opening-layer" style={touch}>
-              <img
-                src={assets.opening.shivaHand}
-                alt=""
-                className="opening-layer"
-                style={{
-                  transform: `translate(${REST.shiva.x - REST.bride.x + 0.6}%, ${REST.shiva.y - REST.bride.y + 1.5}%)`,
-                  filter: "brightness(0) blur(4px)",
-                }}
-              />
-            </div>
+        {/* the picture's own frame, covering the screen, so every layer lines up with the others */}
+        <div className="opening-frame">
+          <img ref={sky} src={assets.opening.sky} alt="" className="opening-layer" style={skyStyle} />
+          <div className="opening-layer" style={together}>
+            <img ref={parvati} src={assets.opening.parvatiHand} alt="" className="opening-layer" style={hand("bride")} />
+            <img ref={shiva} src={assets.opening.shivaHand} alt="" className="opening-layer" style={hand("shiva")} />
           </div>
-          {/* Shiva's hand lies over hers, so it comes second */}
-          <div className="opening-layer opening-fade-shiva" style={hand("shiva")}>
-            <img ref={shiva} src={assets.opening.shivaHand} alt="" className="opening-layer" />
-          </div>
+          <div className="opening-glow" data-waiting={beat < 0 || undefined} style={glow} />
+          {/* as the hands let go: a few gold motes drift outward from where they met */}
+          {reached("release") && !quiet && <GoldMotes pace={pace} at={{ left: "54.6%", top: "54.2%" }} />}
         </div>
-        <div className="opening-glow" data-waiting={beat < 0 || undefined} style={glow} />
       </div>
-
-      {/* as the hands let go: a few gold motes drift outward from where they touched */}
-      {reached("release") && !quiet && <GoldMotes pace={pace} />}
 
       {/* a short shower of red petals once the card is revealed */}
       {card && !quiet && <PetalShower />}
