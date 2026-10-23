@@ -441,6 +441,13 @@ export const wedding = {
      */
     saveTheDateArt: "/art/shiva-parvati-blessing.jpg",
     saveTheDateArtSize: { width: 572, height: 1024 },
+    /**
+     * The same painting in two layers, for the descent to the couple section: the Himalaya (with a
+     * soft mist where the figures stand) and Mahadev and Maa Parvati alone. Together they are the
+     * painting; as the guest scrolls on, the mountains drift up slowly and the figures a little
+     * faster. Made from `saveTheDateArt` — remake both if it changes.
+     */
+    saveTheDateLayers: { back: "/art/painting-back.webp", figures: "/art/painting-figures.webp" },
     /** Shiv–Parvati seated together (Thank You, gallery). */
     divineCouple: "/art/shiva-parvati-seated.webp",
     /** Soft-edged bloom used for every watercolour reveal. */
@@ -460,6 +467,14 @@ export const wedding = {
      * The arch's three temple bells, lifted out so they can sway: each with the lower part of its
      * chain, its top centre on the chain (the pivot). Placed in % of the arch.
      */
+    /**
+     * The lower part of the arch's two jasmine garlands, lifted out like the bells so they can swing
+     * once as the section arrives (top centre = pivot; placed in % of the arch).
+     */
+    coupleGarlands: [
+      { src: "/art/couple-garland-1.webp", left: 6.311, top: 50, width: 6.475, size: { width: 79, height: 282 } },
+      { src: "/art/couple-garland-2.webp", left: 86.311, top: 50, width: 6.311, size: { width: 77, height: 282 } },
+    ],
     coupleBells: [
       { src: "/art/couple-bell-1.webp", left: 27.213, top: 21.667, width: 7.623, size: { width: 93, height: 148 } },
       { src: "/art/couple-bell-2.webp", left: 45.492, top: 7, width: 8.197, size: { width: 100, height: 204 } },

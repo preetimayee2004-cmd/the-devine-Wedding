@@ -28,12 +28,18 @@ const TOAST_MS = 1500;
  */
 export function Couple() {
   const ref = useRef<HTMLElement>(null);
-  const seen = useInView(ref, { threshold: 0.25 });
   const reduced = usePrefersReducedMotion();
+  // the arch has risen into place once the section's top is near the screen's top: then the words
+  // follow (with reduced motion, as soon as the section is in view)
+  const settled = useInView(ref, { threshold: 0, rootMargin: "0px 0px -88% 0px" });
+  const inView = useInView(ref, { threshold: 0.25 });
+  const seen = reduced ? inView : settled;
+  // the bells and garlands swing once, as the section arrives
+  const arrived = useInView(ref, { threshold: 0.3 });
   const hindi = useLang() === "hi";
   const { guestName, isPersonalized } = useGuest();
   const { coupleWelcome: copy, couple, venue, assets } = wedding;
-  const { coupleArch, coupleArchSize, coupleBells, coupleScene, coupleSceneSize } = assets;
+  const { coupleArch, coupleArchSize, coupleBells, coupleGarlands, coupleScene, coupleSceneSize } = assets;
 
   // "Dear {guest}," — the name set in bold; with no name in the link, "Dear Family & Friends,"
   const [dearBefore, dearAfter = ""] = copy.dear.split("{guest}");
@@ -55,10 +61,10 @@ export function Couple() {
     toast.current = window.setTimeout(() => setCopied(false), TOAST_MS);
   };
 
-  // one by one: fade in and rise 10px (700ms, 150ms apart); nothing moves for reduced motion
+  // one by one: fade in and rise 10px (700ms, 150ms apart); for reduced motion, a simple fade
   const appear = (step: number): CSSProperties =>
     reduced
-      ? {}
+      ? { opacity: seen ? 1 : 0, transition: "opacity 400ms linear" }
       : {
           opacity: seen ? 1 : 0,
           transform: seen ? "none" : "translateY(10px)",
@@ -67,12 +73,21 @@ export function Couple() {
 
   return (
     // it starts right where the Save the Date ends
-    <section ref={ref} id="couple" aria-label="Welcome" className="couple-scene relative flex flex-col items-center">
-      {/* the arch, from the very top (no gap after the Save the Date), with its three bells hung back in place to sway */}
+    <section
+      ref={ref}
+      id="couple"
+      aria-label="Welcome"
+      className="couple-scene relative flex flex-col items-center"
+      data-arrived={arrived || undefined}
+      data-still={reduced || undefined}
+    >
+      {/* the arch, from the very top (no gap after the Save the Date), with its three bells and two
+          garlands hung back in place to swing; on the descent it rises into place (Descent.tsx) */}
       <div
         aria-hidden
         className="couple-arch pointer-events-none absolute inset-x-0 select-none"
         style={{ aspectRatio: `${coupleArchSize.width} / ${coupleArchSize.height}` }}
+        data-descent="arch"
       >
         <img
           src={coupleArch}
@@ -95,7 +110,21 @@ export function Couple() {
             decoding="async"
             draggable={false}
             className="couple-bell"
-            style={{ left: `${bell.left}%`, top: `${bell.top}%`, width: `${bell.width}%`, animationDelay: `${i * -1.3}s` }}
+            style={{ left: `${bell.left}%`, top: `${bell.top}%`, width: `${bell.width}%`, "--bell": i } as CSSProperties}
+          />
+        ))}
+        {coupleGarlands.map((garland, i) => (
+          <img
+            key={garland.src}
+            src={garland.src}
+            alt=""
+            width={garland.size.width}
+            height={garland.size.height}
+            loading="lazy"
+            decoding="async"
+            draggable={false}
+            className="couple-garland"
+            style={{ left: `${garland.left}%`, top: `${garland.top}%`, width: `${garland.width}%`, "--garland": i } as CSSProperties}
           />
         ))}
       </div>
@@ -200,6 +229,7 @@ export function Couple() {
         decoding="async"
         draggable={false}
         className="couple-scene-foot pointer-events-none block h-auto w-full select-none"
+        data-descent="scene"
       />
 
     </section>

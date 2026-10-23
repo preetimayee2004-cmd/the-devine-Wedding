@@ -355,41 +355,69 @@ export function Invitation() {
       {/* ── Mahadev blessing Maa Parvati before the Himalaya: edge to edge across the foot of the screen,
           from just under the words (and at least 58% of the screen), its top melting into the sky ── */}
       <div className="relative min-h-0 w-full flex-1">
-        <div className="std-painting absolute bottom-0" style={rise(6, 28, 1300)}>
-          <img
-            src={assets.saveTheDateArt}
-            alt="Mahadev gently blessing Maa Parvati, before the snowy Himalaya and a lotus lake"
-            width={assets.saveTheDateArtSize.width}
-            height={assets.saveTheDateArtSize.height}
-            className="block h-full w-full object-cover"
-            draggable={false}
-          />
-          {/* the crescent moon in Mahadev's hair, softly aglow */}
-          <span aria-hidden className="std-moon" />
-          {/* light clouds drifting over the peaks; they part as the guest scrolls */}
-          <img
-            ref={cloudLeft}
-            src={assets.clouds}
-            alt=""
-            aria-hidden
-            className="std-cloud left-[-22%] top-[3%] w-[70%]"
-            draggable={false}
-          />
-          <img
-            ref={cloudRight}
-            src={assets.clouds}
-            alt=""
-            aria-hidden
-            className="std-cloud right-[-22%] top-[9%] w-[60%]"
-            style={{ scale: "-1 1" }}
-            draggable={false}
-          />
+        {/* In two layers, so that on the way down to the couple section the Himalaya drifts up
+            slowly and the figures a little faster (src/components/sections/Descent.tsx). Each layer
+            has a plain copy and one whose foot also fades, which takes over as the descent begins. */}
+        <div
+          className="std-painting absolute bottom-0"
+          style={rise(6, 28, 1300)}
+          role="img"
+          aria-label="Mahadev gently blessing Maa Parvati, before the snowy Himalaya and a lotus lake"
+        >
+          <div className="std-layer" data-descent="back">
+            {[false, true].map((soft) => (
+              <img
+                key={String(soft)}
+                src={assets.saveTheDateLayers.back}
+                alt=""
+                width={assets.saveTheDateArtSize.width}
+                height={assets.saveTheDateArtSize.height}
+                className={soft ? "std-soft" : "std-solid"}
+                draggable={false}
+              />
+            ))}
+            {/* light clouds drifting over the peaks; they part as the guest scrolls */}
+            <img
+              ref={cloudLeft}
+              src={assets.clouds}
+              alt=""
+              aria-hidden
+              className="std-cloud left-[-22%] top-[3%] w-[70%]"
+              draggable={false}
+            />
+            <img
+              ref={cloudRight}
+              src={assets.clouds}
+              alt=""
+              aria-hidden
+              className="std-cloud right-[-22%] top-[9%] w-[60%]"
+              style={{ scale: "-1 1" }}
+              draggable={false}
+            />
+          </div>
+          <div className="std-layer" data-descent="figures">
+            {[false, true].map((soft) => (
+              <img
+                key={String(soft)}
+                src={assets.saveTheDateLayers.figures}
+                alt=""
+                width={assets.saveTheDateArtSize.width}
+                height={assets.saveTheDateArtSize.height}
+                className={soft ? "std-soft" : "std-solid"}
+                draggable={false}
+              />
+            ))}
+            {/* the crescent moon in Mahadev's hair, softly aglow */}
+            <span aria-hidden className="std-moon" />
+          </div>
         </div>
       </div>
 
-      {/* ── at the foot, on a dark-navy panel over the painting: the blessing, and the way on ── */}
+      {/* ── at the foot, on a dark-navy panel over the painting: the blessing, and the way on
+          (it fades away as the descent begins) ── */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[2]" data-descent="foot">
       <div
-        className="std-foot pointer-events-none absolute inset-x-0 bottom-0 z-[2] flex flex-col items-center px-6 pb-[calc(env(safe-area-inset-bottom,0px)+18px)] pt-12"
+        className="std-foot flex flex-col items-center px-6 pb-[calc(env(safe-area-inset-bottom,0px)+18px)] pt-12"
         style={rise(7, 12)}
       >
         <p className={`max-w-[21rem] text-balance text-[15px] leading-snug text-white ${serif} ${hindi ? "" : "italic"}`}>
@@ -401,6 +429,7 @@ export function Invitation() {
           devanagari={hindi}
           style={{ marginTop: 8, pointerEvents: card ? undefined : "none" }}
         />
+      </div>
       </div>
 
       {/* before it all, every time: "Touch to begin" */}

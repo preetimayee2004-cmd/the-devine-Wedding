@@ -351,6 +351,8 @@
    * 16px under them. It is always taller than that box, so it is cropped —
    * from the bottom, which keeps the crown and crescent in view; the blessing
    * panel covers the foot anyway. Only its top edge fades, into the sky.
+   * It is drawn in two layers (the Himalaya; Mahadev and Maa Parvati) that move
+   * apart on the descent, so each layer carries the fade itself.
    */
   .std-painting {
     left: calc(var(--gutter) * -1);
@@ -359,11 +361,29 @@
     height: max(58svh, 100% + 26.2vw - 16px);
     /* so the moon can be placed in the painting's own width (cqw) */
     container-type: inline-size;
+  }
+  .std-layer {
+    position: absolute;
+    inset: 0;
+  }
+  .std-solid,
+  .std-soft {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+  }
+  .std-solid {
     -webkit-mask-image: linear-gradient(transparent, #000 22%);
     mask-image: linear-gradient(transparent, #000 22%);
   }
-  .std-painting > img:first-child {
-    object-position: center top;
+  /* the copy whose foot fades too: once the layers start to rise, no hard lower edge shows */
+  .std-soft {
+    -webkit-mask-image: linear-gradient(transparent, #000 22%, #000 62%, transparent);
+    mask-image: linear-gradient(transparent, #000 22%, #000 62%, transparent);
+    opacity: 0;
   }
 
   /* The crescent moon in Mahadev's hair (at 24.5%, 0.428 W of the painting), softly aglow. */
@@ -457,12 +477,18 @@
   .couple-arch {
     top: var(--couple-top);
   }
-  /* The three temple bells sway gently from their chains (±2°, 4s), each a little out of step. */
+  /* The three temple bells sway gently from their chains (±2°, 4s), each a little out of step. As the
+     section arrives they first swing once, a little wider, settling into that sway. */
   .couple-bell {
     position: absolute;
     height: auto;
     transform-origin: 50% 0;
-    animation: bell-sway 4s ease-in-out infinite;
+    animation: bell-sway 4s ease-in-out calc(var(--bell, 0) * -1.3s) infinite;
+  }
+  .couple-scene[data-arrived] .couple-bell {
+    animation:
+      bell-swing 2.6s ease-out calc(var(--bell, 0) * 0.15s) 1 both,
+      bell-sway 4s ease-in-out calc(2.6s + var(--bell, 0) * 0.15s) infinite;
   }
   @keyframes bell-sway {
     0%,
@@ -472,6 +498,106 @@
     50% {
       transform: rotate(2deg);
     }
+  }
+  @keyframes bell-swing {
+    0% {
+      transform: rotate(0deg);
+    }
+    14% {
+      transform: rotate(6deg);
+    }
+    32% {
+      transform: rotate(-4.5deg);
+    }
+    50% {
+      transform: rotate(3deg);
+    }
+    68% {
+      transform: rotate(-2.5deg);
+    }
+    84% {
+      transform: rotate(1deg);
+    }
+    100% {
+      transform: rotate(-2deg);
+    }
+  }
+  /* the two jasmine garlands: still, until they swing once as the section arrives */
+  .couple-garland {
+    position: absolute;
+    height: auto;
+    transform-origin: 50% 0;
+  }
+  .couple-scene[data-arrived] .couple-garland {
+    animation: garland-swing 3s ease-out calc(0.2s + var(--garland, 0) * 0.25s) 1 both;
+  }
+  @keyframes garland-swing {
+    0%,
+    100% {
+      transform: rotate(0deg);
+    }
+    18% {
+      transform: rotate(3deg);
+    }
+    38% {
+      transform: rotate(-2.2deg);
+    }
+    58% {
+      transform: rotate(1.4deg);
+    }
+    78% {
+      transform: rotate(-0.6deg);
+    }
+  }
+  /* reduced motion: no swinging; the arch and the scene simply fade in as the section arrives */
+  .couple-scene[data-still] .couple-bell,
+  .couple-scene[data-still] .couple-garland {
+    animation: none;
+  }
+  .couple-scene[data-still] .couple-arch,
+  .couple-scene[data-still] .couple-scene-foot {
+    opacity: 0;
+    transition: opacity 600ms ease;
+  }
+  .couple-scene[data-still][data-arrived] .couple-arch,
+  .couple-scene[data-still][data-arrived] .couple-scene-foot {
+    opacity: 1;
+  }
+
+  /* ── The descent from the Save the Date to the couple section (Descent.tsx): clouds and petals
+     passing in front, only while it is under way, and never outside the screen (or the phone) ── */
+  .descent {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    display: none;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .descent[data-on] {
+    display: block;
+  }
+  .descent-cloud {
+    position: absolute;
+    left: 0;
+    height: auto;
+    max-width: none;
+    opacity: 0;
+    will-change: transform, opacity;
+    -webkit-mask-image: radial-gradient(closest-side, #000 40%, transparent);
+    mask-image: radial-gradient(closest-side, #000 40%, transparent);
+    /* a cool, soft underside, so white clouds read on the pale mist and ivory */
+    filter: drop-shadow(0 10px 14px rgb(70 100 135 / 0.28));
+  }
+  .descent-petal {
+    position: absolute;
+    top: 0;
+    width: var(--size);
+    height: calc(var(--size) * 1.35);
+    border-radius: 60% 60% 50% 50% / 75% 75% 30% 30%;
+    background: linear-gradient(160deg, #f7b9c5, #e2677f 70%, #c94a62);
+    opacity: 0;
+    will-change: transform, opacity;
   }
   /* a fine gold line, 60px wide, between the names and the hashtag, and the date and the venue */
   .couple-rule {
