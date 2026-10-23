@@ -188,7 +188,7 @@ export function Gallery() {
   const handwritten = currentFrame !== "arch";
 
   return (
-    <section id="gallery" ref={sectionRef} aria-labelledby="gallery-heading" className="relative isolate px-[var(--gutter)] pt-[var(--section-gap)]">
+    <section id="gallery" ref={sectionRef} aria-labelledby="gallery-heading" className="relative isolate px-[var(--gutter)] pb-4 pt-[var(--section-gap)]">
       {/* the light wash, taking on the photo's colour */}
       <div aria-hidden className="cf-wash">
         {wash.colors.map((c, i) => (

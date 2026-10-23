@@ -25,7 +25,7 @@ export function Family() {
   const reduced = usePrefersReducedMotion();
 
   return (
-    <section id="family" ref={sectionRef} aria-labelledby="family-heading" className="relative px-[var(--gutter)]">
+    <section id="family" ref={sectionRef} aria-labelledby="family-heading" className="relative px-[var(--gutter)] pb-2 pt-4">
       <SectionHeading
         id="family-heading"
         eyebrow={family.eyebrow}

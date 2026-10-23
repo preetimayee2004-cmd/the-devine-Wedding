@@ -109,7 +109,7 @@ export function Events() {
   const flowing = run > 0 && phase !== "idle" && !reduced;
 
   return (
-    <section id="events" ref={sectionRef} aria-labelledby="events-heading" className="relative px-[var(--gutter)] pb-14 pt-16">
+    <section id="events" ref={sectionRef} aria-labelledby="events-heading" className="relative px-[var(--gutter)] pb-3 pt-5">
       <SectionHeading id="events-heading" title={events.title} intro={`“${events.quote}”`} show={seen} />
 
       <div ref={archRef} className="events-arch" data-shown={archSeen || reduced || undefined} data-still={reduced || undefined}>

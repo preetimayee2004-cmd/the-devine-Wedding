@@ -26,7 +26,7 @@
     --status-bar: env(safe-area-inset-top, 0px);
     --gutter: 1.5rem;
     /* Breathing room above a section that doesn't arrive on a connecting line. */
-    --section-gap: 5rem;
+    --section-gap: 1.25rem; /* small: a Ganga separator stands between the sections */
   }
 
   html {
@@ -1195,11 +1195,195 @@
      at the very edges): it may tuck up beside the words, but always leaves 40px of sky above them. */
   .couple-scene-foot {
     margin-top: calc(40px - 35.1vw);
+    /* its floor melts into the ripple below, without a hard edge */
+    -webkit-mask-image: linear-gradient(to bottom, #000 86%, transparent);
+    mask-image: linear-gradient(to bottom, #000 86%, transparent);
   }
   @supports (width: 1cqw) {
     .couple-scene-foot {
       margin-top: calc(40px - 35.1cqw);
     }
+  }
+
+  /* ── Between sections: a ripple of the Ganga (SectionSeparator.tsx) ──
+     72px tall, edge to edge; a soft band of the site's mist behind it so the sections flow into
+     each other; the line and the one behind it drift opposite ways with the scroll (--drift, -1 … 1,
+     set by one shared scroll listener). Transform and opacity only, besides the line's draw. */
+  .sep {
+    position: relative;
+    height: 72px;
+    overflow: hidden;
+    background: linear-gradient(to bottom, rgb(var(--sky) / 0), rgb(var(--sky) / 0.22) 50%, rgb(var(--sky) / 0));
+    pointer-events: none;
+  }
+  .sep-waves {
+    position: absolute;
+    left: 0;
+    top: 0;
+    overflow: visible;
+  }
+  .sep-front,
+  .sep-back {
+    will-change: transform;
+  }
+  .sep-front {
+    transform: translateX(calc(var(--drift, 0) * 26px));
+  }
+  .sep-back {
+    transform: translateX(calc(var(--drift, 0) * -18px));
+  }
+  .sep-wave,
+  .sep-wave-back,
+  .sep-glow {
+    fill: none;
+    stroke-linecap: round;
+  }
+  .sep-wave {
+    stroke-width: 1.5;
+    stroke-dasharray: 1 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 800ms cubic-bezier(0.45, 0, 0.25, 1);
+  }
+  .sep-glow {
+    stroke: rgb(196 228 248 / 0.55);
+    stroke-width: 6;
+    opacity: 0;
+    transition: opacity 700ms ease-out 500ms;
+  }
+  .sep-wave-back {
+    stroke-width: 1;
+    opacity: 0;
+    transition: opacity 900ms ease-out 400ms;
+  }
+  .sep[data-shown] .sep-wave {
+    stroke-dashoffset: 0;
+  }
+  .sep[data-shown] .sep-glow {
+    opacity: 0.6;
+  }
+  .sep[data-shown] .sep-wave-back {
+    opacity: 0.4;
+  }
+  /* the ornament: rises in after the line, then floats */
+  .sep-ornament {
+    position: absolute;
+    left: 50%;
+    top: 14px;
+    width: 40px;
+    margin-left: -20px;
+    opacity: 0;
+    transform: scale(0.82) translateY(4px);
+    transition:
+      opacity 500ms ease-out 750ms,
+      transform 600ms cubic-bezier(0.22, 1, 0.36, 1) 750ms;
+  }
+  .sep[data-shown] .sep-ornament {
+    opacity: 1;
+    transform: none;
+  }
+  .sep-bob {
+    display: block;
+    animation: sep-bob 3.4s ease-in-out infinite alternate;
+  }
+  @keyframes sep-bob {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(-3px);
+    }
+  }
+  .sep-art {
+    display: block;
+    width: 40px;
+    height: 34px;
+    overflow: visible;
+    filter: drop-shadow(0 2px 2px rgb(110 80 30 / 0.18));
+  }
+  /* the diya's flame flickers, its glow breathing with it */
+  .sep-flame {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation: sep-flicker 1.3s ease-in-out infinite;
+  }
+  .sep-flame-glow {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: sep-glow 1.3s ease-in-out infinite;
+  }
+  @keyframes sep-flicker {
+    0%,
+    100% {
+      transform: scale(1, 1) skewX(0deg);
+      opacity: 1;
+    }
+    23% {
+      transform: scale(0.94, 1.1) skewX(-3deg);
+      opacity: 0.92;
+    }
+    41% {
+      transform: scale(1.04, 0.95) skewX(2deg);
+    }
+    67% {
+      transform: scale(0.96, 1.06) skewX(-1deg);
+      opacity: 0.96;
+    }
+    84% {
+      transform: scale(1.02, 0.98) skewX(2.5deg);
+    }
+  }
+  @keyframes sep-glow {
+    0%,
+    100% {
+      opacity: 0.85;
+      transform: scale(1);
+    }
+    40% {
+      opacity: 1;
+      transform: scale(1.08);
+    }
+    70% {
+      opacity: 0.75;
+      transform: scale(0.96);
+    }
+  }
+  /* the lotus's outer petals open and close, just */
+  .sep-petal {
+    transform-box: view-box;
+    transform-origin: 20px 28px;
+    animation: sep-open 4.6s ease-in-out infinite alternate;
+  }
+  .sep-petal-r {
+    animation-name: sep-open-r;
+  }
+  @keyframes sep-open {
+    from {
+      transform: rotate(3deg);
+    }
+    to {
+      transform: rotate(-5deg);
+    }
+  }
+  @keyframes sep-open-r {
+    from {
+      transform: rotate(-3deg);
+    }
+    to {
+      transform: rotate(5deg);
+    }
+  }
+  /* reduced motion: still and complete */
+  .sep[data-still] .sep-wave,
+  .sep[data-still] .sep-glow,
+  .sep[data-still] .sep-wave-back,
+  .sep[data-still] .sep-ornament {
+    transition: none;
+  }
+  .sep[data-still] .sep-bob,
+  .sep[data-still] .sep-flame,
+  .sep[data-still] .sep-flame-glow,
+  .sep[data-still] .sep-petal {
+    animation: none;
   }
 
   /* ── Section 07: Gallery — the couple's photos under a crescent moon ──

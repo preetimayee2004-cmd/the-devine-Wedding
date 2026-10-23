@@ -53,7 +53,7 @@ export function Countdown() {
       ref={ref}
       aria-labelledby="countdown-heading"
       lang={hindi ? "hi" : undefined}
-      className="relative flex flex-col items-center px-[var(--gutter)] pb-12 pt-10 text-center"
+      className="relative flex flex-col items-center px-[var(--gutter)] pb-4 pt-5 text-center"
     >
       {/* ── the heading, above the wreath ── */}
       <Reveal show={seen} delay={at(300)} as="p" className="cd-deep-gold font-deva text-[16px] font-semibold leading-none">
