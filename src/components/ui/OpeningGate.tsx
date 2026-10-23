@@ -4,15 +4,11 @@ import { ringGhanti } from "@/lib/templeBells";
 interface OpeningGateProps {
   /** The golden ॐ wax seal at its centre. */
   seal: string;
-  /** Soft clouds drifting over the sky. */
-  clouds: string;
+  /** The watercolour sky behind it all (with its trishul, crescent and misty Himalaya). */
+  sky: string;
   /** "You're invited", over the seal. */
   invited: string;
-  /** The couple, under the seal. */
-  names: { bride: string; groom: string };
-  /** The date under the names, "12 · 02 · 2027" (or null). */
-  date: string | null;
-  /** "Touch to begin", in the card's language. */
+  /** "Tap to open", in the card's language. */
   label: string;
   /** The words are in Hindi (set in Devanagari, without letter-spacing, which would break its joins). */
   devanagari?: boolean;
@@ -30,8 +26,8 @@ const OPEN_MS = 800;
 const FADE_MS = 400;
 const REDUCED_FADE_MS = 300;
 
-// Gold dust rising and marigold petals drifting down: fixed, hand-spread values (left %, size px,
-// seconds, delay s, sideways drift px), so every visit looks the same and nothing is random.
+// Gold dust rising: fixed, hand-spread values (left %, size px, seconds, delay s, sideways drift px),
+// so every visit looks the same and nothing is random.
 const DUST = [
   [8, 4, 9, 0, 14],
   [15, 3, 11, -4, -10],
@@ -48,21 +44,16 @@ const DUST = [
   [92, 4, 8, -4, 14],
   [48, 4, 13, -10, -6],
 ] as const;
-const PETALS = [
-  [12, 16, -2, 40],
-  [38, 19, -9, -30],
-  [66, 17, -5, 36],
-  [88, 21, -13, -28],
-] as const;
 
 /**
- * Before the opening, every time the link opens: a soft sky with Mount Kailash faint
- * at its foot and clouds drifting slowly by; "You're invited"; the golden ॐ
- * wax seal, breathing, in a slowly turning gold mandala with a warm glow
- * behind it; the couple's names and the date; and "Touch to begin", with a
- * little hand tapping the seal's lower edge. Gold dust rises and a few
- * marigold petals drift down. Tilting the phone moves a soft shine across the
- * seal (where the browser allows it without asking).
+ * Before the opening, every time the link opens — as in the couple's design: a
+ * watercolour sky with soft clouds, a faint trishul and the crescent above, the
+ * misty Himalaya at the foot; "You're invited" over a small gold lotus line;
+ * the golden ॐ wax seal, breathing, in a fine gold lotus mandala that turns
+ * once in 40s, a warm glow behind it; and under it a hand in a gold circle,
+ * gently pulsing, "Tap to open" and another lotus line. Gold dust rises.
+ * Tilting the phone moves a soft shine across the seal (where the browser
+ * allows it without asking). No names or date here.
  *
  * A tap: a tiny buzz (and a temple ghanti, if the guest turned the sound on in
  * the corner), the ॐ flashes, the seal cracks down the middle and its halves
@@ -70,19 +61,7 @@ const PETALS = [
  * screen — then the gate fades and the hands begin. Skip goes straight to the
  * card. Only transform and opacity move; reduced motion gets a plain fade.
  */
-export function OpeningGate({
-  seal,
-  clouds,
-  invited,
-  names,
-  date,
-  label,
-  devanagari = false,
-  reduced,
-  onBegin,
-  onSkip,
-  onGone,
-}: OpeningGateProps) {
+export function OpeningGate({ seal, sky, invited, label, devanagari = false, reduced, onBegin, onSkip, onGone }: OpeningGateProps) {
   const [phase, setPhase] = useState<"waiting" | "opening" | "leaving">("waiting");
   const [sound, setSound] = useState(false);
   const timers = useRef<number[]>([]);
@@ -164,12 +143,13 @@ export function OpeningGate({
 
   const go = phase !== "waiting" || undefined;
   const still = reduced || undefined;
+  const words = devanagari ? "font-deva" : "font-display font-semibold uppercase";
   return (
     <div
       ref={root}
       role="button"
       tabIndex={0}
-      aria-label={`${invited}: ${names.bride} & ${names.groom}. ${label}`}
+      aria-label={`${invited}. ${label}`}
       onClick={begin}
       onKeyDown={onKey}
       className="gate fixed inset-0 z-[60] flex cursor-pointer select-none flex-col items-center justify-center overflow-hidden outline-none"
@@ -180,35 +160,17 @@ export function OpeningGate({
         pointerEvents: phase === "leaving" ? "none" : undefined,
       }}
     >
-      {/* ── the sky: Mount Kailash faint at its foot, clouds drifting slowly by ── */}
-      {/* pale tints of the sky (not see-through layers, so where they overlap nothing darkens) */}
-      <svg aria-hidden className="gate-kailash" viewBox="0 0 400 170">
-        {/* the peak, far off: a steep, rounded pyramid with its snow cap and gullies */}
-        <path fill="#d2e3f1" d="M104 170l44-46 24-26 14-28c6-12 9-20 14-20s8 8 14 20l14 28 24 26 44 46Z" />
-        <path fill="#f3f9fd" d="M186 70c6-12 9-20 14-20s8 8 14 20l-6 9-5-7-4 11-4-10-4 8Z" />
-        <path fill="none" stroke="#eaf3fa" strokeWidth="1.4" strokeLinecap="round" d="M200 83l-2 30M192 86l-7 28M208 86l7 28" />
-        {/* nearer hills */}
-        <path fill="#c6dae9" d="M0 170v-42l36-16 28 10 34-18 32 20 30 16 40 10 40-10 32-18 32-16 32 14 30-10 34 12v48Z" />
-      </svg>
-      <img aria-hidden src={clouds} alt="" draggable={false} className="gate-cloud left-[-24%] top-[9%] w-[78%]" style={{ "--drift": "7vw" } as CSSProperties} />
-      <img aria-hidden src={clouds} alt="" draggable={false} className="gate-cloud right-[-26%] top-[33%] w-[66%] [scale:-1_1]" style={{ "--drift": "-6vw", animationDelay: "-22s" } as CSSProperties} />
-      <img aria-hidden src={clouds} alt="" draggable={false} className="gate-cloud bottom-[12%] left-[-12%] w-[84%] opacity-50" style={{ "--drift": "5vw", animationDelay: "-41s" } as CSSProperties} />
+      {/* the sky: watercolour clouds, a faint trishul and the crescent, the Himalaya in mist at the foot */}
+      <img aria-hidden src={sky} alt="" draggable={false} className="gate-sky" />
 
-      {/* gold dust rising, marigold petals drifting down */}
+      {/* gold dust rising */}
       {!reduced && (
         <div aria-hidden className="pointer-events-none absolute inset-0">
           {DUST.map(([left, size, secs, delay, drift], i) => (
             <span
-              key={`d${i}`}
+              key={i}
               className="gate-dust"
               style={{ left: `${left}%`, width: size, height: size, animationDuration: `${secs}s`, animationDelay: `${delay}s`, "--x": `${drift}px` } as CSSProperties}
-            />
-          ))}
-          {PETALS.map(([left, secs, delay, drift], i) => (
-            <span
-              key={`p${i}`}
-              className="gate-petal"
-              style={{ left: `${left}%`, animationDuration: `${secs}s`, animationDelay: `${delay}s`, "--x": `${drift}px` } as CSSProperties}
             />
           ))}
         </div>
@@ -216,18 +178,25 @@ export function OpeningGate({
 
       {/* ── the invitation ── */}
       <p
-        className={`gate-words relative text-gold-ink ${devanagari ? "font-deva text-[15px]" : "font-sans text-[12px] font-medium uppercase tracking-[0.3em]"}`}
+        className={`gate-words gate-gold relative ${devanagari ? "font-deva text-[17px]" : `${words} text-[15px] tracking-[0.32em]`}`}
         data-go={go}
       >
         {invited}
       </p>
+      <LotusRule className="gate-words relative mt-2.5" go={go} />
 
-      <div className="gate-stage relative mt-1 flex items-center justify-center">
+      <div className="gate-stage relative mt-4 flex items-center justify-center">
         {/* warm light behind it all */}
         <span aria-hidden className="gate-glow" data-still={still} data-go={go} />
-        {/* the thin gold mandala, turning once in 40s */}
+        {/* the fine gold lotus mandala, turning once in 40s */}
         <svg aria-hidden className="gate-mandala" viewBox="0 0 200 200" data-still={still} data-go={go}>
           <Mandala />
+        </svg>
+        {/* its four small diamonds stay where they are, at the top, the foot and either side */}
+        <svg aria-hidden className="gate-mandala gate-mandala-marks" viewBox="0 0 200 200" data-go={go}>
+          {[0, 90, 180, 270].map((deg) => (
+            <path key={deg} transform={`rotate(${deg} 100 100)`} d="M100 -9l3 4.5l-3 4.5l-3-4.5Z" fill="#b08b47" opacity="0.9" />
+          ))}
         </svg>
         {/* the golden ripple that spreads over the screen on the tap */}
         {!reduced && <span aria-hidden className="gate-ripple" data-go={go} />}
@@ -251,49 +220,24 @@ export function OpeningGate({
             )}
           </div>
         </div>
-
-        {/* a little hand tapping the seal's lower right edge, clear of the ॐ (its fingertip is this point) */}
-        <span aria-hidden className="gate-hand-at" data-go={go}>
-          {!reduced && <span className="gate-tap-ring" />}
-          <svg
-            className="gate-hand"
-            data-still={still}
-            width="52"
-            height="64"
-            viewBox="0 0 44 54"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.6"
-            strokeLinejoin="round"
-            strokeLinecap="round"
-          >
-            <path
-              fill="#FFF9EF"
-              d="M17 6.5a3.5 3.5 0 0 1 7 0V21a3.2 3.2 0 0 1 6 1.4a3.2 3.2 0 0 1 5.6 2a3 3 0 0 1 4.4 2.6V36c0 7-5.6 12.6-12.6 12.6h-3c-3.6 0-7-1.7-9.2-4.6l-7.6-10.2a3.2 3.2 0 0 1 5-4L17 31Z"
-            />
-            <path d="M24 21v7M30 22.4v6.6M35.6 24.4v6" />
-          </svg>
-        </span>
       </div>
 
+      {/* a hand in a gold circle, gently tapping: "tap here" */}
+      <span aria-hidden className="gate-words gate-tap relative mt-6" data-go={go}>
+        {!reduced && <span className="gate-tap-ring" />}
+        <svg className="gate-hand" data-still={still} viewBox="0 0 44 54" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" strokeLinecap="round">
+          <path d="M17 6.5a3.5 3.5 0 0 1 7 0V21a3.2 3.2 0 0 1 6 1.4a3.2 3.2 0 0 1 5.6 2a3 3 0 0 1 4.4 2.6V36c0 7-5.6 12.6-12.6 12.6h-3c-3.6 0-7-1.7-9.2-4.6l-7.6-10.2a3.2 3.2 0 0 1 5-4L17 31Z" />
+          <path d="M24 21v7M30 22.4v6.6M35.6 24.4v6" />
+        </svg>
+      </span>
       <p
-        className={`gate-words relative mt-1 text-[28px] leading-tight text-navy ${devanagari ? "font-deva" : "font-display font-medium italic"}`}
-        data-go={go}
-      >
-        {names.bride} <span className="font-display not-italic text-gold-ink">&amp;</span> {names.groom}
-      </p>
-      {date && (
-        <p className="gate-words relative mt-1.5 font-display text-[13px] font-semibold tracking-[0.2em] text-slate" data-go={go}>
-          {date}
-        </p>
-      )}
-      <p
-        className={`gate-hint relative mt-7 text-slate ${devanagari ? "font-deva text-[15px]" : "font-sans text-[13px] font-medium uppercase tracking-[0.3em]"}`}
+        className={`gate-hint gate-gold relative mt-3.5 ${devanagari ? "font-deva text-[16px]" : `${words} text-[14px] tracking-[0.3em]`}`}
         data-still={still}
         data-go={go}
       >
         {label}
       </p>
+      <LotusRule className="gate-words relative mt-2" go={go} />
 
       {/* the sound of the tap: off unless the guest turns it on */}
       <button
@@ -304,17 +248,12 @@ export function OpeningGate({
         }}
         aria-pressed={sound}
         aria-label={sound ? "Sound on: a temple bell rings on the tap" : "Sound off"}
-        className="fixed left-4 flex h-10 w-10 items-center justify-center rounded-full border border-gold/70 bg-ivory/75 text-navy backdrop-blur-sm hover:bg-ivory/90"
+        className="gate-chip fixed left-4 flex h-10 w-10 items-center justify-center rounded-full"
         style={{ top: "calc(var(--status-bar) + 12px)" }}
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
-          <path strokeLinejoin="round" d="M12 3v2M7.5 15.5V11a4.5 4.5 0 0 1 9 0v4.5l1.5 2H6z" />
-          <path strokeLinecap="round" d="M10.5 19.5a1.6 1.6 0 0 0 3 0" />
-          {sound ? (
-            <path strokeLinecap="round" className="text-gold-ink" d="M19.5 8.5a6 6 0 0 1 0 6M4.5 8.5a6 6 0 0 0 0 6" />
-          ) : (
-            <path strokeLinecap="round" d="M4 4l16 16" />
-          )}
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <path d="M4 9.5h3.2L11.5 6v12l-4.3-3.5H4Z" />
+          {sound ? <path d="M15 9.2a4 4 0 0 1 0 5.6M17.6 7a7.2 7.2 0 0 1 0 10" /> : <path d="M15.6 9.8l4.2 4.4M19.8 9.8l-4.2 4.4" />}
         </svg>
       </button>
 
@@ -324,32 +263,47 @@ export function OpeningGate({
           e.stopPropagation();
           skip();
         }}
-        className="fixed right-4 rounded-full border border-gold/70 bg-ivory/75 px-4 py-1.5 font-display text-[15px] font-semibold tracking-[0.08em] text-navy backdrop-blur-sm hover:bg-ivory/90"
+        className="gate-chip fixed right-4 rounded-full px-4 py-1 font-display text-[17px] font-medium italic"
         style={{ top: "calc(var(--status-bar) + 12px)" }}
       >
-        Skip <span aria-hidden>›</span>
+        Skip <span aria-hidden className="not-italic">›</span>
       </button>
     </div>
   );
 }
 
-/** A thin gold rangoli ring: two fine circles, 24 lotus petals between them and a ring of dots. */
-function Mandala() {
-  const petals = Array.from({ length: 24 }, (_, i) => i * 15);
-  const dots = Array.from({ length: 48 }, (_, i) => i * 7.5);
+/** A short gold line either side of a small lotus. */
+function LotusRule({ className = "", go }: { className?: string; go?: true }) {
   return (
-    <g fill="none" stroke="rgb(var(--gold-ink))" strokeWidth="0.7">
-      <circle cx="100" cy="100" r="97" opacity="0.7" />
-      <circle cx="100" cy="100" r="70" opacity="0.6" />
-      {petals.map((deg) => (
-        // a petal pointing outward, from the inner circle (r 70) to r 89
-        <path key={deg} transform={`rotate(${deg} 100 100)`} d="M100 30c4-6 5-12 0-19c-5 7-4 13 0 19Z" opacity="0.85" />
-      ))}
-      {petals.map((deg) => (
-        <path key={`o${deg}`} transform={`rotate(${deg + 7.5} 100 100)`} d="M100 27c3-4 3.5-8 0-12c-3.5 4-3 8 0 12Z" opacity="0.5" />
-      ))}
-      {dots.map((deg) => (
-        <circle key={`c${deg}`} transform={`rotate(${deg} 100 100)`} cx="100" cy="7.5" r="0.9" fill="rgb(var(--gold-ink))" stroke="none" opacity="0.75" />
+    <span aria-hidden className={`gate-gold flex items-center gap-2 ${className}`} data-go={go}>
+      <span className="h-px w-14 bg-gradient-to-r from-transparent to-current opacity-70" />
+      <svg width="16" height="10" viewBox="0 0 24 14" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round">
+        <path d="M12 1.5c2 2 2.6 5 0 9c-2.6-4-2-7 0-9ZM12 10.5c-2-3-5-4.6-8.5-4.2c.6 3.4 4 5.4 8.5 4.2ZM12 10.5c2-3 5-4.6 8.5-4.2c-.6 3.4-4 5.4-8.5 4.2ZM5 12.5h14" />
+      </svg>
+      <span className="h-px w-14 bg-gradient-to-l from-transparent to-current opacity-70" />
+    </span>
+  );
+}
+
+/**
+ * A fine gold lotus mandala: a dotted outer ring, sixteen lotus petals with a vein each and sixteen
+ * smaller ones between, and a ring of beads. (Its quarter diamonds are drawn apart, so they keep still.)
+ */
+function Mandala() {
+  const big = Array.from({ length: 16 }, (_, i) => i * 22.5);
+  return (
+    <g fill="none" stroke="#b08b47" strokeWidth="0.75" strokeLinecap="round">
+      <circle cx="100" cy="100" r="96" strokeDasharray="0.1 3.4" strokeWidth="1.3" opacity="0.8" />
+      <circle cx="100" cy="100" r="69.5" opacity="0.5" />
+      {big.map((deg) => (
+        <g key={deg} transform={`rotate(${deg} 100 100)`}>
+          {/* a lotus petal pointing out, from r 70 to r 91, and its vein */}
+          <path d="M100 30c5-5 7.5-11 0-21c-7.5 10-5 16 0 21Z" opacity="0.9" />
+          <path d="M100 28v-13" opacity="0.5" />
+          {/* a smaller petal between */}
+          <path transform="rotate(11.25 100 100)" d="M100 31c3-3.4 4.5-7.2 0-13c-4.5 5.8-3 9.6 0 13Z" opacity="0.55" />
+          <circle cx="100" cy="6.5" r="0.9" fill="#b08b47" stroke="none" opacity="0.8" />
+        </g>
       ))}
     </g>
   );

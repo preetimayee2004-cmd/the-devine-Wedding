@@ -20,7 +20,7 @@ import {
 export const wedding = {
   couple: {
     bride: { displayName: "Preeti" },
-    groom: { displayName: "Shivashish" },
+    groom: { displayName: "Shivasish" },
   },
 
   wedding: {
@@ -47,10 +47,10 @@ export const wedding = {
   invitation: {
     /**
      * The gate before the opening (every time the link opens or reloads): this line over the golden ॐ
-     * seal, the couple's names and the date under it, then "Touch to begin".
+     * seal in its mandala, then "Tap to open" under it. (No names or date there.)
      */
     youreInvited: "You're invited",
-    touchToBegin: "Touch to begin",
+    touchToBegin: "Tap to open",
     title: "Save the Date",
     blessing: "With the blessings of Mahadev and Maa Parvati, two hearts begin their sacred journey together.",
     request: "request the honour of your presence as they celebrate their union",
@@ -67,7 +67,7 @@ export const wedding = {
      */
     hindi: {
       youreInvited: "आप आमंत्रित हैं",
-      touchToBegin: "आरंभ करने के लिए स्पर्श करें",
+      touchToBegin: "खोलने के लिए स्पर्श करें",
       title: "शुभ विवाह",
       blessing: "महादेव और माँ पार्वती के आशीर्वाद से, दो हृदय अपनी पवित्र यात्रा आरंभ कर रहे हैं।",
       names: { bride: "प्रीति", groom: "शिवाशीष" },
@@ -87,7 +87,7 @@ export const wedding = {
     dear: "Dear {guest},",
     everyone: "Family & Friends",
     invited: "you are warmly invited",
-    hashtag: "#PreetiWedsShivashish",
+    hashtag: "#PreetiWedsShivasish",
     copied: "Copied",
     /** With the EN / हिं switch on हिं. */
     hindi: {
@@ -274,7 +274,7 @@ export const wedding = {
       },
       {
         title: "The Groom's Family",
-        photo: { src: null, alt: "Shivashish's family" },
+        photo: { src: null, alt: "Shivasish's family" },
         members: [
           { relation: "Parents", name: "Smt. Meera & Shri Prakash Chandra" },
           { relation: "Grandmother", name: "Smt. Savitri Devi" },
@@ -289,7 +289,7 @@ export const wedding = {
     eyebrow: "Moments to Remember",
     title: "Our Gallery",
     photos: list<Photo>([
-      { src: "/art/couple-shivling.webp", alt: "Preeti and Shivashish at the Shivling", caption: "Blessed beginnings" },
+      { src: "/art/couple-shivling.webp", alt: "Preeti and Shivasish at the Shivling", caption: "Blessed beginnings" },
       { src: "/art/shiva-parvati-seated.webp", alt: "Shiva and Parvati seated together", caption: "Shiv & Shakti" },
       { src: null, alt: "Engagement", caption: "Engagement" },
       { src: null, alt: "Pre-wedding", caption: "Pre-wedding" },
@@ -495,6 +495,11 @@ export const wedding = {
     calendarLotusSize: { width: 240, height: 186 },
     /** Soft cloud bank (it parts for the countdown, and drifts over the Save the Date's peaks). */
     clouds: "/art/clouds.webp",
+    /**
+     * The gate's background, from the couple's design: a watercolour sky with clouds, a faint
+     * trishul, the crescent and the misty Himalaya at the foot (940 × 1672, shown to cover).
+     */
+    gateSky: "/art/gate-sky.webp",
   },
 
   /** An artwork credit shown at the very end, e.g. "Hands artwork © Artist name". Null shows none. */
@@ -505,7 +510,7 @@ export const wedding = {
   meta: {
     title: "{bride} & {groom} · Wedding Invitation",
     description: "With the blessings of Mahadev and Maa Parvati, you are invited to our wedding.",
-    /** Full public URL once deployed (for link previews), e.g. https://preeti-shivashish.vercel.app */
+    /** Full public URL once deployed (for link previews), e.g. https://preeti-shivasish.vercel.app */
     siteUrl: "",
     /** Keep the invitation out of search engines. */
     noindex: true,

@@ -170,13 +170,6 @@ export function Invitation() {
     return parts ? formatVenueDate(parts, hindi ? "hi-IN" : "en-IN") : null;
   }, [hindi]);
 
-  // the gate's date, "12 · 02 · 2027"
-  const gateDate = useMemo(() => {
-    const p = parseVenueDateTime(wedding.wedding.dateTime);
-    const two = (n: number) => String(n).padStart(2, "0");
-    return p ? `${two(p.day)} · ${two(p.month)} · ${p.year}` : null;
-  }, []);
-
   const { invitation: copy, couple, venue, assets } = wedding;
   const t = hindi
     ? { ...copy.hindi, bride: copy.hindi.names.bride, groom: copy.hindi.names.groom }
@@ -436,10 +429,8 @@ export function Invitation() {
       {gate !== "gone" && (
         <OpeningGate
           seal={assets.omSeal}
-          clouds={assets.clouds}
+          sky={assets.gateSky}
           invited={t.youreInvited}
-          names={{ bride: t.bride, groom: t.groom }}
-          date={gateDate}
           label={t.touchToBegin}
           devanagari={hindi}
           reduced={still}
