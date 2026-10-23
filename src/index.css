@@ -832,6 +832,137 @@
     transition: none;
   }
 
+  /* ── Section 07: Gallery — "Crescent Moon Memories" ──
+     Seven photos on a fine gold crescent (Gallery.tsx lays them out). On phones the moon reaches a
+     little into the side gutters; from 1000px it lies on its back across a wider stage. */
+  .gallery-stage {
+    margin: 28px calc(12px - var(--gutter)) 0;
+  }
+  @media (min-width: 1000px) {
+    .gallery-stage {
+      margin-inline: calc((100% - min(92vw, 60rem)) / 2);
+    }
+  }
+  .gallery-moon {
+    position: relative;
+    margin-inline: auto;
+    width: min(100%, 400px);
+    container-type: inline-size;
+  }
+  .gallery-moon[data-layout="cradle"] {
+    width: min(100%, 1000px);
+  }
+  .gallery-moon-art {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  /* the outline draws itself from horn to horn; the pale body follows it in */
+  .gallery-moon-line {
+    stroke: #b69a67;
+    stroke-linecap: round;
+    stroke-dasharray: 1 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 1500ms cubic-bezier(0.45, 0, 0.25, 1);
+  }
+  .gallery-moon-body {
+    fill: rgb(255 251 243 / 0.62);
+    opacity: 0;
+    transition: opacity 1200ms ease-out 500ms;
+  }
+  /* last, the two horn tips catch a soft gold glint, and keep it */
+  .gallery-glint {
+    opacity: 0;
+    transition: opacity 900ms ease-out 2700ms;
+  }
+  .gallery-moon[data-shown] .gallery-moon-line {
+    stroke-dashoffset: 0;
+  }
+  .gallery-moon[data-shown] .gallery-moon-body,
+  .gallery-moon[data-shown] .gallery-glint {
+    opacity: 1;
+  }
+
+  /* a photo: a fine antique-gold edge, a narrow ivory mat; the six rise in one by one */
+  .gallery-frame {
+    position: absolute;
+    display: block;
+    padding: 3px;
+    border: 1px solid rgb(182 154 103 / 0.8);
+    border-radius: var(--r) var(--r) var(--foot) var(--foot);
+    background: #fbf7ef;
+    box-shadow: 0 14px 28px -20px rgb(23 59 86 / 0.5);
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 700ms cubic-bezier(0.22, 1, 0.36, 1) var(--delay),
+      transform 700ms cubic-bezier(0.22, 1, 0.36, 1) var(--delay),
+      border-color 300ms ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .gallery-frame-inner {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: calc(var(--r) - 4px) calc(var(--r) - 4px) calc(var(--foot) - 4px) calc(var(--foot) - 4px);
+    /* behind a painting cut out of its sky: the site's mist */
+    background: linear-gradient(rgb(var(--sky)), rgb(var(--sky-pale)));
+  }
+  .gallery-frame-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* the portrait: it fades in, easing back from a slight zoom */
+  .gallery-frame-portrait {
+    transform: none;
+    transition:
+      opacity 800ms ease-out var(--delay),
+      border-color 300ms ease;
+  }
+  .gallery-frame-portrait .gallery-frame-img {
+    transform: scale(1.07);
+    transition: transform 1100ms cubic-bezier(0.22, 1, 0.36, 1) var(--delay);
+  }
+  .gallery-moon[data-shown] .gallery-frame {
+    opacity: 1;
+    transform: none;
+  }
+  .gallery-moon[data-shown] .gallery-frame-portrait .gallery-frame-img {
+    transform: none;
+  }
+  @media (hover: hover) {
+    .gallery-frame:hover {
+      border-color: rgb(182 154 103);
+    }
+  }
+  .gallery-frame:focus-visible {
+    outline: 2px solid rgb(var(--gold-ink));
+    outline-offset: 3px;
+  }
+  /* reduced motion: all as finished, in a short fade */
+  .gallery-moon[data-still] .gallery-moon-line {
+    transition: none;
+  }
+  .gallery-moon[data-still] .gallery-moon-body,
+  .gallery-moon[data-still] .gallery-glint,
+  .gallery-moon[data-still] .gallery-frame {
+    transform: none;
+    transition: opacity 300ms linear;
+  }
+  .gallery-moon[data-still] .gallery-frame-img {
+    transform: none;
+    transition: none;
+  }
+  /* a painting cut out of its sky shows on the site's mist in the lightbox too */
+  .gallery-lightbox-img {
+    background: linear-gradient(rgb(var(--sky)), rgb(var(--sky-pale)));
+  }
+
   /* ── The gate, before the opening (every time the link opens) — as in the couple's design ──
      Only transform and opacity move. */
   .gate {

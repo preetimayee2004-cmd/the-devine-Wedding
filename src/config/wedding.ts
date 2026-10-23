@@ -284,16 +284,60 @@ export const wedding = {
     ]),
   },
 
-  /** Section 07 — the gallery. The first photo is the large one. SAMPLE: add the couple's photos. */
+  /**
+   * Section 07 — the gallery: seven photos along a crescent moon.
+   *
+   * Seven, in this order: the first is the main portrait, at the moon's widest part; the other six
+   * follow its curve from one horn to the other (three on each side of the portrait). Any size works:
+   * each is cropped to its frame (`focus` says which part stays in view), and the lightbox shows it
+   * whole with its `caption`. For now these are the illustrations already on the site — the couple's
+   * own story pictures and the Shiv–Parvati paintings; replace any with a real photo (WebP in
+   * public/photos/) and keep the `alt` describing it.
+   */
   gallery: {
     eyebrow: "Moments to Remember",
     title: "Our Gallery",
+    intro: "Moments we hold close, like the moon in Mahadev's locks.",
     photos: list<Photo>([
-      { src: "/art/couple-shivling.webp", alt: "Preeti and Shivasish at the Shivling", caption: "Blessed beginnings" },
-      { src: "/art/shiva-parvati-seated.webp", alt: "Shiva and Parvati seated together", caption: "Shiv & Shakti" },
-      { src: null, alt: "Engagement", caption: "Engagement" },
-      { src: null, alt: "Pre-wedding", caption: "Pre-wedding" },
-      { src: null, alt: "With family", caption: "With family" },
+      {
+        src: "/photos/gallery-shivling.webp",
+        alt: "Preeti and Shivasish offering water at the Shivling",
+        caption: "Blessed beginnings",
+        focus: "50% 40%",
+      },
+      // along the crescent, from the upper horn …
+      { src: "/art/shiva-parvati-seated.webp", alt: "Shiva and Parvati seated together", caption: "Shiv & Shakti", focus: "56% 40%" },
+      {
+        src: "/art/shiva-parvati-blessing.jpg",
+        alt: "Mahadev blessing Maa Parvati before the snowy Himalaya",
+        caption: "Mahadev's blessing",
+        focus: "50% 22%",
+      },
+      {
+        src: "/photos/story-1.webp",
+        alt: "Illustration: he watches her from the balcony as she turns, a hand in her hair",
+        caption: "The first spark",
+        focus: "50% 24%",
+      },
+      // … past the portrait, to the lower horn
+      {
+        src: "/photos/story-2.webp",
+        alt: "Illustration: he kisses her cheek in the afternoon sun, she in a lavender saree",
+        caption: "Growing closer",
+        focus: "50% 16%",
+      },
+      {
+        src: "/photos/story-3.webp",
+        alt: "Illustration: a warm embrace before a wall of soft lights, she in a red saree",
+        caption: "Our promise",
+        focus: "50% 40%",
+      },
+      {
+        src: "/photos/story-4.webp",
+        alt: "Illustration: their hands joined and the gathbandhan knot tied, at the wedding fire",
+        caption: "The sacred knot",
+        focus: "50% 42%",
+      },
     ]),
   },
 
