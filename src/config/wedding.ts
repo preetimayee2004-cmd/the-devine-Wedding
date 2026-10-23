@@ -130,6 +130,8 @@ export const wedding = {
   events: {
     title: "Wedding Events",
     quote: "Every ritual, a blessing; every moment, a memory we hope to share with you.",
+    /** Under the arch: how to see the other ceremonies. */
+    hint: "Tap the arch frame to see the events",
     list: list<Ceremony>([
       {
         name: "Mehendi",

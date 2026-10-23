@@ -16,8 +16,8 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
  * the Ganga falls (0.5s); a soft wash sweeps down with it and the card dissolves and drifts down
  * in it, droplets and a few lotus petals carried along; the stream thins away, and the next
  * ceremony's couple rises in, its words after (1.6s in all; taps meanwhile are ignored). After the
- * last it returns to the first. Dots under the arch count the ceremonies, and "Tap to continue"
- * pulses there until the first tap. Transform, opacity and a mask only. Reduced motion: a plain
+ * last it returns to the first. Under the arch, dots count the ceremonies and "Tap the arch frame to
+ * see the events" says how — pulsing gently until the first tap. Transform, opacity and a mask only. Reduced motion: a plain
  * crossfade, nothing sways.
  */
 
@@ -50,14 +50,6 @@ const PETALS = [
   [-3, 24, -11, 30, 160, 40], [3.5, 34, 12, 27, 260, -55], [-2.5, 46, -9, 24, 360, 70], [2.8, 56, 10, 20, 440, -35],
 ] as const;
 
-function readTapped() {
-  try {
-    return localStorage.getItem("dw:events-tapped") === "1";
-  } catch {
-    return false;
-  }
-}
-
 export function Events() {
   const { events, assets } = wedding;
   const list = events.list;
@@ -69,7 +61,8 @@ export function Events() {
   const [index, setIndex] = useState(0);
   const [phase, setPhase] = useState<"idle" | "wash" | "enter">("idle");
   const [run, setRun] = useState(0);
-  const [hint, setHint] = useState(() => !readTapped());
+  // the line under the arch pulses gently until the first tap
+  const [tapped, setTapped] = useState(false);
   const busy = useRef(false);
   const timers = useRef<number[]>([]);
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
@@ -78,14 +71,7 @@ export function Events() {
   const next = () => {
     if (busy.current || !list.length) return;
     busy.current = true;
-    if (hint) {
-      setHint(false);
-      try {
-        localStorage.setItem("dw:events-tapped", "1");
-      } catch {
-        /* private mode: the hint simply shows again next time */
-      }
-    }
+    setTapped(true);
     const to = (index + 1) % list.length;
     setPhase("wash");
     if (!reduced) setRun((r) => r + 1);
@@ -189,7 +175,7 @@ export function Events() {
         <button type="button" className="ev-tap" onClick={next} onKeyDown={onKey} aria-label={`Show the next ceremony (${(index + 1) % Math.max(1, list.length) + 1} of ${list.length})`} />
       </div>
 
-      {/* under the arch: which ceremony this is, and the first-time hint */}
+      {/* under the arch: which ceremony this is, and how to see the others */}
       <div className="ev-foot">
         {list.length > 1 && (
           <div aria-hidden className="ev-dots">
@@ -198,7 +184,9 @@ export function Events() {
             ))}
           </div>
         )}
-        {hint && <p className="ev-hint">Tap to continue</p>}
+        <p className="ev-hint" data-pulse={(!tapped && !reduced) || undefined}>
+          {events.hint}
+        </p>
         {ceremony?.credit && <p className="ev-credit">{ceremony.credit}</p>}
       </div>
     </section>

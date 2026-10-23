@@ -687,12 +687,18 @@
     transform: scale(1.35);
   }
   .ev-hint {
+    max-width: 22rem;
+    padding: 0 16px;
     font-family: var(--font-body);
     font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.24em;
+    font-weight: 600;
+    line-height: 1.5;
+    letter-spacing: 0.2em;
+    text-align: center;
     text-transform: uppercase;
-    color: rgb(var(--gold-ink));
+    color: #7a561c;
+  }
+  .ev-hint[data-pulse] {
     animation: ev-hint 2.6s ease-in-out infinite;
   }
   @keyframes ev-hint {
