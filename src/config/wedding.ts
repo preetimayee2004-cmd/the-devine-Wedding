@@ -127,11 +127,11 @@ export const wedding = {
    *            its place. Keep the `alt` describing the photo.
    */
   story: {
-    eyebrow: "Under the same sky",
+    eyebrow: "Our Story",
     title: "A Love Written in the Stars",
     subtitle: "Some souls are destined to find each other.",
     hindi: {
-      eyebrow: "एक ही आसमान तले",
+      eyebrow: "हमारी कहानी",
       title: "सितारों में लिखा प्रेम",
       subtitle: "कुछ आत्माएँ एक-दूसरे को पाने के लिए ही बनी होती हैं।",
     },
