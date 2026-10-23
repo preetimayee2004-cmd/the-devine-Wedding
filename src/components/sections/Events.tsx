@@ -13,9 +13,8 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 /**
  * Section 05 — the wedding ceremonies (PRD §4).
  *
- * The story's kalash ties on a sacred thread — two golds twisted like a
- * kalava — that runs down the left and draws itself as the ceremonies scroll
- * into view. Each ceremony hangs from it as a gold medallion (its symbol
+ * A sacred thread — two golds twisted like a kalava — runs down the left
+ * and draws itself as the ceremonies scroll into view. Each ceremony hangs from it as a gold medallion (its symbol
  * appears first) with its card beside it. Days are marked along the thread.
  * At the end the thread curves to the centre, toward the two families.
  */
@@ -82,8 +81,8 @@ export function Events() {
   }, [reduced]);
 
   return (
-    <section id="events" ref={sectionRef} aria-labelledby="events-heading" className="relative px-[var(--gutter)]">
-      {/* the thread hangs from the story's kalash */}
+    <section id="events" ref={sectionRef} aria-labelledby="events-heading" className="relative px-[var(--gutter)] pt-12">
+      {/* where the thread begins */}
       <span aria-hidden className="sacred-thread mx-auto block h-10 w-[3px]" />
       <div className="mt-5">
         <SectionHeading

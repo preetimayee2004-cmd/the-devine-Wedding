@@ -12,17 +12,6 @@ export interface Photo {
 
 export type Motif = "lotus" | "diya" | "kalash" | "crescent" | "knot";
 
-export interface StoryMoment {
-  title: string;
-  /** "2021" — or any short text: "Spring 2021". */
-  year: string;
-  /** One short line about this milestone. */
-  line: string;
-  photo: Photo;
-  /** The title and line in Hindi, for the EN / हिं switch. */
-  hindi: { title: string; line: string };
-}
-
 export type EventIcon =
   "mehendi" | "sangeet" | "haldi" | "baraat" | "welcome" | "knot" | "sindoor" | "bidaai" | "reception";
 

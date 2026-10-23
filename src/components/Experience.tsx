@@ -2,7 +2,6 @@ import { Invitation } from "@/components/sections/Invitation";
 import { Couple } from "@/components/sections/Couple";
 import { Descent } from "@/components/sections/Descent";
 import { Countdown } from "@/components/sections/Countdown";
-import { Story } from "@/components/sections/Story";
 import { Events } from "@/components/sections/Events";
 import { Family } from "@/components/sections/Family";
 import { Gallery } from "@/components/sections/Gallery";
@@ -21,7 +20,6 @@ export function Experience() {
       {/* the scroll-scrubbed descent from the Save the Date to the couple section */}
       <Descent />
       <Countdown />
-      <Story />
       <Events />
       <Family />
       <Gallery />
