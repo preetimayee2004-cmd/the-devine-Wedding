@@ -1500,6 +1500,439 @@
     border-top: 1px solid rgb(184 149 84 / 0.35);
   }
 
+  /* Finding Your Way — cream cards on the pale sky, navy words, gold capitals. */
+  .fw-card {
+    position: relative;
+    overflow: hidden;
+    padding: 0 18px 22px;
+    border: 1px solid rgb(184 149 84 / 0.5);
+    border-radius: 22px;
+    background: linear-gradient(180deg, #fffaf0, #fdf6ea);
+    box-shadow: 0 18px 40px -28px rgb(18 41 74 / 0.5);
+    text-align: center;
+  }
+  /* a faint Kailash range along the card's top edge */
+  .fw-kailash {
+    position: absolute;
+    inset: 0 0 auto;
+    width: 100%;
+    height: 64px;
+    pointer-events: none;
+  }
+  /* the map, cut into a temple arch with a fine gold edge; a marigold garland and bells across it */
+  .fw-map-wrap {
+    position: relative;
+    margin: 34px 4px 0;
+    aspect-ratio: 100 / 115;
+  }
+  .fw-map {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: linear-gradient(rgb(var(--sky-pale)), #f3efe4);
+    clip-path: url(#fw-arch-clip);
+  }
+  .fw-arch-line {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .fw-arch-line path {
+    fill: none;
+    stroke: #b89554;
+    stroke-width: 1.5;
+  }
+  .fw-garland {
+    position: absolute;
+    left: 6%;
+    top: 4%;
+    width: 88%;
+    height: auto;
+    overflow: visible;
+    pointer-events: none;
+    filter: drop-shadow(0 2px 2px rgb(120 70 20 / 0.25));
+  }
+  .fw-pin {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 30px;
+    height: 40px;
+    margin: -40px 0 0 -15px;
+    pointer-events: none;
+    filter: drop-shadow(0 3px 4px rgb(18 41 74 / 0.35));
+  }
+  /* small pills: "Maps", Call, Map, WhatsApp (48px tall to tap) */
+  .fw-maps-pill,
+  .fw-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 48px;
+    padding: 0 16px;
+    border: 1px solid rgb(184 149 84 / 0.8);
+    border-radius: 9999px;
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      background-color 200ms ease,
+      border-color 200ms ease,
+      transform 150ms ease;
+  }
+  .fw-maps-pill {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    min-height: 36px;
+    padding: 0 13px;
+    background: linear-gradient(#f0d48a, #d9b062);
+    color: rgb(var(--navy));
+    box-shadow: 0 6px 14px -8px rgb(18 41 74 / 0.6);
+  }
+  .fw-maps-pill::after {
+    /* a 48px target round the small pill */
+    content: "";
+    position: absolute;
+    inset: -6px;
+  }
+  .fw-pill {
+    background: rgb(255 251 242 / 0.9);
+    color: rgb(var(--navy));
+  }
+  .fw-pill-solid {
+    background: rgb(var(--navy));
+    color: #fff9ef;
+    border-color: #b89554;
+  }
+  @media (hover: hover) {
+    .fw-pill:hover {
+      border-color: rgb(var(--gold-ink));
+      background: #fffdf8;
+    }
+    .fw-pill-solid:hover {
+      background: #1b3a63;
+    }
+    .fw-maps-pill:hover {
+      filter: brightness(1.05);
+    }
+  }
+  .fw-pill:active,
+  .fw-maps-pill:active {
+    transform: scale(0.97);
+  }
+  .fw-pill:focus-visible,
+  .fw-maps-pill:focus-visible,
+  .fw-directions:focus-visible,
+  .fw-stop-head:focus-visible {
+    outline: 2px solid rgb(var(--gold-ink));
+    outline-offset: 3px;
+  }
+  /* "Get Directions": navy, a gold edge, a small lotus; a soft ripple where it is pressed */
+  .fw-directions {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 50px;
+    margin-top: 18px;
+    border: 1px solid #b89554;
+    border-radius: 10px;
+    background-color: rgb(var(--navy));
+    color: #fff9ef;
+    box-shadow:
+      inset 0 1px 0 rgb(255 249 239 / 0.12),
+      0 12px 24px -14px rgb(18 41 74 / 0.8);
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      background-color 200ms ease,
+      transform 150ms ease;
+  }
+  .fw-directions .fw-small-lotus {
+    color: #e3c27e;
+  }
+  @media (hover: hover) {
+    .fw-directions:hover {
+      background-color: #1b3a63;
+    }
+  }
+  .fw-directions:active {
+    transform: scale(0.985);
+  }
+  .fw-ripple {
+    position: absolute;
+    border-radius: 9999px;
+    background: radial-gradient(circle, rgb(255 236 190 / 0.45), rgb(255 236 190 / 0) 70%);
+    pointer-events: none;
+    animation: fw-ripple 650ms ease-out forwards;
+  }
+  @keyframes fw-ripple {
+    from {
+      opacity: 1;
+      transform: scale(0.1);
+    }
+    to {
+      opacity: 0;
+      transform: scale(1);
+    }
+  }
+  .fw-small-lotus {
+    width: 20px;
+    height: 14px;
+    flex: none;
+  }
+  /* a small gold label: "How to Reach", "Blessed Stays" */
+  .fw-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: rgb(var(--gold-ink));
+  }
+  /* the stops on a thin wavy line of Ganga blue, a lotus at each, opening one after another */
+  .fw-stops {
+    position: relative;
+    display: grid;
+    gap: 14px;
+    margin-top: 16px;
+    padding-left: 40px;
+  }
+  .fw-river {
+    position: absolute;
+    left: 6px;
+    top: 10px;
+    bottom: 10px;
+    width: 22px;
+    height: calc(100% - 20px);
+    overflow: visible;
+  }
+  .fw-river path {
+    fill: none;
+    stroke: #6f9cc6;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    opacity: 0.85;
+  }
+  .fw-stops[data-shown] .fw-river path {
+    animation: fw-draw 1400ms cubic-bezier(0.45, 0, 0.25, 1) 100ms both;
+  }
+  @keyframes fw-draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  .fw-stop {
+    position: relative;
+  }
+  .fw-node {
+    position: absolute;
+    left: -41px;
+    top: 18px;
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border: 1px solid rgb(184 149 84 / 0.7);
+    border-radius: 9999px;
+    background: #fffaf0;
+    color: rgb(var(--gold-ink));
+    box-shadow: 0 3px 8px -4px rgb(18 41 74 / 0.4);
+    transform: scale(0);
+  }
+  .fw-node .fw-small-lotus {
+    width: 16px;
+    height: 11px;
+  }
+  .fw-stops[data-shown] .fw-node {
+    animation: fw-node 420ms cubic-bezier(0.22, 1, 0.36, 1) calc(300ms + var(--i) * 260ms) both;
+  }
+  @keyframes fw-node {
+    from {
+      transform: scale(0);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+  .fw-stops[data-still] .fw-river path {
+    stroke-dashoffset: 0;
+    animation: none;
+  }
+  .fw-stops[data-still] .fw-node {
+    transform: none;
+    animation: none;
+  }
+  .fw-stop-card {
+    overflow: hidden;
+    border: 1px solid rgb(184 149 84 / 0.45);
+    border-radius: 16px;
+    background: rgb(255 251 242 / 0.88);
+    box-shadow: 0 12px 26px -22px rgb(18 41 74 / 0.6);
+  }
+  .fw-stop-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 64px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .fw-stop-icon {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    flex: none;
+    border: 1px solid rgb(184 149 84 / 0.6);
+    border-radius: 9999px;
+    color: rgb(var(--gold-ink));
+  }
+  .fw-chevron {
+    width: 20px;
+    height: 20px;
+    flex: none;
+    color: rgb(var(--gold-ink));
+    transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .fw-stop-card[data-open] .fw-chevron {
+    transform: rotate(180deg);
+  }
+  /* the detail opens smoothly to its own height */
+  .fw-stop-body {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 360ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .fw-stop-card[data-open] .fw-stop-body {
+    grid-template-rows: 1fr;
+  }
+  .fw-stop-body > div {
+    min-height: 0;
+  }
+  .fw-tip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 16px;
+    border: 1px solid rgb(184 149 84 / 0.55);
+    border-radius: 9999px;
+    background: rgb(255 251 242 / 0.8);
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    line-height: 1.35;
+    color: rgb(var(--slate));
+  }
+  /* Blessed Stays: cards to swipe across (no scrollbar), each with its photo in an arch */
+  .fw-carousel {
+    display: flex;
+    gap: 14px;
+    margin: 18px calc(var(--gutter) * -1) 0;
+    padding: 6px var(--gutter) 14px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--gutter);
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .fw-carousel::-webkit-scrollbar {
+    display: none;
+  }
+  .fw-slide {
+    flex: 0 0 min(76%, 270px);
+    scroll-snap-align: start;
+  }
+  .fw-stay {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 14px 14px 16px;
+    border: 1px solid rgb(184 149 84 / 0.45);
+    border-radius: 18px;
+    background: rgb(255 251 242 / 0.9);
+    box-shadow: 0 12px 26px -22px rgb(18 41 74 / 0.6);
+    text-align: left;
+  }
+  .fw-stay[data-featured] {
+    border: 1.5px solid #b89554;
+    box-shadow:
+      0 0 0 3px rgb(184 149 84 / 0.14),
+      0 14px 28px -20px rgb(120 80 20 / 0.55);
+  }
+  .fw-hosted {
+    position: absolute;
+    left: 50%;
+    top: -11px;
+    z-index: 1;
+    padding: 3px 12px;
+    border-radius: 9999px;
+    background: linear-gradient(#f0d48a, #d9b062);
+    font-family: var(--font-body);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: rgb(var(--navy));
+    transform: translateX(-50%);
+  }
+  .fw-stay-photo {
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border: 1px solid rgb(184 149 84 / 0.55);
+    border-radius: 50% 50% 8px 8px / 36% 36% 8px 8px;
+  }
+  .fw-stay-wash {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background:
+      radial-gradient(circle at 50% 30%, #fff8e6 0, transparent 55%),
+      linear-gradient(rgb(var(--sky-pale)), #efe6d4);
+  }
+  .fw-stay-temple {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 56%;
+    color: rgb(18 41 74 / 0.12);
+    transform: translateX(-50%);
+  }
+  /* the point of contact */
+  .fw-contact {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 10px;
+    padding: 12px 16px;
+    border-top: 1px solid rgb(184 149 84 / 0.45);
+    border-bottom: 1px solid rgb(184 149 84 / 0.45);
+  }
+
   /* Save the Date: a short shower of red petals (each falls once). */
   .petal {
     position: absolute;

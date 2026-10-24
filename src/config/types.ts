@@ -53,9 +53,16 @@ export type TravelKind = "air" | "rail" | "bus" | "local";
 
 export interface TravelPoint {
   kind: TravelKind;
+  /** "By air", "By rail", "By road". */
   label: string;
   name: string;
-  note: string;
+  /** Where it is, briefly ("Babatpur"). */
+  place: string;
+  /** From the venue: shown together on one line ("about 25 km · 50 min"). */
+  distance: string;
+  time: string;
+  /** Shown when the stop is opened. */
+  detail: string;
 }
 
 export interface Contact {
@@ -68,9 +75,14 @@ export interface Contact {
 export interface Stay {
   name: string;
   distance: string;
+  /** One line about it. */
   note: string;
+  /** International format without "+"; null hides Call. */
   phone: string | null;
-  bookingUrl: string | null;
+  /** A photo of the place (shown in an arch); null shows a soft painted arch instead. */
+  photo: string | null;
+  /** Arranged by the family (the first such stay is marked "Hosted by family"). */
+  hosted: boolean;
 }
 
 /** Widens a list written inside the `as const` config to its real type. */

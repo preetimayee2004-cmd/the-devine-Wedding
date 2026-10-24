@@ -8,7 +8,6 @@
 import {
   list,
   type Ceremony,
-  type Contact,
   type FamilySide,
   type Photo,
   type Stay,
@@ -323,49 +322,76 @@ export const wedding = {
     ]),
   },
 
-  /** Section 10 — practical details. SAMPLE: only verified places, numbers and links belong here. */
+  /**
+   * Section 10 — "Finding Your Way": the venue, how to get there, and where to stay.
+   * SAMPLE: every distance, time, place, name and number below is a placeholder — check each one
+   * before sharing the link. A null phone hides its Call / WhatsApp button; a null photo shows a
+   * soft painted arch in its place.
+   */
   travel: {
     eyebrow: "Venue & Guest Arrangements",
     title: "Finding Your Way",
+    /** The three ways in, each a stop on the river line; a tap opens its detail. */
     points: list<TravelPoint>([
       {
         kind: "air",
-        label: "Nearest airport",
-        name: "Lal Bahadur Shastri International Airport (VNS)",
-        note: "Babatpur, about 25 km from the city",
+        label: "By air",
+        name: "Lal Bahadur Shastri Airport",
+        place: "Babatpur",
+        distance: "about 25 km",
+        time: "50 min",
+        detail: "Prepaid taxis and app cabs wait outside arrivals. We'll gladly pick you up on 11 & 12 February.",
       },
       {
         kind: "rail",
-        label: "Railway station",
-        name: "Varanasi Junction (BSB)",
-        note: "Cantonment, in the city centre",
+        label: "By rail",
+        name: "Varanasi Junction",
+        place: "Cantonment",
+        distance: "about 10 km",
+        time: "30 min",
+        detail: "Autos and app cabs at the main exit; ask for Sarnath Road. Pickups on 11 & 12 February too.",
       },
-      { kind: "bus", label: "Bus stand", name: "Varanasi Cantt Bus Station", note: "Opposite Varanasi Junction" },
       {
         kind: "local",
-        label: "Getting around",
-        name: "Autos, e-rickshaws and app cabs",
-        note: "Available across the city",
+        label: "By road",
+        name: "Local cab or auto",
+        place: "Anywhere in the city",
+        distance: "across Varanasi",
+        time: "on call",
+        detail: "Ola, Uber, autos and e-rickshaws run all over the city. Show the driver the venue on the map.",
       },
     ]),
-    pickup:
-      "We'll arrange pickups from the airport and Varanasi Junction on 11 and 12 February. Just share your arrival time.",
-    contacts: list<Contact>([{ name: "Rohan", role: "Travel help", phone: null }]),
+    /** The little tip under the stops. */
+    pickupTip: "Guest pickup details will be shared on WhatsApp",
+    /** Who to ask (a null phone shows "number to come" instead of the WhatsApp button). */
+    contact: { name: "Rohan", role: "Your point of contact", phone: null as string | null },
+    stayTitle: "Blessed Stays",
     stayNote: "Rooms are reserved for our outstation guests. Let us know your dates and we'll take care of the rest.",
+    /** Swipe cards; the first marked `hosted` is shown as hosted by the family. */
     stays: list<Stay>([
       {
         name: "Riverside Guest House",
         distance: "2 km from the venue",
-        note: "Reserved for the bride's guests",
+        note: "Reserved for the bride's guests, by the river",
         phone: null,
-        bookingUrl: null,
+        photo: null,
+        hosted: true,
       },
       {
         name: "Sarnath Residency",
         distance: "3.5 km from the venue",
-        note: "Reserved for the groom's guests",
+        note: "Reserved for the groom's guests, near Sarnath",
         phone: null,
-        bookingUrl: null,
+        photo: null,
+        hosted: true,
+      },
+      {
+        name: "Ganga View Homestay",
+        distance: "6 km from the venue",
+        note: "A quiet homestay near the ghats, if you'd like your own",
+        phone: null,
+        photo: null,
+        hosted: false,
       },
     ]),
   },
