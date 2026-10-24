@@ -20,7 +20,7 @@ import { TempleBells, TempleSilhouette } from "@/components/art/Temple";
  * remembered on the phone: every visit, a reload too, starts with the button.
  *
  * The scene: a temple arch in thin antique-gold lines, Mahadev and Maa Parvati within it
- * (the Save the Date painting's own figures), the pillars and the figures melting into the sky at
+ * (the couple's chosen painting of Mahadev holding Maa Parvati close), the pillars and the figures melting into the sky at
  * their foot, faint temples at the corners. Beneath: "A Sacred Celebration", the blessing and "Har
  * Har Mahadev"; then one maroon button, "Add to calendar" (Google Calendar or an .ics file of the
  * wedding as configured — and it says exactly what happened, never that the date is saved), and a
@@ -180,10 +180,10 @@ function Scene({ calendar, note }: { calendar: CalendarItem | null; note: string
         <img
           className="rs-figures"
           style={at(AT.figures)}
-          src={wedding.assets.saveTheDateLayers.figures}
-          alt="Mahadev and Maa Parvati: he gently touches her forehead as she bows her head, garlanded"
-          width={572}
-          height={1024}
+          src={wedding.assets.rsvpCouple}
+          alt="Mahadev holding Maa Parvati close, both with eyes closed, jasmine in her hair and the crescent moon in his"
+          width={wedding.assets.rsvpCoupleSize.width}
+          height={wedding.assets.rsvpCoupleSize.height}
           loading="lazy"
           decoding="async"
           draggable={false}

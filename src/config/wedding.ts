@@ -481,6 +481,13 @@ export const wedding = {
     saveTheDateLayers: { back: "/art/painting-back.webp", figures: "/art/painting-figures.webp" },
     /** Shiv–Parvati seated together (Thank You, gallery). */
     divineCouple: "/art/shiva-parvati-seated.webp",
+    /**
+     * Section 08 (RSVP): Mahadev holding Maa Parvati close, eyes closed — the couple's chosen painting,
+     * cut out of its red ground (the halo's arc and the corner flowers left behind) so it stands in the
+     * gold arch on the site's own sky.
+     */
+    rsvpCouple: "/art/shiva-parvati-embrace.webp",
+    rsvpCoupleSize: { width: 695, height: 969 },
     /** Soft-edged bloom used for every watercolour reveal. */
     watercolorMask: "/art/watercolor-mask.png",
     /** The golden ॐ wax seal on the gate before the opening ("Touch to begin"). */

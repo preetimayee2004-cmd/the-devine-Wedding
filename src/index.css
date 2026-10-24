@@ -892,16 +892,16 @@
     position: absolute;
     left: 50%;
     bottom: 2.5%;
-    height: 82%;
+    height: 80%;
     width: auto;
-    max-width: none;
+    max-width: 92%;
+    object-fit: contain;
+    object-position: 50% 100%;
     translate: -50% 0;
     transform-origin: 50% 80%;
-    /* melting at the foot, and at the right edge where the painting was cut */
-    -webkit-mask-image: linear-gradient(to bottom, #000 64%, transparent 97%), linear-gradient(to left, transparent, #000 7%);
-    mask-image: linear-gradient(to bottom, #000 64%, transparent 97%), linear-gradient(to left, transparent, #000 7%);
-    -webkit-mask-composite: source-in;
-    mask-composite: intersect;
+    /* melting into the sky at the foot */
+    -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent 98%);
+    mask-image: linear-gradient(to bottom, #000 72%, transparent 98%);
     opacity: 0;
     user-select: none;
   }
