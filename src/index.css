@@ -366,6 +366,7 @@
     margin: 22px calc(var(--gutter) * -1) 0;
     aspect-ratio: 1098 / 1228;
     container-type: inline-size;
+    touch-action: pan-y;
     opacity: 0;
     transform: translateY(18px);
     transition:
@@ -388,20 +389,6 @@
     user-select: none;
     pointer-events: none;
   }
-  /* the leaves and lotus: the faintest sway, each at its own pace */
-  .ea-sway {
-    will-change: transform;
-    animation: ea-sway 6s ease-in-out infinite alternate;
-  }
-  @keyframes ea-sway {
-    from {
-      transform: rotate(calc(var(--a) * -1));
-    }
-    to {
-      transform: rotate(var(--a));
-    }
-  }
-
   /* the card: the couple in the arch's upper part, standing on one line; the words below them */
   .ev-card {
     position: absolute;
@@ -502,188 +489,145 @@
     border-radius: 3px;
   }
 
-  /* a tap: a red chunri flies across the arch, corner to corner (0.85s); a mask moving with it —
-     its edge always under the chunri; both run from just beyond one bottom corner (c = -1.45 of the
-     diagonal) to just beyond the opposite top one (c = 1.45) — wipes the old card out behind it and the new one in ahead */
-  .ev-card[data-role="old"],
-  .ev-card[data-role="new"] {
-    -webkit-mask-size: 300% 300%;
-    mask-size: 300% 300%;
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    animation-duration: 850ms;
-    animation-timing-function: cubic-bezier(0.42, 0, 0.45, 1);
-    animation-fill-mode: both;
+  /* the change (0.8s, ease-in-out): the ceremony shown fades out, its picture easing down a little (0.3s)… */
+  .ev-card[data-role="old"] .ev-figure {
+    transform-origin: 50% 70%;
+    animation: ev-out-figure 300ms ease-in-out both;
   }
-  .ev-card[data-role="new"][data-dir="ltr"] {
-    -webkit-mask-image: linear-gradient(to top right, #000 49.6%, transparent 50.4%);
-    mask-image: linear-gradient(to top right, #000 49.6%, transparent 50.4%);
-    animation-name: ev-sweep-ltr;
+  .ev-card[data-role="old"] .ev-words {
+    animation: ev-out 260ms ease-in-out both;
   }
-  .ev-card[data-role="old"][data-dir="ltr"] {
-    -webkit-mask-image: linear-gradient(to top right, transparent 49.6%, #000 50.4%);
-    mask-image: linear-gradient(to top right, transparent 49.6%, #000 50.4%);
-    animation-name: ev-sweep-ltr;
-  }
-  .ev-card[data-role="new"][data-dir="rtl"] {
-    -webkit-mask-image: linear-gradient(to top left, #000 49.6%, transparent 50.4%);
-    mask-image: linear-gradient(to top left, #000 49.6%, transparent 50.4%);
-    animation-name: ev-sweep-rtl;
-  }
-  .ev-card[data-role="old"][data-dir="rtl"] {
-    -webkit-mask-image: linear-gradient(to top left, transparent 49.6%, #000 50.4%);
-    mask-image: linear-gradient(to top left, transparent 49.6%, #000 50.4%);
-    animation-name: ev-sweep-rtl;
-  }
-  @keyframes ev-sweep-ltr {
-    from {
-      -webkit-mask-position: 86.25% 13.75%;
-      mask-position: 86.25% 13.75%;
-    }
-    to {
-      -webkit-mask-position: 13.75% 86.25%;
-      mask-position: 13.75% 86.25%;
-    }
-  }
-  @keyframes ev-sweep-rtl {
-    from {
-      -webkit-mask-position: 13.75% 13.75%;
-      mask-position: 13.75% 13.75%;
-    }
-    to {
-      -webkit-mask-position: 86.25% 86.25%;
-      mask-position: 86.25% 86.25%;
-    }
-  }
-  /* once it has passed, the new words rise in (0.4s) */
-  .ev-card[data-role="new"] .ev-words {
-    animation: ev-words 400ms ease-out 780ms backwards;
-  }
-  @keyframes ev-words {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-  }
-  /* the chunri itself: 170 x 26 (cqw), its middle along the arch's diagonal (the arch is 111.84 tall),
-     from beyond one bottom corner to beyond the opposite top corner, fluttering as it flies */
-  .ev-chunri-sky {
-    position: absolute;
-    inset: 0;
-    z-index: 3;
-    overflow: hidden;
+  .ev-card[data-role="old"] .ev-venue-link {
     pointer-events: none;
   }
-  .ev-chunri {
+  @keyframes ev-out-figure {
+    to {
+      opacity: 0;
+      transform: scale(0.97);
+    }
+  }
+  @keyframes ev-out {
+    to {
+      opacity: 0;
+    }
+  }
+  /* … a small gold ornament glimmers where the couple stood (from 0.17s to 0.61s) … */
+  .ev-ornament {
     position: absolute;
-    left: 0;
-    top: 0;
-    width: 170cqw;
-    height: 26cqw;
-    margin: -13cqw 0 0 -85cqw;
-    will-change: transform;
-    animation: ev-fly-ltr 850ms cubic-bezier(0.42, 0, 0.45, 1) both;
-  }
-  .ev-chunri-sky[data-dir="rtl"] .ev-chunri {
-    animation-name: ev-fly-rtl;
-  }
-  @keyframes ev-fly-ltr {
-    from {
-      transform: translate(-22.5cqw, 137.01cqw) rotate(48.2deg);
-    }
-    to {
-      transform: translate(122.5cqw, -25.16cqw) rotate(48.2deg);
-    }
-  }
-  @keyframes ev-fly-rtl {
-    from {
-      transform: translate(122.5cqw, 137.01cqw) rotate(-48.2deg);
-    }
-    to {
-      transform: translate(-22.5cqw, -25.16cqw) rotate(-48.2deg);
-    }
-  }
-  .ev-chunri-svg {
-    display: block;
-    width: 100%;
-    height: 100%;
-    animation: ev-flutter 283ms ease-in-out 3 alternate both;
-  }
-  @keyframes ev-flutter {
-    from {
-      transform: scaleY(0.92) skewX(-3deg);
-    }
-    to {
-      transform: scaleY(1.07) skewX(3deg);
-    }
-  }
-  /* gold sparkles flying off its edge, each fading as it goes */
-  .ev-spark {
-    position: absolute;
-    width: 3.2cqw;
-    height: 3.2cqw;
-    margin: -1.6cqw 0 0 -1.6cqw;
-    background:
-      radial-gradient(circle, rgb(255 246 214) 0 18%, transparent 20%),
-      conic-gradient(from 45deg, transparent 0 10%, rgb(240 210 140) 12% 13%, transparent 15% 35%, rgb(240 210 140) 37% 38%, transparent 40% 60%, rgb(240 210 140) 62% 63%, transparent 65% 85%, rgb(240 210 140) 87% 88%, transparent 90%);
-    -webkit-mask-image: radial-gradient(circle, #000 30%, transparent 72%);
-    mask-image: radial-gradient(circle, #000 30%, transparent 72%);
+    left: 51%;
+    top: 28%;
+    z-index: 1;
+    width: 22cqw;
+    margin: -3.3cqw 0 0 -11cqw;
+    pointer-events: none;
     opacity: 0;
-    animation: ev-spark 600ms ease-out both;
+    animation: ev-ornament 440ms ease-in-out 170ms both;
   }
-  @keyframes ev-spark {
+  @keyframes ev-ornament {
     0% {
       opacity: 0;
-      transform: translate(0, 0) scale(0.4) rotate(0deg);
+      transform: scale(0.9);
     }
-    30% {
-      opacity: 1;
-      transform: translate(calc(var(--dx) * 0.3), calc(var(--dy) * 0.3)) scale(1.1) rotate(25deg);
+    45% {
+      opacity: 0.95;
+      transform: scale(1);
     }
     100% {
       opacity: 0;
-      transform: translate(var(--dx), var(--dy)) scale(0.6) rotate(60deg);
+      transform: scale(1.03);
+    }
+  }
+  /* … and the next comes in: its picture from 96% to 100% (0.45s), its words rising softly just after */
+  .ev-card[data-role="new"] .ev-figure {
+    transform-origin: 50% 70%;
+    animation: ev-in-figure 450ms ease-in-out 280ms both;
+  }
+  .ev-card[data-role="new"] .ev-words {
+    animation: ev-in-words 450ms ease-in-out 330ms both;
+  }
+  @keyframes ev-in-figure {
+    from {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+  }
+  @keyframes ev-in-words {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
     }
   }
 
-  /* under the arch: the ceremonies counted in small dots, and the first-time hint */
+  /* under the arch: ‹ the gold progress marks (the one shown a short bar) ›, then the hint */
   .ev-foot {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
-    margin-top: 10px;
-    min-height: 22px;
+    gap: 6px;
+    margin-top: 8px;
   }
-  .ev-dots {
-    position: relative;
+  .ev-nav {
     display: flex;
-    gap: 8px;
+    align-items: center;
+    gap: 10px;
   }
-  .ev-dot-glow {
-    position: absolute;
-    left: -5px;
-    top: -5px;
+  .ev-arrow {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border: 1px solid rgb(182 154 103 / 0.55);
+    border-radius: 9999px;
+    background: rgb(252 248 239 / 0.75);
+    color: rgb(var(--gold-ink));
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      border-color 250ms ease,
+      background 250ms ease;
+  }
+  .ev-arrow svg {
     width: 16px;
     height: 16px;
-    border-radius: 9999px;
-    background: radial-gradient(circle, rgb(246 214 140 / 0.95), rgb(246 214 140 / 0) 70%);
-    transform: translateX(calc(var(--at, 0) * 14px));
-    transition: transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
-    pointer-events: none;
   }
-  .ev-dot {
+  @media (hover: hover) {
+    .ev-arrow:hover {
+      border-color: rgb(var(--gold-ink) / 0.8);
+      background: rgb(252 248 239);
+    }
+  }
+  .ev-arrow:focus-visible {
+    outline: 2px solid rgb(var(--gold-ink));
+    outline-offset: 2px;
+  }
+  .ev-marks {
+    display: flex;
+  }
+  .ev-mark {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 32px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .ev-mark span {
     width: 6px;
     height: 6px;
     border-radius: 9999px;
-    background: rgb(182 154 103 / 0.35);
+    background: rgb(182 154 103 / 0.4);
     transition:
-      background 400ms ease,
-      transform 400ms ease;
+      width 450ms ease-in-out,
+      background 450ms ease-in-out;
   }
-  .ev-dot[data-on] {
+  .ev-mark[data-on] span {
+    width: 18px;
     background: rgb(var(--gold-ink));
-    transform: scale(1.35);
+  }
+  .ev-mark:focus-visible {
+    outline: 2px solid rgb(var(--gold-ink));
+    outline-offset: -5px;
+    border-radius: 9999px;
   }
   .ev-hint {
     max-width: 22rem;
@@ -697,46 +641,24 @@
     text-transform: uppercase;
     color: #7a561c;
   }
-  .ev-hint[data-pulse] {
-    animation: ev-hint 2.6s ease-in-out infinite;
-  }
-  @keyframes ev-hint {
-    0%,
-    100% {
-      opacity: 0.95;
-    }
-    50% {
-      opacity: 0.5;
-    }
-  }
   .ev-credit {
     font-family: var(--font-body);
     font-size: 10px;
     letter-spacing: 0.04em;
     color: rgb(var(--slate) / 0.6);
   }
+  .ev-credit[data-new] {
+    animation: ev-in-words 450ms ease-in-out 330ms both;
+  }
 
-  /* reduced motion: nothing sways, nothing flows — the card simply crossfades */
-  .events-arch[data-still] .ea-sway {
-    animation: none;
+  /* reduced motion: a short crossfade, nothing scales or rises, no ornament */
+  .events-arch[data-still] .ev-card[data-role="old"] .ev-figure,
+  .events-arch[data-still] .ev-card[data-role="old"] .ev-words {
+    animation: ev-out 180ms linear both;
   }
-  .ev-card[data-still][data-role="old"] {
-    -webkit-mask-image: none;
-    mask-image: none;
-    animation: ev-fade-out 220ms linear both;
-  }
-  .ev-card[data-still][data-role="new"] {
-    -webkit-mask-image: none;
-    mask-image: none;
-    animation: ev-fade-in 320ms linear 160ms both;
-  }
-  .ev-card[data-still][data-role="new"] .ev-words {
-    animation: none;
-  }
-  @keyframes ev-fade-out {
-    to {
-      opacity: 0;
-    }
+  .events-arch[data-still] .ev-card[data-role="new"] .ev-figure,
+  .events-arch[data-still] .ev-card[data-role="new"] .ev-words {
+    animation: ev-fade-in 240ms linear 160ms both;
   }
   @keyframes ev-fade-in {
     from {
@@ -744,11 +666,11 @@
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    .ev-hint {
-      animation: none;
-    }
-    .ev-dot-glow {
+    .ev-mark span {
       transition: none;
+    }
+    .ev-credit[data-new] {
+      animation: ev-fade-in 240ms linear 160ms both;
     }
   }
 
