@@ -2367,67 +2367,147 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* The Save the Date's date, under gold foil to scratch away (ScratchReveal). Revealed, it sits in a
-     fine gold pill and a gleam of gold crosses it once. */
-  .scratch {
+  /* The Save the Date's date, under a small gold seal (SealReveal). The seal and the date share one
+     box, so nothing around them moves. Gold: the hero's own (gold-ink). */
+  .seal-reveal {
     position: relative;
-    display: inline-flex;
+    display: grid;
+    place-items: center;
+    min-height: 62px;
+  }
+  .seal-reveal > * {
+    grid-area: 1 / 1;
+  }
+  .seal-button {
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    min-width: 262px;
-    min-height: 56px;
-    padding: 10px 24px;
-    border-radius: 9999px;
-    overflow: hidden;
-    outline: none;
+    padding: 0 14px;
+    border-radius: 12px;
+    color: rgb(var(--gold-ink));
+    cursor: pointer;
     -webkit-tap-highlight-color: transparent;
+    transition: opacity 260ms ease;
   }
-  .scratch:focus-visible {
-    box-shadow: 0 0 0 2px rgb(var(--gold-ink));
+  .seal-button:focus-visible {
+    outline: 2px solid rgb(var(--gold-ink) / 0.8);
+    outline-offset: 2px;
   }
-  .scratch[data-revealed] {
-    border: 1px solid rgb(184 149 84 / 0.55);
-    background: rgb(var(--ivory) / 0.45);
-    transition: background-color 600ms ease;
+  .seal-mark {
+    width: 30px;
+    height: 30px;
+    transition: transform 160ms ease-out;
   }
-  .scratch-foil {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    cursor: grab;
-    touch-action: none;
-    filter: drop-shadow(0 4px 8px rgb(120 86 30 / 0.25));
+  .seal-ring {
+    stroke: rgb(var(--gold-ink));
+    stroke-width: 1.1;
+    stroke-dasharray: 1 1;
+    stroke-dashoffset: 0;
   }
-  .scratch-foil:active {
-    cursor: grabbing;
+  .seal-ring-fine {
+    stroke: rgb(var(--gold-ink));
+    stroke-width: 0.6;
+    opacity: 0.55;
   }
-  .scratch[data-lifting] .scratch-foil {
-    pointer-events: none;
-    animation: scratch-lift 520ms ease-in both;
+  .seal-lotus path {
+    fill: rgb(233 210 154 / 0.45);
+    stroke: rgb(var(--gold-ink));
+    stroke-width: 0.9;
   }
-  .scratch[data-still][data-lifting] .scratch-foil {
-    animation-duration: 200ms;
+  .seal-title {
+    margin-top: 4px;
+    line-height: 1.25;
+    font-family: var(--font-body);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: rgb(var(--gold-ink));
   }
-  @keyframes scratch-lift {
+  .seal-note {
+    margin-top: 1px;
+    line-height: 1.25;
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-style: italic;
+    color: rgb(var(--slate) / 0.9);
+  }
+  /* shown with the card: the outer ring draws itself once */
+  .seal-reveal:not([data-shown]) .seal-ring {
+    stroke-dashoffset: 1;
+  }
+  .seal-reveal[data-shown] .seal-ring {
+    animation: seal-draw 800ms cubic-bezier(0.45, 0, 0.25, 1) calc(var(--seal-at) + 250ms) both;
+  }
+  @keyframes seal-draw {
+    from {
+      stroke-dashoffset: 1;
+    }
     to {
-      opacity: 0;
-      transform: scale(1.04);
+      stroke-dashoffset: 0;
     }
   }
-  .scratch-gleam {
-    position: absolute;
-    inset: -20% auto -20% 0;
-    width: 30%;
-    pointer-events: none;
-    background: linear-gradient(90deg, rgb(255 236 190 / 0), rgb(255 236 190 / 0.75), rgb(255 236 190 / 0));
-    mix-blend-mode: screen;
-    transform: translateX(-120%) skewX(-14deg);
-    animation: scratch-gleam 1100ms cubic-bezier(0.45, 0, 0.25, 1) 80ms both;
+  /* tapped: pressed in a little; then the seal fades as a soft gold light opens from it */
+  .seal-button:active .seal-mark,
+  .seal-reveal[data-phase="pressing"] .seal-mark {
+    transform: scale(0.9);
   }
-  @keyframes scratch-gleam {
-    to {
-      transform: translateX(380%) skewX(-14deg);
+  .seal-reveal[data-phase="open"] .seal-button {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .seal-light {
+    width: 56px;
+    height: 56px;
+    border-radius: 9999px;
+    background: radial-gradient(closest-side, rgb(246 214 140 / 0.7), rgb(246 214 140 / 0.22) 55%, rgb(246 214 140 / 0));
+    opacity: 0;
+    pointer-events: none;
+  }
+  .seal-reveal[data-phase="open"] .seal-light {
+    animation: seal-light 850ms ease-out both;
+  }
+  @keyframes seal-light {
+    0% {
+      opacity: 0;
+      transform: scale(0.5);
+    }
+    35% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: scale(3.2, 1.5);
+    }
+  }
+  /* the date, rising gently into the same place */
+  .seal-date {
+    visibility: hidden;
+  }
+  .seal-reveal[data-phase="open"] .seal-date {
+    visibility: visible;
+    animation: seal-date 600ms cubic-bezier(0.22, 1, 0.36, 1) 200ms both;
+  }
+  @keyframes seal-date {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+  /* reduced motion: a short crossfade, no light, the ring already drawn */
+  .seal-reveal[data-still] .seal-ring {
+    stroke-dashoffset: 0;
+    animation: none;
+  }
+  .seal-reveal[data-still] .seal-light {
+    display: none;
+  }
+  .seal-reveal[data-still][data-phase="open"] .seal-date {
+    animation: seal-fade 250ms linear both;
+  }
+  @keyframes seal-fade {
+    from {
+      opacity: 0;
     }
   }
 
