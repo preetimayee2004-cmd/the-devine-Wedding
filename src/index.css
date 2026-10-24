@@ -2175,18 +2175,18 @@
     font-size: 15px;
     letter-spacing: 0;
   }
-  /* "Call": deep maroon, warm ivory words, a thin antique-gold edge */
+  /* "Call": deep navy (as the RSVP and Blessing Wall buttons), warm ivory words, a thin antique-gold edge */
   .ct-call,
   .ct-call-round {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     border: 1px solid #b89554;
-    background-color: #702d35;
+    background-color: rgb(var(--navy));
     color: #fff9ef;
     box-shadow:
       inset 0 1px 0 rgb(255 249 239 / 0.14),
-      0 10px 20px -12px rgb(112 45 53 / 0.75);
+      0 10px 20px -12px rgb(18 41 74 / 0.8);
     -webkit-tap-highlight-color: transparent;
     transition:
       background-color 200ms ease,
@@ -2214,13 +2214,13 @@
   @media (hover: hover) {
     .ct-call:hover,
     .ct-call-round:hover {
-      background-color: #7e3640;
+      background-color: #1b3a63;
       border-color: #d0b06f;
     }
   }
   .ct-call:active,
   .ct-call-round:active {
-    background-color: #5d242b;
+    background-color: #0c1d36;
     transform: scale(0.97);
   }
   .ct-call:focus-visible,

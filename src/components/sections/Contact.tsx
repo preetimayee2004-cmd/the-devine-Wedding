@@ -15,9 +15,9 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
  * "Here for You", the heading, one line and a small gold lotus rule. Then the two families, side by
  * side on a wider screen and one above the other on a phone: each under a fine gold temple arch on a
  * soft cream ground (no box) — the side in gold capitals, the person's name in navy serif, their
- * relationship in small gold capitals, and a deep-maroon "Call" in place of the number. Below a gold
+ * relationship in small gold capitals, and a deep-navy "Call" in place of the number. Below a gold
  * rule that draws itself through a lotus, "Wedding Coordination": two compact rows — the role in gold
- * capitals, the name, a round maroon call button — a fine gold line between them.
+ * capitals, the name, a round navy call button — a fine gold line between them.
  *
  * A call button dials its number (a tel: link, labelled with it for screen readers); until a number
  * is given it only says, quietly, that the number is coming (see `contact` in the config). Seen the
