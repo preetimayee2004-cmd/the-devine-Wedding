@@ -203,7 +203,7 @@ function Stop({ point, index, show, reduced }: { point: TravelPoint; index: numb
               <span className="block font-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-gold-ink">{point.label}</span>
               <span className="block font-display text-[18.5px] font-semibold leading-snug text-navy">{point.name}</span>
               <span className="block font-sans text-[12.5px] text-slate">
-                {[point.place, point.distance, point.time].map((x) => x.replaceAll(" ", NBSP)).join(" · ")}
+                {[point.place, point.distance, point.time].map((x) => x.split(" ").join(NBSP)).join(" · ")}
               </span>
             </span>
             <svg aria-hidden viewBox="0 0 24 24" className="fw-chevron" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
