@@ -1355,12 +1355,12 @@
   }
 
   /* ── Section 07: Gallery — the photos as a heart ──
-     Fourteen tiles clipped to the heart curve, a thin cream gap between them, in 900px of
+     Fourteen tiles clipped to the heart curve, the same thin cream gap between all of them, in 900px of
      perspective: each lifted off the heart by its size and drawn back to its place at rest, so a
      tilt shows the depth. Sized to the screen (20px from each edge, up to 440px) and in its own
      width units (cqw), so a real phone and the desktop's phone match. Transform and opacity. */
   .hc-wrap {
-    margin: 22px calc(20px - var(--gutter)) 0;
+    margin: 26px calc(20px - var(--gutter)) 0;
   }
   .hc {
     position: relative;
@@ -1378,25 +1378,26 @@
     aspect-ratio: 1000 / 904;
     transform-style: preserve-3d;
   }
-  /* the heartbeat, once the tiles are home: 1 → 1.03 → 1 and a softer second beat, every 1.6s */
+  /* the heartbeat, once the tiles are home — barely there: a soft double beat (1 → 1.012), then a
+     long rest, every 3.2s */
   .hc[data-phase="done"]:not([data-plain]) .hc-beat {
-    animation: hc-beat 1.6s ease-in-out infinite;
+    animation: hc-beat 3.2s ease-in-out infinite;
   }
-  .hc[data-open] .hc-beat {
+  .hc[data-viewing] .hc-beat {
     animation-play-state: paused;
   }
   @keyframes hc-beat {
     0%,
-    30%,
-    62%,
+    16%,
+    34%,
     100% {
       transform: scale(1);
     }
-    15% {
-      transform: scale(1.03);
+    8% {
+      transform: scale(1.012);
     }
-    44% {
-      transform: scale(1.015);
+    25% {
+      transform: scale(1.006);
     }
   }
   .hc-tilt {
@@ -1405,7 +1406,8 @@
     transform-style: preserve-3d;
     will-change: transform;
   }
-  /* the cream mount behind the tiles: the gaps between them, a thin rim round the heart, its shadow */
+  /* the cream mount behind the tiles: the gaps between them, a rim round the heart as wide as a gap
+     (0.9cqw), and a faint, soft shadow */
   .hc-mount {
     position: absolute;
     inset: 0;
@@ -1413,13 +1415,13 @@
     height: 100%;
     overflow: visible;
     transform: translateZ(-1px);
-    filter: drop-shadow(0 12px 18px rgb(18 41 74 / 0.16));
+    filter: drop-shadow(0 8px 22px rgb(18 41 74 / 0.08));
     transition: opacity 700ms ease-out;
   }
   .hc-mount path {
     fill: rgb(252 248 239);
     stroke: rgb(252 248 239);
-    stroke-width: 1.6;
+    stroke-width: 1.8;
     stroke-linejoin: round;
   }
   /* a tile: lifted by its size (--z) and drawn back to its place (--dx, --dy, --s) */
@@ -1432,12 +1434,9 @@
     pointer-events: none;
     outline: none;
     transform: translate(var(--dx), var(--dy)) translateZ(var(--z)) rotate(0deg) scale(var(--s));
-    filter: drop-shadow(0 1px 2.5px rgb(18 41 74 / 0.22));
+    /* a faint edge all round (not below), so every gap reads the same */
+    filter: drop-shadow(0 0 1.5px rgb(18 41 74 / 0.1));
     will-change: transform;
-    transition:
-      transform 600ms cubic-bezier(0.3, 0.7, 0.2, 1),
-      filter 450ms ease,
-      opacity 450ms ease;
   }
   /* its clip to the heart (only the photo takes taps, not the corners cut away) */
   .hc-clip {
@@ -1446,7 +1445,7 @@
     pointer-events: auto;
     perspective: 600px;
   }
-  /* the photo, inset for the gap, with its back for turning over */
+  /* the photo, inset for the gap (0.45cqw each side: 0.9cqw between two), with its back for turning over */
   .hc-card {
     position: absolute;
     inset: 0.45cqw;
@@ -1471,14 +1470,6 @@
     height: auto;
     pointer-events: none;
     -webkit-user-drag: none;
-  }
-  /* the full photo, over the small one once it has loaded */
-  .hc-big {
-    opacity: 0;
-    transition: opacity 300ms ease;
-  }
-  .hc-big[data-ready] {
-    opacity: 1;
   }
   .hc-tile:focus-visible .hc-card::after {
     content: "";
@@ -1506,54 +1497,9 @@
       opacity: 1;
     }
   }
-  /* tapped: forward to the middle, larger, a deep shadow; the others dim and blur */
-  .hc-tile[data-open] {
-    z-index: 2;
-    cursor: zoom-out;
-    transform: translate(var(--ox), var(--oy)) translateZ(var(--pz)) rotate(0deg) scale(var(--os));
-    filter: drop-shadow(0 8px 12px rgb(18 41 74 / 0.42));
-    transition-duration: 650ms, 450ms, 450ms;
-    transition-timing-function: cubic-bezier(0.25, 1.15, 0.4, 1), ease, ease;
-  }
-  .hc[data-open] .hc-tile:not([data-open]) {
-    opacity: 0.7;
-    filter: drop-shadow(0 1px 2.5px rgb(18 41 74 / 0.22)) blur(3px) brightness(0.86);
-  }
-  /* its caption, under it */
-  .hc-caption {
-    position: absolute;
-    left: 50%;
-    z-index: 3;
-    width: max-content;
-    max-width: 88%;
-    margin: 0;
-    padding: 4px 16px 5px;
-    border-radius: 9999px;
-    background: rgb(252 248 239 / 0.95);
-    box-shadow: 0 6px 16px -8px rgb(18 41 74 / 0.35);
-    font-family: var(--font-display);
-    font-size: 19px;
-    font-style: italic;
-    font-weight: 500;
-    line-height: 1.25;
-    color: rgb(var(--navy));
-    text-align: center;
-    pointer-events: none;
-    opacity: 0;
-    transform: translate(-50%, 6px);
-    transition:
-      opacity 250ms ease,
-      transform 250ms ease;
-  }
-  .hc-caption[data-on] {
-    opacity: 1;
-    transform: translate(-50%, 0);
-    transition-duration: 400ms;
-    transition-delay: 280ms;
-  }
   /* "Tap a photo", until the first tap */
   .hc-hint {
-    margin-top: 14px;
+    margin-top: 12px;
     min-height: 1.4em;
     font-family: var(--font-display);
     font-size: 17px;
@@ -1569,7 +1515,7 @@
   .hc-hint[data-gone] {
     opacity: 0;
   }
-  /* reduced motion, or a slow phone: flat; the tiles fade in where they are; a tap is a simple zoom */
+  /* reduced motion, or a slow phone: flat; the tiles fade in where they are */
   .hc[data-plain] {
     perspective: none;
   }
@@ -1581,12 +1527,131 @@
       opacity: 0;
     }
   }
-  .hc[data-plain] .hc-tile {
-    transition-duration: 220ms;
-    transition-timing-function: ease-out;
+
+  /* the lightbox: the whole photo on a night-blue veil, its caption, ‹ 3 / 9 ›, and × */
+  .hc-lb-stage {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 56px 16px 24px;
+    touch-action: none;
   }
-  .hc[data-plain][data-open] .hc-tile:not([data-open]) {
-    filter: drop-shadow(0 1px 2.5px rgb(18 41 74 / 0.22)) brightness(0.86);
+  .hc-lb-frame {
+    position: relative;
+    width: min(92vw, calc(68dvh * 0.75));
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    border: 1px solid rgb(var(--gold) / 0.45);
+    border-radius: 12px;
+    box-shadow: 0 24px 60px -24px rgb(0 0 0 / 0.55);
+    will-change: transform;
+  }
+  .hc-lb-photo {
+    position: absolute;
+    inset: 0;
+  }
+  /* turned to: it slides in a little from the side the swipe came from */
+  .hc-lb-photo[data-dir="1"] {
+    animation: hc-lb-from-right 320ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+  .hc-lb-photo[data-dir="-1"] {
+    animation: hc-lb-from-left 320ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+  @keyframes hc-lb-from-right {
+    from {
+      opacity: 0;
+      transform: translateX(8%);
+    }
+  }
+  @keyframes hc-lb-from-left {
+    from {
+      opacity: 0;
+      transform: translateX(-8%);
+    }
+  }
+  .hc-lb-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+  /* the full photo, over the small one once it has loaded */
+  .hc-lb-full {
+    opacity: 0;
+    transition: opacity 300ms ease;
+  }
+  .hc-lb-full[data-ready] {
+    opacity: 1;
+  }
+  .hc-lb-caption {
+    min-height: 1.3em;
+    margin-top: 14px;
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-style: italic;
+    color: rgb(var(--ivory) / 0.92);
+    text-align: center;
+    animation: hc-lb-caption 400ms ease-out both;
+  }
+  @keyframes hc-lb-caption {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+  .hc-lb-nav {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    margin-top: 12px;
+  }
+  .hc-lb-btn {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid rgb(var(--gold) / 0.5);
+    border-radius: 9999px;
+    color: rgb(var(--gold));
+    -webkit-tap-highlight-color: transparent;
+  }
+  .hc-lb-btn:focus-visible,
+  .hc-lb-close:focus-visible {
+    outline: 2px solid rgb(var(--gold));
+    outline-offset: 2px;
+  }
+  .hc-lb-count {
+    min-width: 4.5em;
+    font-family: var(--font-body);
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-align: center;
+    color: rgb(var(--ivory) / 0.65);
+  }
+  .hc-lb-close {
+    position: absolute;
+    right: 12px;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 9999px;
+    color: rgb(var(--ivory));
+    -webkit-tap-highlight-color: transparent;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hc-lb-caption,
+    .hc-lb-photo[data-dir] {
+      animation: none;
+    }
   }
 
   /* ── The gate, before the opening (every time the link opens) — as in the couple's design ──

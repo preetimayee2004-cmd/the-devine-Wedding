@@ -1,17 +1,28 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent,
+} from "react";
 import { wedding } from "@/config/wedding";
 import type { Photo } from "@/config/types";
 import { useInView } from "@/hooks/useInView";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
+import { useScrollLock } from "@/hooks/useScrollLock";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 
 /**
  * Section 07 — "Our Gallery": the couple's photos as a heart.
  *
- * Fourteen photos of different sizes, a thin cream gap between them, together make a heart: its
- * outline is the classic heart curve, each tile clipped to it, so the edge is smooth. Seen the
- * first time, the tiles fly in from the edges (turned up to ±15°, 70ms apart, about 1.4s) and
- * settle with a little spring; then the heart beats, softly (1 → 1.03 → 1, every 1.6s).
+ * Fourteen photos of different sizes, the same thin cream gap between all of them (and round the
+ * heart's edge), together make a heart: its outline is the classic heart curve, each tile clipped
+ * to it, so the edge is smooth; a faint, soft shadow under it. Seen the first time, the tiles fly
+ * in from the edges (turned up to ±15°, 70ms apart, about 1.4s) and settle with a little spring;
+ * then the heart beats now and then, barely (a soft double beat, 1 → 1.012, every 3.2s).
  *
  * In 3D: the heart sits in 900px of perspective, each tile lifted off it by its size (the largest
  * 0, the smallest 40px), and it tilts — up to ±8° — with the phone's gyroscope (an iPhone asks
@@ -19,14 +30,15 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
  * mouse on a computer; the small tiles move more than the large. At rest each tile is drawn back
  * to its place, so the gaps stay even.
  *
- * A tap brings a tile forward to the middle (larger, the full photo loaded for it), with a deep
- * shadow and its caption; the others dim and blur. A tap, on it or anywhere else, sends it back;
- * a swipe while it is forward brings the next or the one before. With more photos than the heart
- * shows, every 3s one tile turns over (rotateY 180°) to show one of the others — one at a time,
- * never while a photo is forward or the heart is being tilted.
+ * A tap opens the photo in a lightbox: the whole photo grows out of its tile onto a night-blue
+ * veil, with its caption and ‹ 3 / 9 › — a swipe sideways (or the arrows, or the arrow keys) for
+ * the next or the one before, through all the photos once each; a swipe down, ×, a tap on the
+ * veil or Escape closes it back into a tile. With more photos than the heart shows, every 3s one
+ * tile turns over (rotateY 180°) to show one of the others — one at a time, never while the
+ * lightbox is open or the heart is being tilted.
  *
- * Transform and opacity (and filters for the shadows and the blur). Reduced motion, or a slow
- * phone: no tilt, turning or beat; the tiles fade in where they are; a tap is a simple zoom.
+ * Transform and opacity (and a filter for the shadows). Reduced motion, or a slow phone: no tilt,
+ * turning or beat; the tiles fade in where they are; the lightbox simply fades.
  */
 
 type Shown = Photo & { src: string };
@@ -38,10 +50,9 @@ type Card = { faces: [Shot, Shot | null]; turns: number };
 
 /** The heart's height to its width. */
 const RATIO = 0.904;
-/** The perspective, the smallest tile's lift, and how far forward a tapped photo comes (px). */
+/** The perspective, and the smallest tile's lift (px). */
 const PERSPECTIVE = 900;
 const LIFT = 40;
-const FORWARD = 120;
 /** The tilt at most (degrees). */
 const TILT = 8;
 /** The fly-in: each tile this long after the one before (ms); one tile's flight. */
@@ -129,18 +140,15 @@ type Geometry = (typeof GEOMETRY)[number];
 const SIZES = GEOMETRY.map((g) => g.size);
 const [SMALLEST, LARGEST] = [Math.min(...SIZES), Math.max(...SIZES)];
 const pct = (v: number) => `${(v * 100).toFixed(3)}%`;
-/** How large a tile shows when tapped (times its size): about 86% of the heart's width or height. */
-const view = (g: Geometry) => Math.min(0.86 / g.w, 0.86 / g.h, 3.2);
 
 /**
- * A tile's place, depth and forward pose, as CSS variables. Its lift (`--z`) would carry it out
- * from the middle and enlarge it in the perspective, so at rest it is drawn back (`--dx`, `--dy`)
- * and scaled down (`--s`) to sit exactly in its place; tilted, the lift shows as parallax.
+ * A tile's place and depth, as CSS variables. Its lift (`--z`) would carry it out from the middle
+ * and enlarge it in the perspective, so at rest it is drawn back (`--dx`, `--dy`) and scaled down
+ * (`--s`) to sit exactly in its place; tilted, the lift shows as parallax.
  */
 function tileStyle(g: Geometry, flat: boolean): CSSProperties {
   const z = flat ? 0 : LIFT * (1 - (g.size - SMALLEST) / (LARGEST - SMALLEST));
   const k = z / PERSPECTIVE;
-  const v = view(g);
   return {
     left: pct(g.x0),
     top: pct(g.y0),
@@ -150,10 +158,6 @@ function tileStyle(g: Geometry, flat: boolean): CSSProperties {
     "--dy": pct(-((g.cy - 0.5) / g.h) * k),
     "--z": `${z.toFixed(1)}px`,
     "--s": (1 - k).toFixed(4),
-    "--ox": pct((0.5 - g.cx) / g.w),
-    "--oy": pct((0.5 - g.cy) / g.h),
-    "--pz": flat ? "0px" : `${FORWARD}px`,
-    "--os": (flat ? v : v * (1 - FORWARD / PERSPECTIVE)).toFixed(4),
   } as CSSProperties;
 }
 
@@ -195,12 +199,9 @@ export function Gallery() {
   const [slow] = useState(slowDevice);
   const plain = reduced || slow;
   const [phase, setPhase] = useState<"before" | "in" | "done">("before");
-  // the tile brought forward, and the one going back (unclipped until it is home)
-  const [open, setOpen] = useState<number | null>(null);
-  const [settling, setSettling] = useState<number | null>(null);
   const [tapped, setTapped] = useState(false);
-  // the full photos loaded in, by "tile:photo"
-  const [big, setBig] = useState<ReadonlySet<string>>(() => new Set());
+  // the lightbox: the photo shown (its place in the list), the tile it opened from, and where that was
+  const [viewing, setViewing] = useState<{ photo: number; tile: number; from: DOMRect } | null>(null);
   // an iPhone's gyroscope, once allowed
   const [motion, setMotion] = useState(false);
   const [cards, setCards] = useState<Card[]>(() =>
@@ -209,19 +210,17 @@ export function Gallery() {
       return { faces: [k >= 0 ? { photo: k, crop: t.crop } : { photo: i % Math.max(n, 1) }, null], turns: 0 };
     }),
   );
-  const openRef = useRef(open);
-  openRef.current = open;
   const cardsRef = useRef(cards);
   cardsRef.current = cards;
+  const viewingRef = useRef(viewing);
+  viewingRef.current = viewing;
   const visible = useRef(false);
   const drag = useRef<{ x: number; y: number; moved: boolean } | null>(null);
-  // when a swipe or a drag ended: the click that follows it is not a tap
-  const swallowed = useRef(0);
+  // when a drag ended: the click that follows it is not a tap
+  const dragged = useRef(0);
   const asked = useRef(false);
   const gyro = useRef(0);
   const lastFlip = useRef(-1);
-  const lastOpen = useRef(0);
-  if (open != null) lastOpen.current = open;
 
   // the fly-in: each tile from a random edge, turned up to ±15°, in a random order
   const [fly] = useState(() => {
@@ -262,12 +261,13 @@ export function Gallery() {
     window.setTimeout(() => setPhase("done"), plain ? 13 * 35 + 450 : 13 * STAGGER + FLIGHT + 60);
   }, [heartSeen, plain]);
 
-  // the tilt: eased toward its aim each frame, written straight to the tilting layer
+  // the tilt: eased toward its aim each frame, written straight to the tilting layer (level while
+  // the lightbox is open)
   const tilt = useRef({ x: 0, y: 0, tx: 0, ty: 0, raf: 0, moved: 0 });
   const aim = useCallback((x: number, y: number) => {
     const t = tilt.current;
     const clamp = (v: number) => Math.max(-TILT, Math.min(TILT, v));
-    const [tx, ty] = openRef.current == null ? [clamp(x), clamp(y)] : [0, 0];
+    const [tx, ty] = viewingRef.current == null ? [clamp(x), clamp(y)] : [0, 0];
     if (Math.abs(tx - t.tx) + Math.abs(ty - t.ty) > 0.4) t.moved = Date.now();
     [t.tx, t.ty] = [tx, ty];
     if (t.raf) return;
@@ -284,20 +284,11 @@ export function Gallery() {
   }, []);
   useEffect(() => () => cancelAnimationFrame(tilt.current.raf), []);
 
-  // on screen? (for the gyroscope and the turning); scrolled away, a photo forward goes back
+  // on screen? (for the gyroscope and the turning)
   useEffect(() => {
     const el = heartRef.current;
     if (!el || !("IntersectionObserver" in window)) return;
-    const io = new IntersectionObserver(
-      ([e]) => {
-        visible.current = e.isIntersecting;
-        if (!e.isIntersecting && openRef.current != null) {
-          openRef.current = null;
-          setOpen(null);
-        }
-      },
-      { threshold: 0.3 },
-    );
+    const io = new IntersectionObserver(([e]) => (visible.current = e.isIntersecting), { threshold: 0.3 });
     io.observe(el);
     return () => io.disconnect();
   }, []);
@@ -328,82 +319,18 @@ export function Gallery() {
       .catch(() => undefined);
   };
 
-  const loadBig = (i: number) => {
-    const key = `${i}:${face(cardsRef.current[i]).photo}`;
-    setBig((b) => (b.has(key) ? b : new Set(b).add(key)));
-  };
-  const settle = (was: number) => {
-    setSettling(was);
-    window.setTimeout(() => setSettling((s) => (s === was ? null : s)), plain ? 260 : 650);
-  };
-  const show = (i: number) => {
-    openRef.current = i;
-    setOpen(i);
-    setTapped(true);
-    aim(0, 0);
-    loadBig(i);
-    // the neighbours' full photos, ready for a swipe
-    for (const j of [i + 1, i + TILES.length - 1]) void ready(photos[face(cardsRef.current[j % TILES.length]).photo].src);
-  };
-  const close = useCallback(() => {
-    const was = openRef.current;
-    if (was == null) return;
-    openRef.current = null;
-    setOpen(null);
-    settle(was);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [plain]);
-  const step = useCallback(
-    (dir: 1 | -1) => {
-      const was = openRef.current;
-      if (was == null) return;
-      const to = (was + dir + TILES.length) % TILES.length;
-      openRef.current = to;
-      setOpen(to);
-      settle(was);
-      loadBig(to);
-      tileRefs.current[to]?.focus({ preventScroll: true });
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [plain],
-  );
-
-  // while a photo is forward: a tap anywhere else sends it back (and does nothing more); keys too
-  useEffect(() => {
-    if (open == null) return;
-    const onClick = (e: MouseEvent) => {
-      if (tileRefs.current[open]?.contains(e.target as Node)) return;
-      e.stopPropagation();
-      e.preventDefault();
-      if (Date.now() - swallowed.current > 450) close();
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") close();
-      else if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
-        e.preventDefault();
-        step(e.key === "ArrowRight" ? 1 : -1);
-      }
-    };
-    document.addEventListener("click", onClick, true);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("click", onClick, true);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [open, close, step]);
-
-  // every 3s, one tile turns over to show a photo not shown — not while one is forward or tilting
+  // every 3s, one tile turns over to show a photo not shown — not while the lightbox is open or tilting
   const flip = useCallback(async () => {
     const cs = cardsRef.current;
     const showing = new Set(cs.map((c) => face(c).photo));
     const pool = photos.map((_, k) => k).filter((k) => !showing.has(k));
-    const tiles = cs.map((_, i) => i).filter((i) => i !== openRef.current && i !== lastFlip.current);
+    const tiles = cs.map((_, i) => i).filter((i) => i !== lastFlip.current);
     if (!pool.length || !tiles.length) return;
     const i = tiles[Math.floor(Math.random() * tiles.length)];
     const p = pool[Math.floor(Math.random() * pool.length)];
     lastFlip.current = i;
     await ready(photos[p].thumb ?? photos[p].src);
-    if (openRef.current === i) return;
+    if (viewingRef.current) return;
     // the hidden face takes the photo, then (a frame on) the tile turns to it
     setCards((cur) =>
       cur.map((c, k) => (k !== i ? c : { ...c, faces: c.turns % 2 ? [{ photo: p }, c.faces[1]] : [c.faces[0], { photo: p }] })),
@@ -415,15 +342,14 @@ export function Gallery() {
   useEffect(() => {
     if (plain || phase !== "done" || !flippable) return;
     const id = window.setInterval(() => {
-      if (!visible.current || document.hidden || openRef.current != null || drag.current) return;
+      if (!visible.current || document.hidden || viewingRef.current || drag.current) return;
       if (Date.now() - tilt.current.moved < 1500) return;
       void flip();
     }, FLIP_MS);
     return () => clearInterval(id);
   }, [plain, phase, flippable, flip]);
 
-  // the pointer: the mouse tilts the heart toward it; a drag turns it (without a gyroscope);
-  // while a photo is forward, a swipe brings the next or the one before
+  // the pointer: the mouse tilts the heart toward it; a drag turns it (without a gyroscope)
   const onPointerDown = (e: PointerEvent) => {
     if (e.pointerType === "mouse" && e.button !== 0) return;
     drag.current = { x: e.clientX, y: e.clientY, moved: false };
@@ -431,7 +357,7 @@ export function Gallery() {
   const onPointerMove = (e: PointerEvent) => {
     const d = drag.current;
     if (d && (Math.abs(e.clientX - d.x) > 8 || Math.abs(e.clientY - d.y) > 8)) d.moved = true;
-    if (plain || phase !== "done" || openRef.current != null) return;
+    if (plain || phase !== "done" || viewingRef.current) return;
     if (e.pointerType === "mouse") {
       const r = heartRef.current!.getBoundingClientRect();
       aim(((e.clientY - r.top) / r.height - 0.5) * 2 * TILT, -((e.clientX - r.left) / r.width - 0.5) * 2 * TILT);
@@ -441,29 +367,37 @@ export function Gallery() {
     const d = drag.current;
     drag.current = null;
     if (!d) return;
-    const [dx, dy] = [e.clientX - d.x, e.clientY - d.y];
     if (e.pointerType !== "mouse" && Date.now() - gyro.current > 1000) aim(0, 0);
-    if (openRef.current != null && Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.2) {
-      swallowed.current = Date.now();
-      step(dx < 0 ? 1 : -1);
-    } else if (d.moved) swallowed.current = Date.now();
+    if (d.moved) dragged.current = Date.now();
   };
   const onPointerCancel = (e: PointerEvent) => {
     drag.current = null;
     if (e.pointerType !== "mouse" && Date.now() - gyro.current > 1000) aim(0, 0);
   };
+
+  /** A tile's photo, where it is on screen now. */
+  const tileRect = (i: number) => tileRefs.current[i]?.querySelector(".hc-side")?.getBoundingClientRect() ?? null;
+  // a tap: the lightbox, growing out of the tile
   const onTile = (i: number) => {
-    if (Date.now() - swallowed.current < 450) return;
+    if (Date.now() - dragged.current < 450) return;
     askMotion();
-    if (phase !== "done") return;
-    if (openRef.current === i) close();
-    else if (openRef.current == null) show(i);
+    if (phase !== "done" || viewingRef.current) return;
+    const from = tileRect(i);
+    if (!from) return;
+    setTapped(true);
+    viewingRef.current = { photo: face(cardsRef.current[i]).photo, tile: i, from };
+    aim(0, 0);
+    setViewing(viewingRef.current);
+  };
+  // closing: back into the tile it opened from, if it shows this photo, else the first that does
+  const closeOnto = (photo: number) => {
+    const v = viewingRef.current;
+    const order = v ? [v.tile, ...TILES.map((_, i) => i)] : TILES.map((_, i) => i);
+    const i = order.find((k) => face(cardsRef.current[k]).photo === photo);
+    return i == null ? null : tileRect(i);
   };
 
   if (!n) return null;
-  const capTile = open ?? lastOpen.current;
-  const capPhoto = photos[face(cards[capTile]).photo];
-  const capG = GEOMETRY[capTile];
 
   return (
     <section id="gallery" ref={sectionRef} aria-labelledby="gallery-heading" className="relative overflow-x-clip px-[var(--gutter)] pb-4 pt-[var(--section-gap)]">
@@ -475,9 +409,9 @@ export function Gallery() {
           className="hc"
           data-phase={phase}
           data-plain={plain || undefined}
-          data-open={open != null || undefined}
+          data-viewing={viewing ? "" : undefined}
           role="group"
-          aria-label={`${gallery.title}: ${TILES.length} photos in a heart. Tap one to see it larger; the arrow keys bring the next.`}
+          aria-label={`${gallery.title}: ${TILES.length} photos in a heart. Tap one to see it larger.`}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
@@ -486,7 +420,7 @@ export function Gallery() {
         >
           <div className="hc-beat">
             <div ref={tiltRef} className="hc-tilt">
-              {/* the cream mount: the gaps between the tiles, and a thin rim round the heart */}
+              {/* the cream mount: the gaps between the tiles, and a rim round the heart as thin as they are */}
               <svg className="hc-mount" viewBox="0 0 100 90.4" preserveAspectRatio="none" aria-hidden>
                 <path d={HEART_PATH} />
               </svg>
@@ -501,33 +435,27 @@ export function Gallery() {
                     type="button"
                     className="hc-tile"
                     style={{ ...styles[i], ...fly[i] }}
-                    data-open={open === i || undefined}
-                    aria-label={p.caption ? `${p.caption}: ${p.alt}` : p.alt}
-                    aria-pressed={open === i}
+                    aria-label={`Open the photo: ${p.caption ?? p.alt}`}
                     onClick={() => onTile(i)}
                   >
-                    <span className="hc-clip" style={{ clipPath: open === i || settling === i ? undefined : g.clip }}>
+                    <span className="hc-clip" style={{ clipPath: g.clip }}>
                       <span className="hc-card" style={card.turns ? { transform: `rotateY(${card.turns * 180}deg)` } : undefined}>
                         {card.faces.map((shot, f) => {
                           if (!shot) return null;
                           const ph = photos[shot.photo];
-                          const at = shotStyle(g, shot, ph);
                           return (
                             <span key={f} className="hc-side" data-back={f === 1 || undefined}>
-                              <img className="hc-img" src={ph.thumb ?? ph.src} alt="" width={484} height={648} loading="lazy" decoding="async" draggable={false} style={at} />
-                              {big.has(`${i}:${shot.photo}`) && (
-                                <img
-                                  className="hc-img hc-big"
-                                  src={ph.src}
-                                  alt=""
-                                  width={484}
-                                  height={648}
-                                  decoding="async"
-                                  draggable={false}
-                                  style={at}
-                                  onLoad={(e) => (e.currentTarget.dataset.ready = "")}
-                                />
-                              )}
+                              <img
+                                className="hc-img"
+                                src={ph.thumb ?? ph.src}
+                                alt=""
+                                width={484}
+                                height={648}
+                                loading="lazy"
+                                decoding="async"
+                                draggable={false}
+                                style={shotStyle(g, shot, ph)}
+                              />
                             </span>
                           );
                         })}
@@ -538,20 +466,260 @@ export function Gallery() {
               })}
             </div>
           </div>
-          {/* the caption, under the photo brought forward */}
-          <p
-            className="hc-caption"
-            data-on={open != null || undefined}
-            aria-live="polite"
-            style={{ top: `calc(50% + ${(view(capG) * capG.h * 50).toFixed(2)}% + 12px)` }}
-          >
-            {capPhoto.caption ?? capPhoto.alt}
-          </p>
         </div>
         <p className="hc-hint" data-shown={phase === "done" || undefined} data-gone={tapped || undefined} aria-hidden>
           {gallery.hint}
         </p>
       </div>
+
+      {viewing && (
+        <Lightbox
+          photos={photos}
+          index={viewing.photo}
+          from={viewing.from}
+          reduced={plain}
+          onStep={(d) => setViewing((v) => v && { ...v, photo: (v.photo + d + n) % n })}
+          target={closeOnto}
+          onClosed={() => setViewing(null)}
+        />
+      )}
     </section>
+  );
+}
+
+/**
+ * The lightbox, on a night-blue veil: the whole photo grows out of its tile, with its caption and
+ * ‹ 3 / 9 ›. A swipe sideways (the arrows, the arrow keys) turns to the next or the one before;
+ * a swipe down — or ×, a tap on the veil, Escape — closes it back into a tile showing it. Focus
+ * returns to the tile, and the page keeps its place.
+ */
+function Lightbox({
+  photos,
+  index,
+  from,
+  reduced,
+  onStep,
+  target,
+  onClosed,
+}: {
+  photos: Shown[];
+  index: number;
+  from: DOMRect;
+  reduced: boolean;
+  onStep: (dir: 1 | -1) => void;
+  target: (photo: number) => DOMRect | null;
+  onClosed: () => void;
+}) {
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const frameRef = useRef<HTMLDivElement>(null);
+  const veilRef = useRef<HTMLDivElement>(null);
+  const [dir, setDir] = useState<1 | -1 | 0>(0);
+  const closing = useRef(false);
+  const touch = useRef<{ x: number; y: number; dy: number; mode: "" | "x" | "y" } | null>(null);
+  // when a swipe ended: the click that follows it does not close
+  const swiped = useRef(0);
+  useScrollLock(true);
+  const photo = photos[index];
+  const n = photos.length;
+
+  /** The transform that lays the photo over a tile: centred on it, as large as the tile shows it. */
+  const onto = (rect: DOMRect | null) => {
+    const el = frameRef.current;
+    if (!el || !rect) return "scale(0.92)";
+    // measured where it rests, without whatever drag or flight it is in
+    const [t, tr] = [el.style.transform, el.style.transition];
+    el.style.transition = "none";
+    el.style.transform = "none";
+    const to = el.getBoundingClientRect();
+    el.style.transform = t;
+    void el.offsetWidth;
+    el.style.transition = tr;
+    const s = Math.max(rect.width / to.width, rect.height / to.height);
+    const x = rect.left + rect.width / 2 - (to.left + to.width / 2);
+    const y = rect.top + rect.height / 2 - (to.top + to.height / 2);
+    return `translate(${x}px, ${y}px) scale(${s})`;
+  };
+
+  // open: show the dialog, start the photo over its tile, then let it grow to full size
+  useLayoutEffect(() => {
+    const dialog = dialogRef.current;
+    const el = frameRef.current;
+    const veil = veilRef.current;
+    if (!dialog || !el || !veil) return;
+    if (!dialog.open) dialog.showModal();
+    el.style.transition = veil.style.transition = "none";
+    el.style.opacity = veil.style.opacity = "0";
+    if (!reduced) el.style.transform = onto(from);
+    void el.offsetWidth;
+    requestAnimationFrame(() => {
+      el.style.transition = reduced ? "opacity 250ms linear" : "transform 480ms cubic-bezier(0.22, 1, 0.36, 1), opacity 260ms ease-out";
+      el.style.transform = "none";
+      el.style.opacity = "1";
+      veil.style.transition = reduced ? "opacity 250ms linear" : "opacity 360ms ease-out";
+      veil.style.opacity = "1";
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // the next and the one before, loaded ahead
+  useEffect(() => {
+    if (n > 1) for (const k of [index + 1, index + n - 1]) void ready(photos[k % n].src);
+  }, [index, n, photos]);
+
+  const close = useCallback(() => {
+    if (closing.current) return;
+    closing.current = true;
+    const el = frameRef.current;
+    const veil = veilRef.current;
+    const dialog = dialogRef.current;
+    const done = () => {
+      const y = window.scrollY;
+      dialog?.close();
+      if (window.scrollY !== y) window.scrollTo({ top: y, behavior: "instant" });
+      onClosed();
+    };
+    if (!el || !veil) return done();
+    if (reduced) {
+      el.style.transition = veil.style.transition = "opacity 220ms linear";
+    } else {
+      el.style.transition = "transform 400ms cubic-bezier(0.4, 0, 0.2, 1), opacity 260ms ease 140ms";
+      el.style.transform = onto(target(index));
+      veil.style.transition = "opacity 360ms ease";
+    }
+    el.style.opacity = veil.style.opacity = "0";
+    window.setTimeout(done, reduced ? 230 : 410);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduced, onClosed, index]);
+
+  const step = useCallback(
+    (d: 1 | -1) => {
+      if (n < 2 || closing.current) return;
+      setDir(d);
+      onStep(d);
+    },
+    [onStep, n],
+  );
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowRight") step(1);
+      if (e.key === "ArrowLeft") step(-1);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [step]);
+
+  // a swipe here moves only the photo: no scroll and no fling (a tap during a fling only stops it,
+  // so the ‹ › tapped just after a swipe would do nothing)
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    const hold = (e: TouchEvent) => e.preventDefault();
+    dialog.addEventListener("touchmove", hold, { passive: false });
+    return () => dialog.removeEventListener("touchmove", hold);
+  }, []);
+
+  // swipe sideways for the next, down to close (the photo follows the finger down, the veil thins)
+  const down = (e: PointerEvent) => (touch.current = { x: e.clientX, y: e.clientY, dy: 0, mode: "" });
+  const move = (e: PointerEvent) => {
+    const t = touch.current;
+    const el = frameRef.current;
+    const veil = veilRef.current;
+    if (!t || !el || !veil || closing.current) return;
+    const dx = e.clientX - t.x;
+    const dy = e.clientY - t.y;
+    if (!t.mode) {
+      if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+      t.mode = Math.abs(dy) > Math.abs(dx) && dy > 0 ? "y" : "x";
+    }
+    if (t.mode === "y") t.dy = Math.max(0, dy);
+    if (t.mode === "y" && !reduced) {
+      el.style.transition = "none";
+      el.style.transform = `translateY(${t.dy}px) scale(${1 - Math.min(0.12, t.dy / 1600)})`;
+      veil.style.transition = "none";
+      veil.style.opacity = String(Math.max(0.3, 1 - t.dy / 420));
+    }
+  };
+  const up = (e: PointerEvent) => {
+    const t = touch.current;
+    touch.current = null;
+    if (!t || !t.mode) return;
+    swiped.current = Date.now();
+    const dx = e.clientX - t.x;
+    if (t.mode === "y") {
+      if (t.dy > 90) close();
+      else if (!closing.current) {
+        const el = frameRef.current!;
+        const veil = veilRef.current!;
+        el.style.transition = "transform 260ms ease-out";
+        el.style.transform = "none";
+        veil.style.transition = "opacity 260ms ease-out";
+        veil.style.opacity = "1";
+      }
+    } else if (Math.abs(dx) > 40) step(dx < 0 ? 1 : -1);
+  };
+
+  return (
+    <dialog
+      ref={dialogRef}
+      aria-label={`Photo ${index + 1} of ${n}`}
+      onCancel={(e) => {
+        e.preventDefault();
+        close();
+      }}
+      className="hc-lb fixed inset-0 m-0 h-[100dvh] max-h-none w-screen max-w-none overflow-hidden bg-transparent p-0 backdrop:bg-transparent"
+    >
+      <div ref={veilRef} aria-hidden className="absolute inset-0 bg-navy-deep/[0.96]" />
+      {/* a tap on the veil (not the photo or its controls) closes */}
+      <figure
+        className="hc-lb-stage"
+        onPointerDown={down}
+        onPointerMove={move}
+        onPointerUp={up}
+        onPointerCancel={() => (touch.current = null)}
+        onClick={(e) => e.target === e.currentTarget && Date.now() - swiped.current > 450 && close()}
+      >
+        <div ref={frameRef} className="hc-lb-frame">
+          {/* turned to, the photo slides in from the side the swipe came from */}
+          <div key={index} className="hc-lb-photo" data-dir={dir !== 0 && !reduced ? dir : undefined}>
+            <img src={photo.thumb ?? photo.src} alt="" aria-hidden width={484} height={648} draggable={false} className="hc-lb-img" />
+            <img
+              src={photo.src}
+              alt={photo.alt}
+              width={484}
+              height={648}
+              draggable={false}
+              className="hc-lb-img hc-lb-full"
+              onLoad={(e) => (e.currentTarget.dataset.ready = "")}
+            />
+          </div>
+        </div>
+        <figcaption key={`c${index}`} className="hc-lb-caption">
+          {photo.caption}
+        </figcaption>
+        {n > 1 && (
+          <div className="hc-lb-nav">
+            <button type="button" onClick={() => step(-1)} aria-label="Previous photo" className="hc-lb-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M14.5 5.5L8 12l6.5 6.5" />
+              </svg>
+            </button>
+            <span aria-live="polite" className="hc-lb-count">
+              {index + 1} / {n}
+            </span>
+            <button type="button" onClick={() => step(1)} aria-label="Next photo" className="hc-lb-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M9.5 5.5L16 12l-6.5 6.5" />
+              </svg>
+            </button>
+          </div>
+        )}
+      </figure>
+      <button type="button" onClick={close} aria-label="Close" className="hc-lb-close" style={{ top: "calc(var(--status-bar, 0px) + 14px)" }}>
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden>
+          <path d="M4.5 4.5l9 9M13.5 4.5l-9 9" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+        </svg>
+      </button>
+    </dialog>
   );
 }
