@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { wedding } from "@/config/wedding";
+import { usePersonal } from "@/context/GuestContext";
 import { useCountdown } from "@/hooks/useCountdown";
 import { useInView } from "@/hooks/useInView";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
@@ -26,6 +27,7 @@ export function Countdown() {
   const seen = useInView(ref, { threshold: 0.2 });
   const reduced = usePrefersReducedMotion();
   const hindi = useLang() === "hi";
+  const personal = usePersonal();
   const at = (ms: number) => (reduced ? 0 : ms);
   const { countdown: copy, assets } = wedding;
   const t = hindi ? { ...copy, ...copy.hindi } : copy;
@@ -143,7 +145,7 @@ export function Countdown() {
             as="p"
             className={`text-balance text-[22px] font-medium leading-snug text-slate ${hindi ? "font-deva" : "font-display italic"}`}
           >
-            {message.line}
+            {personal(message.lineFor, message.line)}
           </Reveal>
         ) : (
           state.phase === "counting" && (

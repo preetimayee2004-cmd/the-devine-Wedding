@@ -1,5 +1,6 @@
 import { useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { wedding } from "@/config/wedding";
+import { usePersonal } from "@/context/GuestContext";
 import type { TravelPoint } from "@/config/types";
 import { useInView } from "@/hooks/useInView";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
@@ -30,6 +31,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
  */
 export function Venue() {
   const { venue, travel } = wedding;
+  const personal = usePersonal();
   const sectionRef = useRef<HTMLElement>(null);
   const travelRef = useRef<HTMLDivElement>(null);
   const seen = useInView(sectionRef, { threshold: 0.06 });
@@ -110,7 +112,7 @@ export function Venue() {
           <Reveal show={travelSeen} delay={t(1200)} className="mt-5 flex justify-center">
             <p className="fw-tip">
               <Icon name="chat" className="h-4 w-4 shrink-0 text-gold-ink" strokeWidth={1.5} />
-              {travel.pickupTip}
+              {personal(travel.pickupTipFor, travel.pickupTip)}
             </p>
           </Reveal>
         </div>

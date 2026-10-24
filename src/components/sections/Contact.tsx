@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { wedding } from "@/config/wedding";
+import { usePersonal } from "@/context/GuestContext";
 import type { Coordinator, FamilyContact } from "@/config/types";
 import { useInView } from "@/hooks/useInView";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
@@ -26,6 +27,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
  */
 export function Contact() {
   const { contact } = wedding;
+  const personal = usePersonal();
   const ref = useRef<HTMLElement>(null);
   const seen = useInView(ref, { threshold: 0.12 });
   const reduced = usePrefersReducedMotion();
@@ -40,7 +42,7 @@ export function Contact() {
       data-shown={seen || undefined}
       data-still={reduced || undefined}
     >
-      <SectionHeading id="contact-heading" eyebrow={contact.eyebrow} title={contact.title} intro={contact.intro} show={seen} />
+      <SectionHeading id="contact-heading" eyebrow={contact.eyebrow} title={contact.title} intro={personal(contact.introFor, contact.intro)} show={seen} />
       <Reveal show={seen} delay={t(380)} className="mt-3 flex justify-center">
         <LotusRule />
       </Reveal>

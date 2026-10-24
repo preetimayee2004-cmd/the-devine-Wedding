@@ -8,6 +8,8 @@ interface OpeningGateProps {
   sky: string;
   /** "You're invited", over the seal. */
   invited: string;
+  /** The guest's name, above it — only when the link names them. */
+  guest?: string;
   /** "Tap to open", in the card's language. */
   label: string;
   /** The words are in Hindi (set in Devanagari, without letter-spacing, which would break its joins). */
@@ -52,14 +54,14 @@ const DUST = [
  * once in 40s, a warm glow behind it; and under it a hand in a gold circle,
  * gently pulsing, "Tap to open" and another lotus line. Gold dust rises.
  * Tilting the phone moves a soft shine across the seal (where the browser
- * allows it without asking). No names or date here.
+ * allows it without asking). No names or date here — only, when the link names a guest, theirs.
  *
  * A tap: a tiny buzz (and a temple ghanti, if the guest turned the sound on in
  * the corner), and the gate simply fades away as the opening's hands begin
  * beneath it. Skip goes straight to the card. Only transform and opacity move;
  * reduced motion gets a plain fade.
  */
-export function OpeningGate({ seal, sky, invited, label, devanagari = false, reduced, onBegin, onSkip, onGone }: OpeningGateProps) {
+export function OpeningGate({ seal, sky, invited, guest, label, devanagari = false, reduced, onBegin, onSkip, onGone }: OpeningGateProps) {
   const [phase, setPhase] = useState<"waiting" | "leaving">("waiting");
   const [sound, setSound] = useState(false);
   const timers = useRef<number[]>([]);
@@ -137,7 +139,7 @@ export function OpeningGate({ seal, sky, invited, label, devanagari = false, red
       ref={root}
       role="button"
       tabIndex={0}
-      aria-label={`${invited}. ${label}`}
+      aria-label={`${guest ? `${guest}, ` : ""}${invited}. ${label}`}
       onClick={begin}
       onKeyDown={onKey}
       className="gate fixed inset-0 z-[60] flex cursor-pointer select-none flex-col items-center justify-center overflow-hidden outline-none"
@@ -164,7 +166,12 @@ export function OpeningGate({ seal, sky, invited, label, devanagari = false, red
         </div>
       )}
 
-      {/* ── the invitation ── */}
+      {/* ── the invitation: for a named guest, their name first ── */}
+      {guest && (
+        <p className="gate-words gate-gold relative mb-2 max-w-[18rem] text-balance text-center font-display text-[26px] font-semibold italic leading-tight">
+          {guest}
+        </p>
+      )}
       <p
         className={`gate-words gate-gold relative ${devanagari ? "font-deva text-[17px]" : `${words} text-[15px] tracking-[0.32em]`}`}
        

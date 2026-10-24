@@ -1,5 +1,6 @@
 import { Fragment, useRef, type CSSProperties } from "react";
 import { wedding } from "@/config/wedding";
+import { usePersonal } from "@/context/GuestContext";
 import type { FamilySide } from "@/config/types";
 import { useInView } from "@/hooks/useInView";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
@@ -23,6 +24,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
  */
 export function Family() {
   const { family } = wedding;
+  const personal = usePersonal();
   const sectionRef = useRef<HTMLElement>(null);
   const pairRef = useRef<HTMLDivElement>(null);
   const seen = useInView(sectionRef, { threshold: 0.1 });
@@ -40,7 +42,7 @@ export function Family() {
       <TempleBells />
       <TempleSilhouette className="fam-temple" />
 
-      <SectionHeading id="family-heading" eyebrow={family.eyebrow} title={family.title} intro={family.intro} show={seen} />
+      <SectionHeading id="family-heading" eyebrow={family.eyebrow} title={family.title} intro={personal(family.introFor, family.intro)} show={seen} />
       <Reveal show={seen} delay={reduced ? 0 : 380} className="mt-3 flex justify-center">
         <LotusRule />
       </Reveal>

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 import { wedding } from "@/config/wedding";
+import { usePersonal } from "@/context/GuestContext";
 import type { Ceremony } from "@/config/types";
 import { useInView } from "@/hooks/useInView";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
@@ -37,6 +38,7 @@ function mapsHref(venue: string) {
 
 export function Events() {
   const { events, assets } = wedding;
+  const personal = usePersonal();
   const list = events.list;
   const n = list.length;
   const sectionRef = useRef<HTMLElement>(null);
@@ -106,7 +108,7 @@ export function Events() {
 
   return (
     <section id="events" ref={sectionRef} aria-labelledby="events-heading" className="relative px-[var(--gutter)] pb-3 pt-5">
-      <SectionHeading id="events-heading" title={events.title} intro={`“${events.quote}”`} show={seen} />
+      <SectionHeading id="events-heading" title={events.title} intro={`“${personal(events.quoteFor, events.quote)}”`} show={seen} />
 
       <div
         ref={archRef}

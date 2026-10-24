@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { wedding } from "@/config/wedding";
+import { useGuest } from "@/context/GuestContext";
 import { REDUCED_MOTION_QUERY } from "@/hooks/useMediaQuery";
 import { useLang } from "@/lib/lang";
 import { directionsUrl } from "@/lib/maps";
@@ -180,6 +181,7 @@ export function Invitation() {
 
   // ── the card's language: English or Hindi, remembered on this phone ──
   const hindi = useLang() === "hi";
+  const { guestName, isPersonalized } = useGuest();
 
   const date = useMemo(() => {
     const parts = parseVenueDateTime(wedding.wedding.dateTime);
@@ -450,6 +452,7 @@ export function Invitation() {
           seal={assets.omSeal}
           sky={assets.opening.sky}
           invited={t.youreInvited}
+          guest={isPersonalized ? guestName : undefined}
           label={t.touchToBegin}
           devanagari={hindi}
           reduced={still}

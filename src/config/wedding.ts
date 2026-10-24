@@ -46,7 +46,8 @@ export const wedding = {
   invitation: {
     /**
      * The gate before the opening (every time the link opens or reloads): this line over the golden ॐ
-     * seal in its mandala, then "Tap to open" under it. (No names or date there.)
+     * seal in its mandala, then "Tap to open" under it. For a guest named in the link, their name
+     * shows above this line. (No other names, and no date, there.)
      */
     youreInvited: "You're invited",
     touchToBegin: "Tap to open",
@@ -114,13 +115,21 @@ export const wedding = {
       labels: { days: "दिन", hours: "घंटे", minutes: "मिनट", seconds: "सेकंड" },
       weddingDay: "विवाह का दिन",
       lead: "हमारे विवाह में बाकी हैं",
-      today: { title: "आज हमारा विवाह है", line: "महादेव के आशीर्वाद से, आज दो दिल एक हो रहे हैं।" },
-      after: { title: "शुभ विवाह", line: "हमें आशीर्वाद देने के लिए धन्यवाद।" },
+      today: {
+        title: "आज हमारा विवाह है",
+        line: "महादेव के आशीर्वाद से, आज दो दिल एक हो रहे हैं।",
+        lineFor: "{guest}, महादेव के आशीर्वाद से आज दो दिल एक हो रहे हैं — आपके साथ होने की हमें बहुत खुशी है।",
+      },
+      after: { title: "शुभ विवाह", line: "हमें आशीर्वाद देने के लिए धन्यवाद।", lineFor: "{guest}, हमें आशीर्वाद देने के लिए धन्यवाद।" },
     },
     /** Shown on the wedding day itself (at the venue), instead of the numbers. */
-    today: { title: "Aaj Hamara Vivah Hai", line: "Today, with Mahadev's blessings, two hearts become one." },
+    today: {
+      title: "Aaj Hamara Vivah Hai",
+      line: "Today, with Mahadev's blessings, two hearts become one.",
+      lineFor: "Today, with Mahadev's blessings, two hearts become one — and we're so glad you're with us, {guest}.",
+    },
     /** Shown once the wedding day has passed. */
-    after: { title: "Shubh Vivah", line: "Thank you for blessing us." },
+    after: { title: "Shubh Vivah", line: "Thank you for blessing us.", lineFor: "Thank you for blessing us, {guest}." },
   },
 
   /**
@@ -135,6 +144,8 @@ export const wedding = {
   events: {
     title: "Wedding Events",
     quote: "Every ritual, a blessing; every moment, a memory we hope to share with you.",
+    /** The same, for a guest named in the link. */
+    quoteFor: "Every ritual, a blessing; every moment, a memory we hope to share with you, {guest}.",
     /** Under the arch: how to see the other ceremonies. */
     hint: "Tap the arch frame to see the events",
     list: list<Ceremony>([
@@ -179,6 +190,8 @@ export const wedding = {
     eyebrow: "Two Families, One Celebration",
     title: "With Their Blessings",
     intro: "With the blessings of our elders and the love of our families, two homes become one.",
+    /** The same, for a guest named in the link. */
+    introFor: "With the blessings of our elders and the love of our families, two homes become one — and you, {guest}, are family to us.",
     sides: list<FamilySide>([
       {
         title: "The Bride's Family",
@@ -375,6 +388,8 @@ export const wedding = {
     ]),
     /** The little tip under the stops. */
     pickupTip: "Guest pickup details will be shared on WhatsApp",
+    /** For a named guest, in two lines (the box hugs them). */
+    pickupTipFor: "{guest}, your pickup details\nwill be shared on WhatsApp",
   },
 
   /**
@@ -390,6 +405,8 @@ export const wedding = {
     eyebrow: "Here for You",
     title: "Contact & Assistance",
     intro: "For any questions or assistance, our families are always happy to help.",
+    /** The same, for a guest named in the link (about as long, so the section still fits one screen). */
+    introFor: "For anything you need, {guest}, our families are always happy to help.",
     /** One for each side: who to call, and how they are related to the bride or the groom. */
     family: list<FamilyContact>([
       // SAMPLE: the bride's brother and the groom's sister, as named in the family section above
@@ -427,10 +444,12 @@ export const wedding = {
   },
 
   /**
-   * Personalised links: ?guest=Ananya (also ?to= or ?name=). The name greets the guest in the couple
-   * section, the RSVP (its line, and the thanks once accepted), the blessing wall (the box and the
-   * thanks), the thank-you, the love note and the browser tab; without one, those lines read as
-   * written for anyone (each "…For" line has its plain twin beside it).
+   * Personalised links: ?guest=Ananya (also ?to= or ?name=). The name greets the guest on the gate
+   * (above "You're invited"), in the couple section, the countdown's line on and after the day, the
+   * family's intro, the events' quote, the RSVP (its line, and the thanks once accepted), the
+   * blessing wall (the box, the signature and the thanks), the pickup tip, the contact intro, the
+   * thank-you, the love note and the browser tab; without one, those lines read as written for
+   * anyone (each "…For" line has its plain twin beside it).
    */
   guest: {
     queryKeys: ["guest", "to", "name"],
