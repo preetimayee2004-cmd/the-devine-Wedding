@@ -294,7 +294,12 @@ export const wedding = {
   rsvp: {
     title: "A Sacred Celebration",
     message: "Your presence would make our celebration even more special.",
+    /** The same, for a guest named in the link ({guest} is their name). */
+    messageFor: "{guest}, your presence would make our celebration even more special.",
     button: "Join the Celebration",
+    /** Once accepted, over the scene: for a named guest, and for anyone. */
+    thanksFor: "Thank you, {guest} — we can't wait to celebrate with you!",
+    thanks: "Thank you — we can't wait to celebrate with you!",
     blessing: "With the blessings of Mahadev and Maa Parvati, we look forward to celebrating this special occasion with you.",
     closing: "Har Har Mahadev",
     calendarButton: "Add to calendar",
@@ -306,11 +311,13 @@ export const wedding = {
     title: "Blessing Wall",
     quote: "May your hearts always find their way home to each other.",
     placeholder: "Write a heartfelt wish for the couple…",
+    placeholderFor: "{guest}, write a heartfelt wish for the couple…",
     maxLength: 280,
     formTitle: "Leave a Blessing",
     button: "Offer your blessing",
     /** Shown once a blessing is saved (never before). */
     thanks: "Your blessing joins their journey of love.",
+    thanksFor: "Thank you, {guest}. Your blessing joins their journey of love.",
     samples: list<Wish>([
       {
         id: "s1",
@@ -404,6 +411,8 @@ export const wedding = {
     title: "Thank You",
     message:
       "Thank you for being a part of our beautiful beginning. May the blessings of Mahadev always guide our journey.",
+    messageFor:
+      "Thank you, {guest}, for being a part of our beautiful beginning. May the blessings of Mahadev always guide our journey.",
     mantra: "ॐ नमः शिवाय",
   },
 
@@ -411,16 +420,25 @@ export const wedding = {
   loveNote: {
     eyebrow: "A Little Note from the Couple",
     title: "Before You Go…",
+    /** Above the note, for a guest named in the link only. */
+    greetingFor: "Dear {guest},",
     message: "Our story is made more beautiful by the people who share it with us. Thank you for being part of ours.",
     signoff: "With love,",
     closing: "Har Har Mahadev",
   },
 
-  /** Personalised links: ?guest=Ananya (also ?to= or ?name=). */
+  /**
+   * Personalised links: ?guest=Ananya (also ?to= or ?name=). The name greets the guest in the couple
+   * section, the RSVP (its line, and the thanks once accepted), the blessing wall (the box and the
+   * thanks), the thank-you, the love note and the browser tab; without one, those lines read as
+   * written for anyone (each "…For" line has its plain twin beside it).
+   */
   guest: {
     queryKeys: ["guest", "to", "name"],
     fallbackName: "Guest",
     maxLength: 40,
+    /** The browser tab, for a named guest: "Ananya, you're invited · …". */
+    titleFor: "{guest}, you're invited",
   },
 
   opening: {

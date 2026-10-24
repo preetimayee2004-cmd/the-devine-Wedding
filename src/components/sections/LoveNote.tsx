@@ -1,5 +1,6 @@
 import { useRef, type CSSProperties } from "react";
 import { wedding } from "@/config/wedding";
+import { usePersonal } from "@/context/GuestContext";
 import { useInView } from "@/hooks/useInView";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
 import { EASE } from "@/lib/motion";
@@ -13,6 +14,7 @@ import { Reveal } from "@/components/ui/Reveal";
  * softens back to the pale blue of the very beginning. Plays once, no loops.
  */
 export function LoveNote() {
+  const greeting = usePersonal()(wedding.loveNote.greetingFor, "");
   const { loveNote: copy, couple, credits } = wedding;
   const ref = useRef<HTMLElement>(null);
   const seen = useInView(ref, { threshold: 0.35 });
@@ -104,6 +106,7 @@ export function LoveNote() {
             as="p"
             className="mt-3 text-balance font-display text-[19.5px] font-medium italic leading-snug text-slate"
           >
+            {greeting && <span className="mb-1 block not-italic text-navy">{greeting}</span>}
             {copy.message}
           </Reveal>
           <Reveal show={seen} delay={at(2300)} className="mt-6">

@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState, type CSSProperties } from "react";
 import { wedding } from "@/config/wedding";
-import { useGuest } from "@/context/GuestContext";
+import { useGuest, usePersonal } from "@/context/GuestContext";
 import { useInView } from "@/hooks/useInView";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
 import { acceptInvitation, BackendError, type Acceptance } from "@/lib/backend";
@@ -63,6 +63,7 @@ type Phase = "idle" | "sending" | "leaving" | "open";
 export function Rsvp() {
   const { rsvp } = wedding;
   const { guestName, isPersonalized } = useGuest();
+  const personal = usePersonal();
   const ref = useRef<HTMLElement>(null);
   const seen = useInView(ref, { threshold: 0.15 });
   const reduced = usePrefersReducedMotion();
@@ -123,7 +124,7 @@ export function Rsvp() {
               {rsvp.title}
             </h2>
             <p className="rs-message rs-in" style={at(AT.message)}>
-              {rsvp.message}
+              {personal(rsvp.messageFor, rsvp.message)}
             </p>
             <div className="rs-in mt-7" style={at(AT.join)}>
               <button
@@ -172,6 +173,7 @@ export function Rsvp() {
 /** The scene that opens once the acceptance is saved (its parts timed from the moment it opens). */
 function Scene({ calendar, note }: { calendar: CalendarItem | null; note: string }) {
   const { rsvp } = wedding;
+  const personal = usePersonal();
   return (
     <div className="rs-scene flex flex-col items-center" aria-live="polite">
       {/* the temple arch, and Mahadev and Maa Parvati within it */}
@@ -191,6 +193,9 @@ function Scene({ calendar, note }: { calendar: CalendarItem | null; note: string
         <Arch />
       </div>
 
+      <p className="rs-thanks rs-in" style={at(AT.heading - 150)}>
+        {personal(rsvp.thanksFor, rsvp.thanks)}
+      </p>
       <h2 id="rsvp-heading" className="rs-heading rs-in" style={at(AT.heading)}>
         {rsvp.title}
       </h2>

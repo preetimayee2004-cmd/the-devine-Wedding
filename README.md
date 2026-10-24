@@ -43,7 +43,7 @@ Add the guest's name to the link:
 https://<site>/?guest=Ananya        (also ?to= or ?name=)
 ```
 
-The invitation then greets them by name. Their RSVP and wishes are signed with that name, and the RSVP is tied to it. With no name in the link it says "Dear Guest" and wishes are signed "With love".
+The invitation then greets them by name wherever it is warmer that way: "Dear Ananya," in the couple section; the RSVP ("Ananya, your presence would make our celebration even more special.", and "Thank you, Ananya — we can't wait to celebrate with you!" once accepted); the blessing wall ("Ananya, write a heartfelt wish…" in the box, "Thank you, Ananya. Your blessing joins their journey of love." once saved); the thank-you ("Thank you, Ananya, for being a part of our beautiful beginning…"); "Dear Ananya," above the love note; and the browser tab ("Ananya, you're invited · …"). The lines live in `src/config/wedding.ts` as `…For` templates (`{guest}` is the name) beside their plain twins. Their RSVP and wishes are signed with that name, and the RSVP is tied to it. With no name in the link every line reads as written for anyone ("Dear Guest" in the couple section) and wishes are signed "With love".
 
 ## RSVPs and blessings: where they're saved
 

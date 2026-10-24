@@ -1,5 +1,6 @@
 import { useRef, type CSSProperties } from "react";
 import { wedding } from "@/config/wedding";
+import { usePersonal } from "@/context/GuestContext";
 import { useInView } from "@/hooks/useInView";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
 import { EASE } from "@/lib/motion";
@@ -18,6 +19,7 @@ const HALO_DOTS = Array.from({ length: 12 }, (_, i) => {
 });
 
 export function ThankYou() {
+  const personal = usePersonal();
   const { thankYou: copy, assets } = wedding;
   const ref = useRef<HTMLElement>(null);
   const seen = useInView(ref, { threshold: 0.25 });
@@ -131,7 +133,7 @@ export function ThankYou() {
         as="p"
         className="mx-auto mt-3 max-w-[20rem] text-balance font-display text-[20px] font-medium italic leading-snug text-slate"
       >
-        {copy.message}
+        {personal(copy.messageFor, copy.message)}
       </Reveal>
       <Reveal show={seen} delay={at(1900)} as="p" className="mt-5 font-deva text-[21px] text-gold-ink">
         <span lang="sa">{copy.mantra}</span>

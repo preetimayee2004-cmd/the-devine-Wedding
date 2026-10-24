@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, type ReactNode } from "react";
 import { wedding } from "@/config/wedding";
 
 interface GuestState {
@@ -41,7 +41,30 @@ function readGuestFromUrl(): GuestState {
 export function GuestProvider({ children }: { children: ReactNode }) {
   // The share link is fixed for a visit, so read it once.
   const value = useMemo(readGuestFromUrl, []);
+  // a named guest sees their name in the browser tab too
+  useEffect(() => {
+    if (!value.isPersonalized) return;
+    const base = document.title;
+    document.title = `${forGuest(wedding.guest.titleFor, value.guestName)} · ${base}`;
+    return () => {
+      document.title = base;
+    };
+  }, [value]);
   return <GuestContext.Provider value={value}>{children}</GuestContext.Provider>;
+}
+
+/** A line with the guest's name put in for "{guest}". */
+export function forGuest(template: string, name: string): string {
+  return template.replace(/\{guest\}/g, name);
+}
+
+/**
+ * Lines for this guest: `personal(template, plain)` is the template with their name when the link
+ * names them, and the plain line when it doesn't.
+ */
+export function usePersonal(): (template: string, plain: string) => string {
+  const { guestName, isPersonalized } = useGuest();
+  return (template, plain) => (isPersonalized ? forGuest(template, guestName) : plain);
 }
 
 export function useGuest(): GuestState {

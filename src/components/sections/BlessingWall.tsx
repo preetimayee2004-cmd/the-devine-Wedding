@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { wedding } from "@/config/wedding";
 import type { Wish } from "@/config/types";
-import { useGuest } from "@/context/GuestContext";
+import { useGuest, usePersonal } from "@/context/GuestContext";
 import { useInView } from "@/hooks/useInView";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
 import { addWish, BackendError, backendMode, listWishes, newId } from "@/lib/backend";
@@ -51,6 +51,7 @@ const signature = (w: Wish) => (w.name ? `With love · ${w.name}` : "With love")
 export function BlessingWall() {
   const { wishes: copy } = wedding;
   const { guestName, isPersonalized } = useGuest();
+  const personal = usePersonal();
   const sectionRef = useRef<HTMLElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLTextAreaElement>(null);
@@ -173,7 +174,7 @@ export function BlessingWall() {
         <Reveal show={formSeen} delay={t(260)} className="mt-5">
           {state.kind === "sent" ? (
             <Confirmation
-              thanks={copy.thanks}
+              thanks={personal(copy.thanksFor, copy.thanks)}
               reduced={reduced}
               onAnother={() => {
                 setState({ kind: "idle" });
@@ -196,7 +197,7 @@ export function BlessingWall() {
                 }}
                 maxLength={copy.maxLength}
                 rows={4}
-                placeholder={copy.placeholder}
+                placeholder={personal(copy.placeholderFor, copy.placeholder)}
                 aria-describedby="wish-count wish-hint"
                 aria-invalid={invalid || undefined}
                 className="bw-textarea"
