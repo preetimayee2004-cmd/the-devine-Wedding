@@ -427,6 +427,14 @@ export const wedding = {
      * veena, harmonium, a painted gramophone and a festive elephant at its foot. Its white was made
      * transparent (and the editing app's checkerboard blob removed), so the site's sky shows through.
      */
+    /**
+     * Section 06: the frame round each family photo — gold pillars and scrolls, a peacock on each
+     * pillar (its white made transparent, trimmed to the art). The photo sits between the peacocks
+     * (WINDOW in Family.tsx). NOTE: this copy carries the stock site's watermark; replace it with
+     * the licensed file of the same picture (same name, and update the size if it differs).
+     */
+    familyFrame: "/art/peacock-frame.webp",
+    familyFrameSize: { width: 1163, height: 1105 },
     eventsArch: "/art/events-arch.webp",
     eventsArchSize: { width: 1098, height: 1228 },
     saveTheDateArt: "/art/shiva-parvati-blessing.jpg",

@@ -12,9 +12,10 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
  * Section 06 — two families, one celebration (PRD §4).
  *
  * Temple bells hang from the section's top corners; under the heading and its line, a small gold
- * lotus rule. Each family stands in a temple-arch frame — a pointed, lobed arch in fine gold with a
- * lotus on its peak, an ivory mat, a small flourish at each side and corner — its photograph filling
- * the arch; then the family's name and its members (relation in gold capitals, names beneath). On a
+ * lotus rule. Each family stands in the peacock frame — gold pillars crowned with gold scrolls, a
+ * peacock on each pillar — its photograph between them (an arched top, a fine gold edge), the
+ * peacocks just in front of it; then the family's name and its members (relation in gold capitals,
+ * names beneath). On a
  * phone the two families stand one above the other with a lotus rule between; on a wider screen,
  * side by side. A faint temple stands at the foot. Seen, the bells drop in and settle, the frame
  * appears, then the photograph within it, then the names; the two sides take turns.
@@ -51,7 +52,7 @@ export function Family() {
                 <LotusRule />
               </Reveal>
             )}
-            <Side side={side} index={i} show={pairSeen} reduced={reduced} delay={reduced ? 0 : i * 320} />
+            <Side side={side} show={pairSeen} reduced={reduced} delay={reduced ? 0 : i * 320} />
           </Fragment>
         ))}
       </div>
@@ -59,7 +60,7 @@ export function Family() {
   );
 }
 
-function Side({ side, index, show, reduced, delay }: { side: FamilySide; index: number; show: boolean; reduced: boolean; delay: number }) {
+function Side({ side, show, reduced, delay }: { side: FamilySide; show: boolean; reduced: boolean; delay: number }) {
   const photoIn = delay + (reduced ? 0 : 450);
   const appear = (ms: number, extra?: CSSProperties): CSSProperties =>
     reduced
@@ -69,8 +70,7 @@ function Side({ side, index, show, reduced, delay }: { side: FamilySide; index: 
   return (
     <div className="flex flex-col items-center text-center">
       <div className="fam-frame" style={appear(delay, { transform: show || reduced ? "none" : "translateY(10px) scale(0.97)" })}>
-        <ArchFrame
-          id={`fam-window-${index}`}
+        <PeacockFrame
           photo={side.photo}
           photoStyle={
             reduced
@@ -99,73 +99,44 @@ function Side({ side, index, show, reduced, delay }: { side: FamilySide; index: 
   );
 }
 
-/** The arch's outer edge and its inner one (the photograph's window), in a 200 × 270 frame. */
-const OUTER =
-  "M6 262V70C6 56 16 48 30 44C40 41 46 34 52 28C60 20 70 18 80 18C88 18 94 14 100 8C106 14 112 18 120 18C130 18 140 20 148 28C154 34 160 41 170 44C184 48 194 56 194 70V262Z";
-const INNER =
-  "M13 255V72C13 61 21 55 33 51C44 48 51 41 57 34C64 27 72 25 81 25C89 25 95 21 100 16C105 21 111 25 119 25C128 25 136 27 143 34C149 41 156 48 167 51C179 55 187 61 187 72V255Z";
-/** A flourish at the left side's middle and at its foot (the right side's are its mirror). */
-const SIDE_FLOURISH = "M6 140C0 142-3 146-3 150S0 158 6 160M-3 150H-7";
-const FOOT_FLOURISH = "M6 262C1 262-2 265-2 269M6 262C6 267 9 270 13 270";
+/** The photograph's window in the frame picture (%): between the peacocks, under the gold scrolls. */
+const WINDOW = { left: 22, top: 14, width: 56, height: 81 };
 
 /**
- * The temple-arch frame: an ivory mat between two fine gold lines, a lotus on the peak, small
- * flourishes; the photograph fills the inner arch (cropped to it, centred), or — before it comes — a
- * pale wash with a small lotus.
+ * The peacock frame: the photograph in its window (an arched top, a fine gold edge), the frame
+ * picture over it — gold pillars and scrolls, a peacock on each pillar — so the peacocks stand just
+ * in front of the photograph's edges. Before a photo comes: a pale wash with a small lotus.
  */
-function ArchFrame({ id, photo, photoStyle }: { id: string; photo: FamilySide["photo"]; photoStyle?: CSSProperties }) {
+function PeacockFrame({ photo, photoStyle }: { photo: FamilySide["photo"]; photoStyle?: CSSProperties }) {
+  const { familyFrame, familyFrameSize } = wedding.assets;
   return (
-    <svg role="img" aria-label={photo.src ? photo.alt : `${photo.alt} (photo to come)`} viewBox="-10 -10 220 290" className="fam-arch">
-      <defs>
-        <clipPath id={id}>
-          <path d={INNER} />
-        </clipPath>
-        <linearGradient id={`${id}-wash`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" style={{ stopColor: "rgb(var(--sky-pale))" }} />
-          <stop offset="1" style={{ stopColor: "rgb(var(--sky))" }} />
-        </linearGradient>
-      </defs>
-      {/* the mat, edged in gold */}
-      <path d={OUTER} fill="#fffbf2" stroke="#c9a45c" strokeWidth="1.3" />
-      {photo.src ? (
-        <image
-          href={photo.src}
-          x="13"
-          y="16"
-          width="174"
-          height="239"
-          preserveAspectRatio="xMidYMid slice"
-          clipPath={`url(#${id})`}
-          className="fam-photo"
-          style={photoStyle}
-        />
-      ) : (
-        <g clipPath={`url(#${id})`}>
-          <rect x="13" y="16" width="174" height="239" fill={`url(#${id}-wash)`} />
-          <path d="M100 150c-6-8-6-16 0-24 6 8 6 16 0 24Zm0 0c-9-2-15-7-17-15 8 0 14 6 17 15Zm0 0c9-2 15-7 17-15-8 0-14 6-17 15Z" fill="none" stroke="#b89554" strokeWidth="1.2" />
-        </g>
-      )}
-      <path d={INNER} fill="none" stroke="#b89554" strokeWidth="1" />
-      {/* the lotus on the peak */}
-      <g fill="#ecd69f" stroke="#b89554" strokeWidth="0.8" strokeLinejoin="round">
-        <path d="M100 7C95 6 92 3 91-1C95-1 98 2 100 7Z" />
-        <path d="M100 7C105 6 108 3 109-1C105-1 102 2 100 7Z" />
-        <path d="M100 7C97 3 97-1 100-4C103-1 103 3 100 7Z" />
-      </g>
-      {/* the flourishes at each side and foot */}
-      <g fill="none" stroke="#b89554" strokeWidth="1" strokeLinecap="round">
-        <path d={SIDE_FLOURISH} />
-        <path d={FOOT_FLOURISH} />
-        <g transform="translate(200 0) scale(-1 1)">
-          <path d={SIDE_FLOURISH} />
-          <path d={FOOT_FLOURISH} />
-        </g>
-      </g>
-      <g fill="#b89554">
-        <circle cx="-9" cy="150" r="1.4" />
-        <circle cx="209" cy="150" r="1.4" />
-      </g>
-    </svg>
+    <div className="fam-peacock" style={{ aspectRatio: `${familyFrameSize.width} / ${familyFrameSize.height}` }}>
+      <div
+        className="fam-window"
+        style={{ left: `${WINDOW.left}%`, top: `${WINDOW.top}%`, width: `${WINDOW.width}%`, height: `${WINDOW.height}%` }}
+      >
+        {photo.src ? (
+          <img src={photo.src} alt={photo.alt} loading="lazy" decoding="async" draggable={false} className="fam-window-photo" style={photoStyle} />
+        ) : (
+          <div role="img" aria-label={`${photo.alt} (photo to come)`} className="flex h-full w-full items-center justify-center">
+            <svg aria-hidden viewBox="0 0 40 40" className="h-1/4 w-1/4" fill="none" stroke="#b89554" strokeWidth="1.2">
+              <path d="M20 30c-5-6-5-13 0-19 5 6 5 13 0 19Zm0 0c-7-1-12-6-13-12 7 0 12 5 13 12Zm0 0c7-1 12-6 13-12-7 0-12 5-13 12Z" />
+            </svg>
+          </div>
+        )}
+      </div>
+      <img
+        aria-hidden
+        src={familyFrame}
+        alt=""
+        width={familyFrameSize.width}
+        height={familyFrameSize.height}
+        loading="lazy"
+        decoding="async"
+        draggable={false}
+        className="fam-peacock-art"
+      />
+    </div>
   );
 }
 

@@ -1501,27 +1501,45 @@
   }
   /* The couple's heads sit 35.1% of the width down the scene piece (its top is clear sky with palms
      at the very edges): it may tuck up beside the words, but always leaves 40px of sky above them. */
-  /* Family: on a phone the two families one above the other (a lotus rule between), each arch
-     frame 64% wide; from 520px side by side */
+  /* Family: on a phone the two families one above the other (a lotus rule between); from 520px
+     side by side */
   .fam-pair {
     display: grid;
     grid-template-columns: 1fr;
     row-gap: 30px;
     margin-top: 26px;
   }
+  /* the peacock frame: as wide as the screen allows (into the side margins), up to 400px */
   .fam-frame {
-    width: min(64%, 250px);
+    width: min(calc(100% + 2 * var(--gutter) - 12px), 400px);
   }
-  .fam-arch {
+  .fam-peacock {
+    position: relative;
+    width: 100%;
+  }
+  .fam-window {
+    position: absolute;
+    overflow: hidden;
+    border: 1.5px solid #c9a45c;
+    border-radius: 50% 50% 4px 4px / 18% 18% 4px 4px;
+    background: rgb(var(--sky-pale));
+    box-shadow: 0 12px 24px -14px rgb(18 41 74 / 0.4);
+  }
+  .fam-window-photo {
     display: block;
     width: 100%;
-    height: auto;
-    overflow: visible;
-    filter: drop-shadow(0 12px 18px rgb(18 41 74 / 0.12));
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 35%;
   }
-  .fam-photo {
-    transform-box: fill-box;
-    transform-origin: 50% 50%;
+  .fam-peacock-art {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    user-select: none;
+    filter: drop-shadow(0 6px 10px rgb(18 41 74 / 0.12));
   }
   .fam-between {
     display: flex;
@@ -1541,7 +1559,7 @@
       column-gap: 20px;
     }
     .fam-frame {
-      width: min(86%, 250px);
+      width: min(100%, 400px);
     }
     .fam-between {
       display: none;
