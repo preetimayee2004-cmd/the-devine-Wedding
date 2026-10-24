@@ -1,12 +1,12 @@
-import { useMemo, useRef, useState, type CSSProperties } from "react";
+import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { wedding } from "@/config/wedding";
 import { useGuest } from "@/context/GuestContext";
 import { useInView } from "@/hooks/useInView";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
+import { useScrollLock } from "@/hooks/useScrollLock";
 import { acceptInvitation, BackendError, type Acceptance } from "@/lib/backend";
 import { downloadIcs, googleCalendarUrl, weddingCalendarItem } from "@/lib/calendar";
 import { whatsappUrl } from "@/lib/maps";
-import { EASE } from "@/lib/motion";
 import { Icon } from "@/components/art/Icons";
 import { Reveal } from "@/components/ui/Reveal";
 
@@ -14,29 +14,31 @@ import { Reveal } from "@/components/ui/Reveal";
  * Section 08 — a personal confirmation (PRD §4). No form, no fields: a deep night-blue box with
  * temple bells hanging from its top corners and a faint temple at its foot; a gold trishul, "A
  * Sacred Celebration" in gold, one line of invitation, and one deep-maroon button, "Join the
- * Celebration". Tapped, it becomes a small gold seal with a soft glow and a brief scatter of gold;
- * then a personal message, the couple's words, and Add to Calendar. Every visit starts with the
- * button: an acceptance isn't remembered, so a reload shows it again.
+ * Celebration".
  *
- * Honesty rule: the wording says the family received it only when the
- * database actually saved it. Without one, it asks the guest to let the
- * family know too and (if configured) offers to do it on WhatsApp.
+ * Tapped (once — more taps are ignored), it presses in and a thin line of gold light runs round
+ * its edge (0.45s) while the acceptance is sent; only when that has succeeded does the scene open
+ * (if it fails, the button stays, with the reason). The button fades away and the blue box opens
+ * out to fill the screen, its blue unchanged; then, about 4s in all:
+ *   a narrow gold light rises from the bottom centre toward the middle, and as it passes the
+ *     temples at the foot and the bells above come faintly into view (0.5–1.4s);
+ *   a temple arch draws itself in fine antique gold — both pillars rising together, then the
+ *     upper arch from each side to meet at its peak, and one gleam running along it (1.4–2.4s);
+ *   Mahadev and Maa Parvati appear inside it (the Save the Date painting's own figures), from 97%
+ *     to full size, with a warm gold light behind them (2.4–3.2s);
+ *   "Your presence means the world", the blessing and "Har Har Mahadev" rise in, one after the
+ *     other (3.2–4s), then "Add to calendar" and "Return to invitation".
+ * Then everything is still. Add to calendar offers Google Calendar or an .ics file, and says
+ * exactly what happened (a tab opened, a file downloaded) — never that the event is saved.
+ * Return to invitation (or Escape) folds the scene back into the box, which now shows the guest
+ * their acceptance and can open the scene again (at once, without the journey).
+ *
+ * Every visit starts with the button: an acceptance isn't remembered, so a reload shows it again.
+ * Honesty rule: the wording says the family received it only when the database actually saved it.
+ * Without one, it asks the guest to let the family know too and (if configured) offers WhatsApp.
+ * Reduced motion: no sweep, no journey; the finished scene simply fades in, and out.
  */
-type Phase = "idle" | "sending" | "sealed";
-
-/** Where the gold scatters to (px from the seal), and what shape each piece is. */
-const SPARKS = [
-  [-70, -54, "dot"],
-  [64, -60, "petal"],
-  [-92, 6, "petal"],
-  [96, -4, "dot"],
-  [-54, 58, "dot"],
-  [58, 56, "petal"],
-  [-18, -86, "petal"],
-  [22, 84, "dot"],
-  [-104, -38, "dot"],
-  [104, 36, "petal"],
-] as const;
+type Phase = "idle" | "sending" | "leaving" | "accepted";
 
 /**
  * The temple bells (the couple arch's own) hanging from the box's top corners: which bell, how far
@@ -44,84 +46,122 @@ const SPARKS = [
  */
 const BELLS = {
   left: [
-    { src: "/art/couple-bell-1.webp", ratio: 148 / 93, at: 13, drop: 62, w: 15 },
-    { src: "/art/couple-bell-2.webp", ratio: 204 / 100, at: 31, drop: 44, w: 13 },
-    { src: "/art/couple-bell-3.webp", ratio: 148 / 94, at: 47, drop: 24, w: 11 },
+    {
+      src: "/art/couple-bell-1.webp",
+      ratio: 148 / 93,
+      at: 13,
+      drop: 62,
+      w: 15,
+    },
+    {
+      src: "/art/couple-bell-2.webp",
+      ratio: 204 / 100,
+      at: 31,
+      drop: 44,
+      w: 13,
+    },
+    {
+      src: "/art/couple-bell-3.webp",
+      ratio: 148 / 94,
+      at: 47,
+      drop: 24,
+      w: 11,
+    },
   ],
   right: [
-    { src: "/art/couple-bell-3.webp", ratio: 148 / 94, at: 13, drop: 40, w: 14 },
-    { src: "/art/couple-bell-1.webp", ratio: 148 / 93, at: 30, drop: 64, w: 13 },
-    { src: "/art/couple-bell-2.webp", ratio: 204 / 100, at: 46, drop: 26, w: 11 },
+    {
+      src: "/art/couple-bell-3.webp",
+      ratio: 148 / 94,
+      at: 13,
+      drop: 40,
+      w: 14,
+    },
+    {
+      src: "/art/couple-bell-1.webp",
+      ratio: 148 / 93,
+      at: 30,
+      drop: 64,
+      w: 13,
+    },
+    {
+      src: "/art/couple-bell-2.webp",
+      ratio: 204 / 100,
+      at: 46,
+      drop: 26,
+      w: 11,
+    },
   ],
 } as const;
+
+/** The button's gold light runs round its edge this long (ms); then it fades away (ms). */
+const SWEEP = 450;
+const LEAVE = 220;
+
+const pause = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export function Rsvp() {
   const { rsvp, couple } = wedding;
   const { guestName, isPersonalized } = useGuest();
   const ref = useRef<HTMLElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const replayRef = useRef<HTMLButtonElement>(null);
   const seen = useInView(ref, { threshold: 0.25 });
   const reduced = usePrefersReducedMotion();
   const [acceptance, setAcceptance] = useState<Acceptance | null>(null);
   const [phase, setPhase] = useState<Phase>("idle");
-  const [celebrate, setCelebrate] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // the scene: open (from where the box was), and whether it plays its journey or simply appears
+  const [scene, setScene] = useState<{
+    from: DOMRect | null;
+    instant: boolean;
+  } | null>(null);
+  const busy = useRef(false);
   const calendar = useMemo(() => weddingCalendarItem(), []);
 
   const accept = async () => {
-    if (phase !== "idle") return;
+    if (busy.current || phase !== "idle") return;
+    busy.current = true;
     setPhase("sending");
     setError(null);
+    const t0 = performance.now();
     try {
       const a = await acceptInvitation(guestName, isPersonalized ? guestName : null);
+      // let the gold light finish its round, then the button fades and the scene opens
+      if (!reduced) await pause(Math.max(0, SWEEP - (performance.now() - t0)));
       setAcceptance(a);
-      setCelebrate(!reduced);
-      setPhase("sealed");
+      setPhase("leaving");
+      if (!reduced) await pause(LEAVE - 40);
+      setScene({
+        from: cardRef.current?.getBoundingClientRect() ?? null,
+        instant: reduced,
+      });
+      // the box shows the acceptance once the scene covers it (so it never peeks out as it opens)
+      if (!reduced) await pause(560);
+      setPhase("accepted");
     } catch (e) {
       setError(e instanceof BackendError ? e.message : "Something went wrong. Please try again.");
       setPhase("idle");
+    } finally {
+      busy.current = false;
     }
   };
 
-  const sealed = phase === "sealed";
   const names = `${couple.bride.displayName} & ${couple.groom.displayName}`;
-  // The acceptance unfolds step by step (with reduced motion, all at once).
-  const after = (ms: number) => (celebrate ? ms : 0);
   const tellFamily =
     rsvp.whatsapp && acceptance?.savedTo === "local"
-      ? whatsappUrl(
-          rsvp.whatsapp,
-          `Namaste! ${guestName} here — I'm delighted to accept the invitation to ${names}'s wedding.`,
-        )
+      ? whatsappUrl(rsvp.whatsapp, `Namaste! ${guestName} here — I'm delighted to accept the invitation to ${names}'s wedding.`)
       : null;
-
-  // the button: a maroon bar with rounded corners, which draws itself into a round gold seal
-  const morph: CSSProperties = {
-    width: sealed ? 68 : 236,
-    height: sealed ? 68 : 46,
-    borderRadius: sealed ? 34 : 10,
-    transition: reduced
-      ? "background-color 200ms ease, border-color 200ms ease"
-      : `width 600ms ${EASE.silk}, height 600ms ${EASE.silk}, border-radius 600ms ${EASE.silk}, background-color 300ms ease, border-color 300ms ease, box-shadow 400ms ease, transform 150ms ease`,
-  };
+  const note =
+    acceptance?.savedTo === "remote"
+      ? "Your acceptance has reached the family."
+      : "Please also let the family know you're coming.";
 
   return (
-    <section
-      id="rsvp"
-      ref={ref}
-      aria-labelledby="rsvp-heading"
-      className="relative px-[var(--gutter)] pt-[var(--section-gap)]"
-    >
+    <section id="rsvp" ref={ref} aria-labelledby="rsvp-heading" className="relative px-[var(--gutter)] pt-[var(--section-gap)]">
       <Reveal show={seen} className="mx-auto max-w-[22.5rem]">
-        <div className="rsvp-card px-6 pb-12 pt-8 text-center">
-          {/* the bells from the top corners, and a temple, faint, at the foot */}
-          {(["left", "right"] as const).map((side) =>
-            BELLS[side].map((b, i) => (
-              <span key={`${side}${i}`} aria-hidden className="rsvp-bell" style={{ [side]: b.at, width: b.w, height: b.drop }}>
-                <img src={b.src} alt="" width={b.w} height={Math.round(b.w * b.ratio)} draggable={false} />
-              </span>
-            )),
-          )}
-          <Temple />
+        <div ref={cardRef} className="rsvp-card px-6 pb-12 pt-8 text-center">
+          <Bells />
+          <Temple className="rsvp-temple" />
 
           <div className="relative">
             <Trishul />
@@ -132,122 +172,391 @@ export function Rsvp() {
             <p className="rsvp-message mx-auto mt-2 max-w-[16.5rem] text-balance">{rsvp.message}</p>
             <Divider />
 
-            {/* the button that becomes a seal */}
-            <div className="relative mx-auto mt-4 flex h-[76px] items-center justify-center">
-              {celebrate && (
-                <>
-                  <span aria-hidden className="rsvp-ring absolute h-[68px] w-[68px] rounded-full border border-gold" />
-                  <span aria-hidden className="rsvp-glow absolute h-[68px] w-[68px] rounded-full" />
-                  {SPARKS.map(([dx, dy, kind], i) => (
-                    <span
-                      key={i}
+            {phase !== "accepted" ? (
+              <div className="mx-auto mt-4 flex h-[76px] items-center justify-center">
+                <button
+                  type="button"
+                  onClick={accept}
+                  aria-disabled={phase !== "idle" || undefined}
+                  aria-live="polite"
+                  className="rsvp-btn relative flex items-center justify-center overflow-hidden"
+                  data-phase={phase}
+                  style={{ width: 236, height: 46, borderRadius: 10 }}
+                >
+                  <span className="rsvp-btn-label">
+                    {phase === "sending" && !reduced
+                      ? rsvp.button
+                      : phase === "sending"
+                        ? "Sending your joy…"
+                        : error
+                          ? "Try again"
+                          : rsvp.button}
+                    <svg
                       aria-hidden
-                      className={`rsvp-spark ${kind === "petal" ? "rsvp-petal" : ""}`}
-                      style={
-                        {
-                          "--dx": `${dx}px`,
-                          "--dy": `${dy}px`,
-                          animationDelay: `${120 + (i % 4) * 40}ms`,
-                        } as CSSProperties
-                      }
-                    />
-                  ))}
-                </>
-              )}
-              <button
-                type="button"
-                onClick={accept}
-                disabled={phase !== "idle"}
-                aria-live="polite"
-                className="rsvp-btn relative flex max-w-full items-center justify-center overflow-hidden"
-                data-sealed={sealed || undefined}
-                style={morph}
-              >
-                <span className="rsvp-btn-label absolute whitespace-nowrap" style={{ opacity: sealed ? 0 : 1, transition: "opacity 250ms ease" }}>
-                  {phase === "sending" ? "Sending your joy…" : error ? "Try again" : rsvp.button}
-                  {phase === "idle" && (
-                    <svg aria-hidden viewBox="0 0 20 10" className="h-[8px] w-[16px]" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
+                      viewBox="0 0 20 10"
+                      className="h-[8px] w-[16px]"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
                       <path d="M1 5h17M14 1.5 18 5l-4 3.5" />
                     </svg>
+                  </span>
+                  {/* the thin gold light running once round the edge */}
+                  {phase === "sending" && !reduced && (
+                    <svg aria-hidden className="rsvp-sweep" viewBox="0 0 236 46" preserveAspectRatio="none">
+                      <rect x="0.75" y="0.75" width="234.5" height="44.5" rx="9.25" pathLength="1" />
+                    </svg>
                   )}
-                </span>
-                <span
-                  className="absolute"
-                  style={{ opacity: sealed ? 1 : 0, transition: `opacity 400ms ease ${after(350)}ms` }}
-                  aria-hidden={!sealed}
-                >
-                  <Icon name="lotus" className="h-8 w-8" strokeWidth={1.4} />
-                  <span className="sr-only">Invitation accepted</span>
-                </span>
-              </button>
-            </div>
+                </button>
+              </div>
+            ) : (
+              acceptance && (
+                <div className="mt-5">
+                  <span aria-hidden className="rsvp-seal mx-auto">
+                    <Icon name="lotus" className="h-7 w-7" strokeWidth={1.4} />
+                  </span>
+                  <p className="mt-4 text-balance font-display text-[21px] font-semibold italic leading-snug text-[#fff9ef]">
+                    {rsvp.welcome.replace("{guest}", acceptance.guestName)}
+                  </p>
+                  <button
+                    ref={replayRef}
+                    type="button"
+                    className="rsvp-chip mt-4"
+                    onClick={() =>
+                      setScene({
+                        from: cardRef.current?.getBoundingClientRect() ?? null,
+                        instant: true,
+                      })
+                    }
+                  >
+                    <Icon name="lotus" className="h-4 w-4 text-[#d4b26e]" /> See the blessing again
+                  </button>
+                  <p className="mx-auto mt-4 max-w-[17rem] text-balance text-[12.5px] leading-relaxed text-[#fff9ef]/75">
+                    {note}
+                  </p>
+                  {tellFamily && (
+                    <a
+                      href={tellFamily}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rsvp-btn mt-3 inline-flex items-center gap-2 rounded-[10px] px-5 py-2.5 font-sans text-[13px] font-medium"
+                    >
+                      <Icon name="chat" className="h-4 w-4" /> Tell the family on WhatsApp
+                    </a>
+                  )}
+                </div>
+              )
+            )}
 
             {error && (
               <p role="alert" className="mt-3 text-[13.5px] leading-snug text-[#f3b8ae]">
                 We couldn't send your acceptance. {error}
               </p>
             )}
-
-            {sealed && acceptance && (
-              <div className="mt-6">
-                <Reveal
-                  show
-                  delay={after(900)}
-                  as="p"
-                  className="text-balance font-display text-[23px] font-semibold italic leading-snug text-[#fff9ef]"
-                >
-                  {rsvp.welcome.replace("{guest}", acceptance.guestName)}
-                </Reveal>
-                <Reveal show delay={after(1100)} as="p" className="mt-3 text-balance text-[15px] leading-relaxed text-[#fff9ef]/80">
-                  {rsvp.blessing}
-                </Reveal>
-                <Reveal show delay={after(1300)} as="blockquote" className="mt-4">
-                  <p className="text-balance font-display text-[18px] font-medium italic leading-snug text-[#e3c27e]">“{rsvp.quote}”</p>
-                  <footer className="mt-1 font-script text-[28px] leading-tight text-[#e3c27e]">— {names}</footer>
-                </Reveal>
-
-                {calendar && (
-                  <Reveal show delay={after(1600)} className="mt-6">
-                    <p className="font-sans text-[10.5px] font-medium uppercase tracking-[0.24em] text-[#fff9ef]/65">Add to calendar</p>
-                    <div className="mt-2.5 flex flex-wrap justify-center gap-2.5">
-                      <a href={googleCalendarUrl(calendar)} target="_blank" rel="noopener noreferrer" className="rsvp-chip">
-                        <Icon name="calendar" className="h-4 w-4 text-[#d4b26e]" /> Google Calendar
-                      </a>
-                      <button type="button" onClick={() => downloadIcs(calendar)} className="rsvp-chip">
-                        <Icon name="calendar" className="h-4 w-4 text-[#d4b26e]" /> Apple · Outlook
-                      </button>
-                    </div>
-                  </Reveal>
-                )}
-
-                <Reveal
-                  show
-                  delay={after(1800)}
-                  as="p"
-                  className="mx-auto mt-5 max-w-[17rem] text-balance text-[12.5px] leading-relaxed text-[#fff9ef]/75"
-                >
-                  {acceptance.savedTo === "remote" ? "Your acceptance has reached the family." : "Please also let the family know you're coming."}
-                </Reveal>
-                {tellFamily && (
-                  <Reveal show delay={after(1900)} className="mt-3">
-                    <a href={tellFamily} target="_blank" rel="noopener noreferrer" className="rsvp-btn inline-flex items-center gap-2 rounded-[10px] px-5 py-2.5 font-sans text-[13px] font-medium">
-                      <Icon name="chat" className="h-4 w-4" /> Tell the family on WhatsApp
-                    </a>
-                  </Reveal>
-                )}
-              </div>
-            )}
           </div>
         </div>
       </Reveal>
+
+      {scene && (
+        <BlessingScene
+          from={scene.from}
+          instant={scene.instant || reduced}
+          note={note}
+          tellFamily={tellFamily}
+          calendar={calendar}
+          target={() => cardRef.current?.getBoundingClientRect() ?? null}
+          onClosed={() => {
+            setScene(null);
+            replayRef.current?.focus({ preventScroll: true });
+          }}
+        />
+      )}
     </section>
+  );
+}
+
+type CalendarItem = NonNullable<ReturnType<typeof weddingCalendarItem>>;
+
+/**
+ * The scene, full screen on the box's own blue: the light's journey, the temple arch, Mahadev and
+ * Maa Parvati, the blessing, and the two buttons. Every step is a one-time CSS animation, timed
+ * from the moment it opens; `instant` shows the finished scene at once.
+ */
+function BlessingScene({
+  from,
+  instant,
+  note,
+  tellFamily,
+  calendar,
+  target,
+  onClosed,
+}: {
+  from: DOMRect | null;
+  instant: boolean;
+  note: string;
+  tellFamily: string | null;
+  calendar: CalendarItem | null;
+  target: () => DOMRect | null;
+  onClosed: () => void;
+}) {
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const bgRef = useRef<HTMLDivElement>(null);
+  const sceneRef = useRef<HTMLDivElement>(null);
+  const closing = useRef(false);
+  const [options, setOptions] = useState(false);
+  const [feedback, setFeedback] = useState("");
+  useScrollLock(true);
+  const { saveTheDateLayers } = wedding.assets;
+
+  /** The screen clipped down to a box's rectangle (its rounded corners too). */
+  const inset = (r: DOMRect) =>
+    `inset(${r.top}px ${window.innerWidth - r.right}px ${window.innerHeight - r.bottom}px ${r.left}px round 22px)`;
+  const FULL = "inset(0px 0px 0px 0px round 0px)";
+
+  // open: the box's blue opens out from where the box is to fill the screen
+  useLayoutEffect(() => {
+    const dialog = dialogRef.current;
+    const bg = bgRef.current;
+    if (!dialog || !bg) return;
+    if (!dialog.open) dialog.showModal();
+    if (instant || !from || !bg.animate) {
+      bg.animate?.([{ opacity: 0 }, { opacity: 1 }], {
+        duration: 260,
+        easing: "linear",
+        fill: "both",
+      });
+      return;
+    }
+    bg.animate([{ clipPath: inset(from) }, { clipPath: FULL }], {
+      duration: 520,
+      easing: "cubic-bezier(0.65, 0, 0.35, 1)",
+      fill: "both",
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const close = () => {
+    if (closing.current) return;
+    closing.current = true;
+    const dialog = dialogRef.current;
+    const bg = bgRef.current;
+    const scene = sceneRef.current;
+    const done = () => {
+      const y = window.scrollY;
+      dialog?.close();
+      if (window.scrollY !== y) window.scrollTo({ top: y, behavior: "instant" });
+      onClosed();
+    };
+    if (!dialog || !bg || !scene || !bg.animate) return done();
+    scene.animate([{ opacity: 1 }, { opacity: 0 }], {
+      duration: instant ? 200 : 240,
+      easing: "ease",
+      fill: "both",
+    });
+    const to = target();
+    if (instant || !to) {
+      bg.animate([{ opacity: 1 }, { opacity: 0 }], {
+        duration: 240,
+        easing: "linear",
+        fill: "both",
+      }).finished.then(done, done);
+      return;
+    }
+    bg.animate([{ clipPath: FULL }, { clipPath: inset(to) }], {
+      duration: 460,
+      delay: 160,
+      easing: "cubic-bezier(0.65, 0, 0.35, 1)",
+      fill: "both",
+    }).finished.then(done, done);
+  };
+
+  const google = () => {
+    if (!calendar) return;
+    window.open(googleCalendarUrl(calendar), "_blank", "noopener,noreferrer");
+    setFeedback("Google Calendar has opened in a new tab — tap Save there to keep the date.");
+  };
+  const ics = () => {
+    if (!calendar) return;
+    downloadIcs(calendar);
+    setFeedback("A calendar file (.ics) has been downloaded — open it to add the wedding to your calendar.");
+  };
+
+  return (
+    <dialog
+      ref={dialogRef}
+      aria-labelledby="rv-heading"
+      onCancel={(e) => {
+        e.preventDefault();
+        close();
+      }}
+      className="rv fixed inset-0 m-0 h-[100dvh] max-h-none w-screen max-w-none overflow-hidden bg-transparent p-0 backdrop:bg-transparent"
+      data-instant={instant || undefined}
+    >
+      <div ref={bgRef} aria-hidden className="rv-bg" />
+      <div ref={sceneRef} className="rv-layer">
+        {/* the light's journey, and what it brings into view (behind, never scrolling) */}
+        <div aria-hidden className="rv-deco">
+          <span className="rv-light" />
+          <Temple className="rv-temple rv-temple-left" />
+          <Temple className="rv-temple rv-temple-right" />
+          <div className="rv-bells">
+            <Bells />
+          </div>
+        </div>
+        <div className="rv-scene">
+          {/* the arch, and Mahadev and Maa Parvati within it */}
+          <div className="rv-art">
+            <span aria-hidden className="rv-glow" />
+            <img
+              className="rv-figures"
+              src={saveTheDateLayers.figures}
+              alt="Mahadev and Maa Parvati: he gently touches her forehead as she bows her head, garlanded"
+              width={572}
+              height={1024}
+              draggable={false}
+            />
+            <Arch />
+          </div>
+
+          <div className="rv-words">
+            <h2 id="rv-heading" className="rv-heading rv-rise" style={{ "--at": "2700ms" } as CSSProperties}>
+              Your presence means the world
+            </h2>
+            <p className="rv-text rv-rise" style={{ "--at": "2900ms" } as CSSProperties}>
+              With the blessings of Mahadev and Maa Parvati, we look forward to celebrating this special occasion with you.
+            </p>
+            <p className="rv-closing rv-rise" style={{ "--at": "3100ms" } as CSSProperties}>
+              Har Har Mahadev
+            </p>
+          </div>
+
+          <div className="rv-actions">
+            {calendar && (
+              <div className="rv-rise flex flex-col items-center" style={{ "--at": "3500ms" } as CSSProperties}>
+                <button type="button" className="rsvp-btn rv-btn" aria-expanded={options} onClick={() => setOptions((o) => !o)}>
+                  <Icon name="calendar" className="h-4 w-4" strokeWidth={1.5} /> Add to calendar
+                </button>
+                {options && (
+                  <div className="rv-options">
+                    <button type="button" className="rsvp-chip" onClick={google}>
+                      Google Calendar
+                    </button>
+                    <button type="button" className="rsvp-chip" onClick={ics}>
+                      Apple · Outlook (.ics)
+                    </button>
+                  </div>
+                )}
+                <p className="rv-feedback" aria-live="polite">
+                  {feedback}
+                </p>
+              </div>
+            )}
+            <div className="rv-rise" style={{ "--at": "3620ms" } as CSSProperties}>
+              <button type="button" className="rsvp-btn rv-btn" onClick={close}>
+                Return to invitation
+              </button>
+            </div>
+            <p className="rv-note rv-rise" style={{ "--at": "3740ms" } as CSSProperties}>
+              {note}
+            </p>
+            {tellFamily && (
+              <a
+                href={tellFamily}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rsvp-chip rv-rise"
+                style={{ "--at": "3740ms" } as CSSProperties}
+              >
+                <Icon name="chat" className="h-4 w-4 text-[#d4b26e]" /> Tell the family on WhatsApp
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
+    </dialog>
+  );
+}
+
+/**
+ * The temple arch, in fine antique gold (300 × 400): two pillars on their plinths, rising
+ * together; the upper arch drawn from each pillar's top to meet at its peak (an outer line and a
+ * finer inner one); a small kalash on the peak; and one gleam running along the arch.
+ */
+function Arch() {
+  const draw = (at: number, dur: number) => ({ "--at": `${at}ms`, "--dur": `${dur}ms` }) as CSSProperties;
+  const half = "M36 166C36 122 86 100 116 78 134 64 144 48 150 28";
+  const halfIn = "M48 172C48 132 94 112 121 92 137 80 146 66 150 50";
+  const mirror = (d: string) =>
+    d.replace(/(\d+(?:\.\d+)?) (\d+(?:\.\d+)?)/g, (_, x: string, y: string) => `${300 - Number(x)} ${y}`);
+  return (
+    <svg aria-hidden className="rv-arch" viewBox="0 0 300 400" fill="none" strokeLinecap="round" strokeLinejoin="round">
+      {[0, 1].map((side) => {
+        const x = (v: number) => (side ? 300 - v : v);
+        return (
+          <g key={side}>
+            {/* the pillar: two lines rising from the plinth to the capital */}
+            <path className="rv-stroke" pathLength={1} d={`M${x(28)} 392V172`} style={draw(900, 500)} />
+            <path className="rv-stroke rv-fine" pathLength={1} d={`M${x(44)} 392V176`} style={draw(950, 480)} />
+            <path
+              className="rv-stroke"
+              pathLength={1}
+              d={`M${x(20)} 396H${x(52)}M${x(23)} 388H${x(49)}`}
+              style={draw(900, 220)}
+            />
+            <path
+              className="rv-stroke"
+              pathLength={1}
+              d={`M${x(22)} 172H${x(50)}M${x(25)} 178H${x(47)}`}
+              style={draw(1330, 200)}
+            />
+            {/* the arch, from the pillar's top to the peak */}
+            <path className="rv-stroke" pathLength={1} d={side ? mirror(half) : half} style={draw(1300, 480)} />
+            <path className="rv-stroke rv-fine" pathLength={1} d={side ? mirror(halfIn) : halfIn} style={draw(1360, 440)} />
+          </g>
+        );
+      })}
+      {/* the kalash on the peak */}
+      <g className="rv-kalash">
+        <path d="M150 28V18M150 22c-4-2-7-1-8 2M150 22c4-2 7-1 8 2" stroke="#b89554" strokeWidth="1.2" />
+        <circle cx="150" cy="14" r="3.2" stroke="#d4b26e" strokeWidth="1.2" fill="#d4b26e" fillOpacity="0.35" />
+      </g>
+      {/* one gleam running along the arch, left to right */}
+      <path className="rv-shine" pathLength={1} d={`${half}C156 48 166 64 184 78 214 100 264 122 264 166`} />
+    </svg>
+  );
+}
+
+/** The bells from the box's top corners. */
+function Bells() {
+  return (
+    <>
+      {(["left", "right"] as const).map((side) =>
+        BELLS[side].map((b, i) => (
+          <span key={`${side}${i}`} aria-hidden className="rsvp-bell" style={{ [side]: b.at, width: b.w, height: b.drop }}>
+            <img src={b.src} alt="" width={b.w} height={Math.round(b.w * b.ratio)} draggable={false} />
+          </span>
+        )),
+      )}
+    </>
   );
 }
 
 /** Mahadev's trishul, in fine gold line. */
 function Trishul() {
   return (
-    <svg aria-hidden viewBox="0 0 32 46" className="mx-auto h-[52px] w-9" fill="none" stroke="#d4b26e" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      aria-hidden
+      viewBox="0 0 32 46"
+      className="mx-auto h-[52px] w-9"
+      fill="none"
+      stroke="#d4b26e"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       {/* the middle blade, the two curving side prongs, the shaft */}
       <path d="M16 2.5 13.6 9 16 15l2.4-6Z" fill="#d4b26e" fillOpacity="0.35" />
       <path d="M16 15v29" />
@@ -284,10 +593,10 @@ function Divider({ wide = false }: { wide?: boolean }) {
   );
 }
 
-/** A temple's silhouette, faint, at the box's foot (bottom right). */
-function Temple() {
+/** A temple's silhouette, faint (the box's foot, and the scene's two corners). */
+function Temple({ className }: { className: string }) {
   return (
-    <svg aria-hidden viewBox="0 0 120 90" className="rsvp-temple" fill="currentColor">
+    <svg aria-hidden viewBox="0 0 120 90" className={className} fill="currentColor">
       {/* the plinth, the hall, the main tower with its amalaka, kalash and flag, a small shrine */}
       <path d="M8 84h112v6H8z" />
       <path d="M34 84V66q0-6 6-11 5-4 8-7 3 3 8 7 6 5 6 11v18z" />
