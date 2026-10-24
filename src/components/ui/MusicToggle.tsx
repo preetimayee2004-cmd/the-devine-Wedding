@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { createDhun, type Dhun } from "@/lib/templeBells";
 
 /**
- * A small round button in the top corner: soft temple bells on, or off. Off
- * until the guest taps it — never plays on its own.
+ * A small round sound button in the top corner (a speaker, as on the gate): soft temple bells on, or
+ * off. Off until the guest taps it — never plays on its own.
  */
 export function MusicToggle({ visible }: { visible: boolean }) {
   const dhun = useRef<Dhun | null | undefined>(undefined);
@@ -24,20 +24,19 @@ export function MusicToggle({ visible }: { visible: boolean }) {
       type="button"
       onClick={toggle}
       aria-pressed={playing}
-      aria-label={playing ? "Turn off the temple bells" : "Play soft temple bells"}
+      aria-label={playing ? "Sound on: turn off the temple bells" : "Sound off: play soft temple bells"}
       className={`fixed right-5 z-40 flex h-10 w-10 items-center justify-center rounded-full border border-gold/70 bg-ivory/80 text-navy shadow-[0_4px_14px_-6px_rgb(var(--navy)/0.35)] backdrop-blur-sm transition-opacity duration-500 hover:bg-ivory ${visible ? "opacity-100" : "pointer-events-none opacity-0"}`}
       style={{ top: "calc(var(--status-bar) + 22px)" }}
     >
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
-        {/* a temple bell */}
-        <path strokeLinejoin="round" d="M12 3v2M7.5 15.5V11a4.5 4.5 0 0 1 9 0v4.5l1.5 2H6z" />
-        <path strokeLinecap="round" d="M10.5 19.5a1.6 1.6 0 0 0 3 0" />
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        {/* a speaker */}
+        <path d="M4 9.5h3.2L11.5 6v12l-4.3-3.5H4Z" />
         {playing ? (
-          // ringing
-          <path strokeLinecap="round" className="text-gold-ink" stroke="currentColor" d="M19.5 8.5a6 6 0 0 1 0 6M4.5 8.5a6 6 0 0 0 0 6" />
+          // sound
+          <path className="text-gold-ink" stroke="currentColor" d="M15 9.2a4 4 0 0 1 0 5.6M17.6 7a7.2 7.2 0 0 1 0 10" />
         ) : (
           // silent
-          <path strokeLinecap="round" d="M4 4l16 16" />
+          <path d="M15.6 9.8l4.2 4.4M19.8 9.8l-4.2 4.4" />
         )}
       </svg>
     </button>
