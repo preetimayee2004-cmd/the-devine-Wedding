@@ -11,7 +11,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
  * "Wedding Events" and one quote above the couple's gold temple arch, wreathed in lotus and banana
  * leaves, with the music of the celebration and a festive elephant at its foot — all of it still.
  * Inside the arch, one ceremony at a time: the couple dressed for it, then its name, date and time,
- * venue (a tap opens it in Google Maps) and dress code.
+ * venue (a small ivory button with a gold edge: a tap opens it in Google Maps) and dress code.
  *
  * To the next: a tap on the arch, a swipe left, the › under it (‹ or a swipe right for the one
  * before), or a gold progress mark; after the last, the first. The change (0.8s; taps meanwhile
@@ -210,6 +210,9 @@ function Card({ ceremony, role }: { ceremony: Ceremony; role: "rest" | "old" | "
               <circle cx="12" cy="10" r="2.4" />
             </svg>
             <span>{ceremony.venue}</span>
+            <svg aria-hidden viewBox="0 0 24 24" className="ev-venue-out" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M8 16 16 8M10 8h6v6" />
+            </svg>
           </a>
         </p>
         <p className="ev-dress">

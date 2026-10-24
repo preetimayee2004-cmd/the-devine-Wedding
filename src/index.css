@@ -463,30 +463,59 @@
     border-radius: 20px;
   }
 
-  /* the venue: a tap opens it in Google Maps (it sits above the arch's own tap) */
+  /* the venue: a small button — an ivory pill with a fine antique-gold edge, the gold pin, the
+     place, a small arrow out; a tap opens it in Google Maps (it sits above the arch's own tap) */
+  .ev-venue {
+    margin-top: 1.5cqw;
+  }
   .ev-venue-link {
     position: relative;
     z-index: 5;
     display: inline-flex;
-    align-items: baseline;
-    gap: 0.25em;
-    color: inherit;
-    text-decoration: underline dotted rgb(182 154 103 / 0.9);
-    text-underline-offset: 3px;
+    align-items: center;
+    gap: 0.35em;
+    max-width: 100%;
+    padding: 0.32em 0.85em 0.36em 0.7em;
+    border: 1px solid rgb(184 149 84 / 0.75);
+    border-radius: 9999px;
+    background: rgb(255 251 242 / 0.82);
+    box-shadow: 0 3px 8px -5px rgb(18 41 74 / 0.35);
+    color: rgb(var(--navy));
+    font-weight: 500;
+    line-height: 1.25;
+    text-decoration: none;
     pointer-events: auto;
     -webkit-tap-highlight-color: transparent;
+    transition:
+      background-color 200ms ease,
+      border-color 200ms ease,
+      box-shadow 200ms ease,
+      transform 150ms ease;
   }
   .ev-venue-link svg {
     flex: none;
-    align-self: center;
     width: 0.95em;
     height: 0.95em;
     color: rgb(var(--gold-ink));
   }
+  .ev-venue-link .ev-venue-out {
+    width: 0.8em;
+    height: 0.8em;
+    opacity: 0.85;
+  }
+  @media (hover: hover) {
+    .ev-venue-link:hover {
+      border-color: rgb(var(--gold-ink));
+      background: #fffdf8;
+      box-shadow: 0 4px 10px -5px rgb(18 41 74 / 0.45);
+    }
+  }
+  .ev-venue-link:active {
+    transform: scale(0.97);
+  }
   .ev-venue-link:focus-visible {
     outline: 2px solid rgb(var(--gold-ink));
     outline-offset: 2px;
-    border-radius: 3px;
   }
 
   /* the change (0.8s, ease-in-out): the ceremony shown fades out, its picture easing down a little (0.3s)… */
