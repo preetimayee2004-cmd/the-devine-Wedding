@@ -10,8 +10,9 @@ import { Reveal } from "@/components/ui/Reveal";
  * Section 11 — blessed beginnings (PRD §4).
  *
  * The venue's route runs into a circular gold halo that draws itself slowly.
- * Within it, Shiv and Parvati paint in through the watercolour bloom; the
- * thank-you and a closing mantra follow.
+ * Within it, little Mahadev on Nandi paints in through the watercolour bloom —
+ * his trishul rising past the ring — and the thank-you and a closing mantra
+ * follow.
  */
 const HALO_DOTS = Array.from({ length: 12 }, (_, i) => {
   const a = (i / 12) * Math.PI * 2;
@@ -102,18 +103,18 @@ export function ThankYou() {
             ))}
           </g>
         </svg>
-        {/* Shiv and Parvati, fading softly into the halo at the base */}
-        <div className="absolute inset-x-[11%] bottom-[10%] top-[16%] [mask-image:linear-gradient(#000_72%,transparent)] [-webkit-mask-image:linear-gradient(#000_72%,transparent)]">
+        {/* little Mahadev on Nandi, fading softly into the halo at the base; the trishul rises past the ring */}
+        <div className="absolute inset-x-[7%] bottom-[7%] top-[4%] [mask-image:linear-gradient(#000_80%,transparent_99%)] [-webkit-mask-image:linear-gradient(#000_80%,transparent_99%)]">
           <div
             className="watercolor-reveal flex h-full items-end justify-center"
             style={{ ...paint, "--watercolor-mask": `url(${assets.watercolorMask})` } as CSSProperties}
           >
             <img
-              src={assets.divineCouple}
-              alt="Shiva and Parvati seated together"
+              src={assets.thankYouArt}
+              alt="Little Mahadev riding Nandi, holding his trishul and damru"
               loading="lazy"
               decoding="async"
-              className="block h-auto w-full"
+              className="block h-full w-full object-contain object-bottom"
             />
           </div>
         </div>

@@ -517,8 +517,12 @@ export const wedding = {
      * faster. Made from `saveTheDateArt` — remake both if it changes.
      */
     saveTheDateLayers: { back: "/art/painting-back.webp", figures: "/art/painting-figures.webp" },
-    /** Shiv–Parvati seated together (Thank You, gallery). */
-    divineCouple: "/art/shiva-parvati-seated.webp",
+    /**
+     * Section 11 (Thank You): little Mahadev riding Nandi, trishul and damru in hand — the couple's
+     * chosen picture, cut out of its Himalayan scene (the bun's top and Nandi's back, cropped by the
+     * picture, fade softly) so it stands in the gold halo on the site's own sky.
+     */
+    thankYouArt: "/art/baby-shiva-nandi.webp",
     /**
      * Section 08 (RSVP): Mahadev holding Maa Parvati close, eyes closed — the couple's chosen painting,
      * cut out of its red ground (the halo's arc and the corner flowers left behind) so it stands in the
