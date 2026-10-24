@@ -5,6 +5,7 @@ import { useLang } from "@/lib/lang";
 import { directionsUrl } from "@/lib/maps";
 import { EASE, MOTION } from "@/lib/motion";
 import { glideTo, USER_INPUT_EVENTS } from "@/lib/scroll";
+import { snapToNext } from "@/lib/snap";
 import { readSessionFlag, writeSessionFlag } from "@/lib/session";
 import { formatVenueDate, parseVenueDateTime } from "@/lib/venueTime";
 import { Icon } from "@/components/art/Icons";
@@ -163,6 +164,19 @@ export function Invitation() {
       USER_INPUT_EVENTS.forEach((type) => window.removeEventListener(type, onInput));
     };
   }, [done, still]);
+
+  // Save the Date ⇄ the couple section, one whole screen at a time: a scroll down glides straight to
+  // the couple section and stops there; a scroll up from there glides back (the descent plays as it goes)
+  useEffect(() => {
+    if (!done) return;
+    return snapToNext(
+      () => {
+        const next = document.getElementById("couple");
+        return next ? next.getBoundingClientRect().top + window.scrollY : 0;
+      },
+      { ignore: ".veil-foil" },
+    );
+  }, [done]);
 
   // ── the card's language: English or Hindi, remembered on this phone ──
   const hindi = useLang() === "hi";
