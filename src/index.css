@@ -674,6 +674,74 @@
     }
   }
 
+  /* Temple bells (components/art/Temple): a fine antique-gold thread from the top edge down to each
+     bell (it swings from the top). Their holder's data-bells: "hidden" before they come in; "in" —
+     each drops 12px into place and settles with one small swing toward the middle (from --bells-at);
+     "still" — they simply fade in. Nothing keeps moving. */
+  .temple-bell {
+    position: absolute;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    transform-origin: 50% 0;
+    pointer-events: none;
+  }
+  .temple-bell::before {
+    content: "";
+    flex: 1;
+    width: 1px;
+    margin-bottom: -2px;
+    background: linear-gradient(to bottom, rgb(184 149 84 / 0.95), rgb(184 149 84 / 0.7));
+  }
+  .temple-bell img {
+    display: block;
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.3));
+  }
+  [data-bells="hidden"] .temple-bell {
+    opacity: 0;
+  }
+  [data-bells="in"] .temple-bell {
+    animation:
+      bell-in 550ms cubic-bezier(0.22, 1, 0.36, 1) calc(var(--bells-at, 0ms) + var(--i) * 70ms) both,
+      bell-sway 1300ms ease-out calc(var(--bells-at, 0ms) + 200ms + var(--i) * 70ms) both;
+  }
+  [data-bells="still"] .temple-bell {
+    animation: bell-fade 400ms ease-out both;
+  }
+  @keyframes bell-in {
+    from {
+      opacity: 0;
+      translate: 0 -12px;
+    }
+  }
+  @keyframes bell-sway {
+    0% {
+      rotate: 0deg;
+    }
+    22% {
+      rotate: calc(var(--dir) * 3deg);
+    }
+    48% {
+      rotate: calc(var(--dir) * -1.8deg);
+    }
+    72% {
+      rotate: calc(var(--dir) * 0.8deg);
+    }
+    100% {
+      rotate: 0deg;
+    }
+  }
+  @keyframes bell-fade {
+    from {
+      opacity: 0;
+    }
+  }
+
   /* RSVP: a deep night-blue box with a fine double edge of antique gold; temple bells hanging from
      its top corners, a temple faint at its foot; gold words. */
   .rsvp-card {
@@ -1669,37 +1737,50 @@
   }
   /* The couple's heads sit 35.1% of the width down the scene piece (its top is clear sky with palms
      at the very edges): it may tuck up beside the words, but always leaves 40px of sky above them. */
-  /* Family: on a phone the two families one above the other, each frame 72% wide; from 520px side
-     by side, the thread parting in two */
+  /* Family: on a phone the two families one above the other (a lotus rule between), each arch
+     frame 64% wide; from 520px side by side */
   .fam-pair {
     display: grid;
     grid-template-columns: 1fr;
-    row-gap: 40px;
-    margin-top: 8px;
+    row-gap: 30px;
+    margin-top: 26px;
   }
   .fam-frame {
-    width: min(72%, 290px);
+    width: min(64%, 250px);
   }
-  .fam-thread-one {
+  .fam-arch {
     display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    filter: drop-shadow(0 12px 18px rgb(18 41 74 / 0.12));
   }
-  .fam-thread-two {
-    display: none;
+  .fam-photo {
+    transform-box: fill-box;
+    transform-origin: 50% 50%;
+  }
+  .fam-between {
+    display: flex;
+    justify-content: center;
+  }
+  .fam-temple {
+    position: absolute;
+    right: 10px;
+    bottom: 4px;
+    width: 86px;
+    color: rgb(18 41 74 / 0.08);
+    pointer-events: none;
   }
   @media (min-width: 520px) {
     .fam-pair {
       grid-template-columns: 1fr 1fr;
-      column-gap: 16px;
-      margin-top: 0;
+      column-gap: 20px;
     }
     .fam-frame {
-      width: 100%;
+      width: min(86%, 250px);
     }
-    .fam-thread-one {
+    .fam-between {
       display: none;
-    }
-    .fam-thread-two {
-      display: block;
     }
   }
   /* "Welcome": a deep kumkum red, festive, and clear on the pale sky */

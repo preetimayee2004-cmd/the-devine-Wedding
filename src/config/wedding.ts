@@ -431,9 +431,6 @@ export const wedding = {
      * veena, harmonium, a painted gramophone and a festive elephant at its foot. Its white was made
      * transparent (and the editing app's checkerboard blob removed), so the site's sky shows through.
      */
-    /** Section 06: the ornate frame round each family photo — gilded scrolls on deep blue, its white made transparent. */
-    familyFrame: "/art/family-frame.webp",
-    familyFrameSize: { width: 667, height: 1000 },
     eventsArch: "/art/events-arch.webp",
     eventsArchSize: { width: 1098, height: 1228 },
     saveTheDateArt: "/art/shiva-parvati-blessing.jpg",
