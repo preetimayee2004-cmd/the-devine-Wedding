@@ -176,7 +176,7 @@
     height: auto;
     max-width: none;
     translate: -50% -52%;
-    filter: drop-shadow(0 3px 4px rgb(120 30 50 / 0.28));
+    filter: drop-shadow(0 3px 4px rgb(30 40 110 / 0.3));
     pointer-events: none;
   }
   /* the lotus breathes, a soft gold glow swelling behind it (2.6s) */
@@ -223,8 +223,8 @@
     position: relative;
     color: #fff;
     text-shadow:
-      0 1px 2px rgb(110 20 45 / 0.75),
-      0 0 6px rgb(150 30 60 / 0.5);
+      0 1px 2px rgb(24 32 90 / 0.8),
+      0 0 6px rgb(40 50 120 / 0.55);
   }
   /* the words above, in a deeper gold that reads on the pale sky */
   .cd-deep-gold {
@@ -2247,7 +2247,8 @@
     width: var(--size);
     height: calc(var(--size) * 1.35);
     border-radius: 60% 60% 50% 50% / 75% 75% 30% 30%;
-    background: linear-gradient(160deg, #f7b9c5, #e2677f 70%, #c94a62);
+    /* jasmine-white petals with a breath of lavender, as the couple scene's */
+    background: linear-gradient(160deg, #ffffff, #e2e4f6 65%, #b9bde6);
     opacity: 0;
     will-change: transform, opacity;
   }
@@ -2372,9 +2373,9 @@
       display: none;
     }
   }
-  /* "Welcome": a deep kumkum red, festive, and clear on the pale sky */
+  /* "Welcome": a deep sapphire — Mahadev's blue, festive, and clear on the pale sky */
   .couple-welcome-word {
-    color: #9b1c31;
+    color: #2a4f8f;
   }
   .couple-scene-foot {
     margin-top: calc(40px - 35.1vw);

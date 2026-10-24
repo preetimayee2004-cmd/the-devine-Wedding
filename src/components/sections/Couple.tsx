@@ -20,7 +20,7 @@ const TOAST_MS = 1500;
  * below the bells, the guest's welcome — their name from the link, the
  * couple's names, the hashtag (a tap copies it), the date and the venue (a
  * map link); and at the foot the couple offering water to the Shivling, by
- * the river with a temple, a diya and lotuses — always with clear sky above
+ * the river with a temple, a diya and blue lotuses (she in lavender, he in cool white) — always with clear sky above
  * their heads. The words rise in one by one as the section comes into view
  * (in Hindi too, when the Save the Date's EN / हिं switch is on हिं). It keeps
  * its id because the Save the Date's "View the Invitation" and auto-glide land
