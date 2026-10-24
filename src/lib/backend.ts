@@ -65,7 +65,6 @@ async function rest(path: string, init: RequestInit & { prefer?: string } = {}):
 // ── This phone ─────────────────────────────────────────────────
 
 const LOCAL_WISHES = "dw:wishes";
-const LOCAL_ACCEPTED = "dw:accepted";
 
 function readLocal<T>(key: string, fallback: T): T {
   try {
@@ -117,13 +116,8 @@ export async function addWish(wish: Wish): Promise<void> {
 export interface Acceptance {
   id: string;
   guestName: string;
-  /** "remote": the family has it. "local": kept on this phone only. */
+  /** "remote": the family has it. "local": not sent anywhere (and not kept: a reload asks again). */
   savedTo: "remote" | "local";
-}
-
-/** A previous acceptance from this phone, so a returning guest sees their confirmation. */
-export function readAcceptance(): Acceptance | null {
-  return readLocal<Acceptance | null>(LOCAL_ACCEPTED, null);
 }
 
 export async function acceptInvitation(guestName: string, guestKey: string | null): Promise<Acceptance> {
@@ -137,6 +131,5 @@ export async function acceptInvitation(guestName: string, guestKey: string | nul
   } else {
     await pause(350);
   }
-  writeLocal(LOCAL_ACCEPTED, acceptance);
   return acceptance;
 }

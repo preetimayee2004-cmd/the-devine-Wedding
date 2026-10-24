@@ -3,7 +3,7 @@ import { wedding } from "@/config/wedding";
 import { useGuest } from "@/context/GuestContext";
 import { useInView } from "@/hooks/useInView";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
-import { acceptInvitation, BackendError, readAcceptance, type Acceptance } from "@/lib/backend";
+import { acceptInvitation, BackendError, type Acceptance } from "@/lib/backend";
 import { downloadIcs, googleCalendarUrl, weddingCalendarItem } from "@/lib/calendar";
 import { whatsappUrl } from "@/lib/maps";
 import { EASE } from "@/lib/motion";
@@ -15,11 +15,12 @@ import { Reveal } from "@/components/ui/Reveal";
  * Section 08 — a personal confirmation (PRD §4). No form, no fields: one
  * "Accept with Joy" button. Tapped, it becomes a small gold seal with a soft
  * glow and a brief scatter of gold; then a personal message, the couple's
- * words, and Add to Calendar.
+ * words, and Add to Calendar. Every visit starts with the button: an
+ * acceptance isn't remembered, so a reload shows "Accept with Joy" again.
  *
  * Honesty rule: the wording says the family received it only when the
- * database actually saved it. Without one, it says the confirmation is on
- * the guest's phone and (if configured) offers to tell the family on WhatsApp.
+ * database actually saved it. Without one, it asks the guest to let the
+ * family know too and (if configured) offers to do it on WhatsApp.
  */
 type Phase = "idle" | "sending" | "sealed";
 
@@ -43,8 +44,8 @@ export function Rsvp() {
   const ref = useRef<HTMLElement>(null);
   const seen = useInView(ref, { threshold: 0.25 });
   const reduced = usePrefersReducedMotion();
-  const [acceptance, setAcceptance] = useState<Acceptance | null>(() => readAcceptance());
-  const [phase, setPhase] = useState<Phase>(acceptance ? "sealed" : "idle");
+  const [acceptance, setAcceptance] = useState<Acceptance | null>(null);
+  const [phase, setPhase] = useState<Phase>("idle");
   const [celebrate, setCelebrate] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -73,7 +74,7 @@ export function Rsvp() {
 
   const sealed = phase === "sealed";
   const names = `${couple.bride.displayName} & ${couple.groom.displayName}`;
-  // A fresh acceptance unfolds step by step; a returning guest sees it settled.
+  // The acceptance unfolds step by step (with reduced motion, all at once).
   const after = (ms: number) => (celebrate ? ms : 0);
   const tellFamily =
     rsvp.whatsapp && acceptance?.savedTo === "local"
@@ -230,7 +231,7 @@ export function Rsvp() {
                 >
                   {acceptance.savedTo === "remote"
                     ? "Your acceptance has reached the family."
-                    : "This confirmation is saved on your phone. Please also let the family know you're coming."}
+                    : "Please also let the family know you're coming."}
                 </Reveal>
                 {tellFamily && (
                   <Reveal show delay={after(1900)} className="mt-3">
