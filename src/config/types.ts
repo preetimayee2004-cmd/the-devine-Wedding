@@ -72,6 +72,24 @@ export interface Contact {
   phone: string | null;
 }
 
+/** A family member to call (Contact & Assistance). Null fields show as "to come". */
+export interface FamilyContact {
+  /** "The Bride's Family", "The Groom's Family". */
+  side: string;
+  name: string | null;
+  /** Their actual relationship, e.g. "Bride's brother". */
+  relation: string | null;
+  /** International format without "+"; null hides the call button. */
+  phone: string | null;
+}
+
+/** A coordinator to call (Contact & Assistance). */
+export interface Coordinator {
+  role: string;
+  name: string | null;
+  phone: string | null;
+}
+
 export interface Stay {
   name: string;
   distance: string;

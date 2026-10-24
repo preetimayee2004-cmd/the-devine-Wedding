@@ -8,6 +8,7 @@ import { Gallery } from "@/components/sections/Gallery";
 import { Rsvp } from "@/components/sections/Rsvp";
 import { BlessingWall } from "@/components/sections/BlessingWall";
 import { Venue } from "@/components/sections/Venue";
+import { Contact } from "@/components/sections/Contact";
 import { ThankYou } from "@/components/sections/ThankYou";
 import { LoveNote } from "@/components/sections/LoveNote";
 import { SectionSeparator } from "@/components/ui/SectionSeparator";
@@ -39,8 +40,10 @@ export function Experience() {
       <SectionSeparator ornament="lotus" />
       <Venue />
       <SectionSeparator ornament="diya" />
-      <ThankYou />
+      <Contact />
       <SectionSeparator ornament="shankh" />
+      <ThankYou />
+      <SectionSeparator ornament="lotus" />
       <LoveNote />
     </>
   );

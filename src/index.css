@@ -2076,6 +2076,258 @@
     border-bottom: 1px solid rgb(184 149 84 / 0.45);
   }
 
+  /* Contact & Assistance — a small wedding directory: the two families under fine gold arches on a
+     soft cream ground, then two compact coordinator rows. */
+  .ct-family {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+    max-width: 24rem;
+    margin: 28px auto 0;
+  }
+  @media (min-width: 520px) {
+    .ct-family {
+      grid-template-columns: 1fr 1fr;
+      max-width: 34rem;
+    }
+  }
+  .ct-person {
+    position: relative;
+    height: 100%;
+    padding-top: 30px;
+    text-align: center;
+  }
+  /* the arch above, in fine gold, opening onto a soft cream ground (no box) */
+  .ct-arch {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    width: 100%;
+    height: 44px;
+    overflow: visible;
+  }
+  .ct-arch path {
+    fill: none;
+    stroke: #b89554;
+    stroke-width: 1.2;
+    vector-effect: non-scaling-stroke;
+  }
+  .ct-arch .ct-arch-fine {
+    stroke: #c9a45c;
+    stroke-width: 0.7;
+    opacity: 0.75;
+  }
+  .ct-person-body {
+    height: 100%;
+    margin: 0 3%;
+    padding: 18px 18px 20px;
+    background: linear-gradient(180deg, rgb(255 251 242 / 0.25), rgb(255 251 242 / 0.85) 40%, rgb(255 251 242 / 0.6));
+    border-radius: 0 0 14px 14px;
+  }
+  .ct-side {
+    font-family: var(--font-body);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: rgb(var(--gold-ink));
+  }
+  .ct-name {
+    margin-top: 8px;
+    font-family: var(--font-display);
+    font-size: 25px;
+    font-weight: 600;
+    line-height: 1.15;
+    color: rgb(var(--navy));
+  }
+  .ct-relation {
+    margin-top: 4px;
+    font-family: var(--font-body);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgb(var(--gold-ink));
+  }
+  .ct-phone {
+    margin-top: 10px;
+    font-family: var(--font-body);
+    font-size: 15.5px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: rgb(var(--slate));
+    font-variant-numeric: tabular-nums;
+  }
+  /* what isn't given yet: quiet italics */
+  #contact .ct-tbc {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 500;
+    color: rgb(var(--slate) / 0.75);
+  }
+  .ct-name.ct-tbc {
+    font-size: 20px;
+  }
+  .ct-phone.ct-tbc,
+  .ct-row-phone.ct-tbc {
+    font-size: 15px;
+    letter-spacing: 0;
+  }
+  /* "Call": deep maroon, warm ivory words, a thin antique-gold edge */
+  .ct-call,
+  .ct-call-round {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #b89554;
+    background-color: #702d35;
+    color: #fff9ef;
+    box-shadow:
+      inset 0 1px 0 rgb(255 249 239 / 0.14),
+      0 10px 20px -12px rgb(112 45 53 / 0.75);
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      background-color 200ms ease,
+      border-color 200ms ease,
+      transform 150ms ease;
+  }
+  .ct-call {
+    gap: 8px;
+    min-height: 48px;
+    margin-top: 14px;
+    padding: 0 26px;
+    border-radius: 10px;
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .ct-call-round {
+    flex: none;
+    width: 48px;
+    height: 48px;
+    border-radius: 9999px;
+  }
+  @media (hover: hover) {
+    .ct-call:hover,
+    .ct-call-round:hover {
+      background-color: #7e3640;
+      border-color: #d0b06f;
+    }
+  }
+  .ct-call:active,
+  .ct-call-round:active {
+    background-color: #5d242b;
+    transform: scale(0.97);
+  }
+  .ct-call:focus-visible,
+  .ct-call-round:focus-visible {
+    outline: 2px solid rgb(var(--gold-ink));
+    outline-offset: 3px;
+  }
+  /* the gold rule between the families and the coordinators, drawing out from its lotus */
+  .ct-rule {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    max-width: 18rem;
+    margin: 30px auto 22px;
+  }
+  .ct-rule-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgb(184 149 84 / 0), rgb(184 149 84 / 0.9));
+    transform-origin: right;
+  }
+  .ct-rule-right {
+    background: linear-gradient(90deg, rgb(184 149 84 / 0.9), rgb(184 149 84 / 0));
+    transform-origin: left;
+  }
+  .ct-rule-lotus {
+    width: 30px;
+    height: 20px;
+    flex: none;
+  }
+  #contact:not([data-shown]) .ct-rule-line {
+    transform: scaleX(0);
+  }
+  #contact:not([data-shown]) .ct-rule-lotus {
+    opacity: 0;
+  }
+  #contact[data-shown] .ct-rule-line {
+    animation: ct-draw 800ms cubic-bezier(0.45, 0, 0.25, 1) 900ms both;
+  }
+  #contact[data-shown] .ct-rule-lotus {
+    animation: ct-fade 500ms ease-out 850ms both;
+  }
+  #contact[data-still] .ct-rule-line,
+  #contact[data-still] .ct-rule-lotus {
+    animation: ct-fade 400ms ease-out both;
+  }
+  @keyframes ct-draw {
+    from {
+      transform: scaleX(0);
+    }
+  }
+  @keyframes ct-fade {
+    from {
+      opacity: 0;
+    }
+  }
+  /* wedding coordination: a gold heading, then two compact rows with a fine gold line between */
+  .ct-coord-title {
+    font-family: var(--font-body);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.26em;
+    text-align: center;
+    text-transform: uppercase;
+    color: rgb(var(--gold-ink));
+  }
+  .ct-rows {
+    margin-top: 14px;
+    border-top: 1px solid rgb(184 149 84 / 0.45);
+    border-bottom: 1px solid rgb(184 149 84 / 0.45);
+  }
+  .ct-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 4px;
+  }
+  .ct-row + .ct-row {
+    border-top: 1px solid rgb(184 149 84 / 0.35);
+  }
+  .ct-role {
+    font-family: var(--font-body);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgb(var(--gold-ink));
+  }
+  .ct-row-name {
+    margin-top: 2px;
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.2;
+    color: rgb(var(--navy));
+  }
+  .ct-row-name.ct-tbc {
+    font-size: 17px;
+  }
+  .ct-row-phone {
+    margin-top: 1px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: rgb(var(--slate));
+    font-variant-numeric: tabular-nums;
+  }
+
   /* Save the Date: a short shower of red petals (each falls once). */
   .petal {
     position: absolute;

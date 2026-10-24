@@ -8,6 +8,8 @@
 import {
   list,
   type Ceremony,
+  type Coordinator,
+  type FamilyContact,
   type FamilySide,
   type Photo,
   type Stay,
@@ -393,6 +395,32 @@ export const wedding = {
         photo: null,
         hosted: false,
       },
+    ]),
+  },
+
+  /**
+   * Section 10½ — "Contact & Assistance", between the venue and the thank-you.
+   *
+   * Fill in only real details. A contact with no `name` shows "Details to come"; with no `phone`,
+   * "Number to come" and no call button. Phones in international format without "+", e.g.
+   * "919876543210" (shown as +91 98765 43210, dialled from a tel: link).
+   */
+  contact: {
+    eyebrow: "Here for You",
+    title: "Contact & Assistance",
+    intro: "For any questions or assistance, our families are always happy to help.",
+    /** One for each side: who to call, and how they are related to the bride or the groom. */
+    family: list<FamilyContact>([
+      // the bride's brother, as named in the family section above
+      { side: "The Bride's Family", name: "Ankit", relation: "Bride's brother", phone: null },
+      // the groom's side: who it is (and their actual relationship) still to be given
+      { side: "The Groom's Family", name: null, relation: null, phone: null },
+    ]),
+    coordinationTitle: "Wedding Coordination",
+    coordinationNote: "For assistance with guest arrangements and wedding details.",
+    coordinators: list<Coordinator>([
+      { role: "Guest Coordinator", name: null, phone: null },
+      { role: "Wedding Coordinator", name: null, phone: null },
     ]),
   },
 
