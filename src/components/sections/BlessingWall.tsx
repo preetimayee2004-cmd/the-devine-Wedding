@@ -5,26 +5,33 @@ import { useGuest } from "@/context/GuestContext";
 import { useInView } from "@/hooks/useInView";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
 import { addWish, BackendError, backendMode, listWishes, newId } from "@/lib/backend";
-import { EASE } from "@/lib/motion";
-import { Icon } from "@/components/art/Icons";
+import { Lotus, LotusRule } from "@/components/art/Ornaments";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Sheet } from "@/components/ui/Sheet";
 
 /**
- * Section 09 — three wishes, one beautiful beginning (PRD §4).
+ * Section 09 — the Blessing Wall (PRD §4), laid out like a page of an old wedding manuscript.
  *
- * Exactly three featured wishes, a View All Wishes action, one wish box and
- * one Leave Your Wish button — nothing more. A wish is trimmed, checked and
- * cleaned before it's sent; only a successful send plays the little
- * celebration (a gold ripple, a lotus, the wish as a keepsake card). A failed
- * send keeps the words and offers to try again.
+ * The heading and its line, a small gold lotus rule. Then three blessings, not as cards: the first
+ * is the centrepiece — on a warm-ivory, faintly textured leaf with only small gold corner ornaments,
+ * an oversized opening quotation mark, the words in italic serif and the sender beneath in small
+ * gold capitals; the next two sit below it, unboxed, side by side and slightly staggered, a fine
+ * gold line between them. "View all wishes →" (a fine gold underline that fills on hover, the arrow
+ * stepping on) opens every blessing in the sheet.
+ *
+ * "Leave a Blessing" follows on the page itself, no card: a small gold lotus, the heading, a clean
+ * box with a fine gold edge (its placeholder, a counter, who it is signed by), and "Send your
+ * blessing". A wish is trimmed, checked and cleaned before it's sent; only once it is saved does
+ * the form give way to its confirmation — a gold lotus drawing itself, "Your blessing has found its
+ * place.", where it was kept — and the new blessing takes the centre of the wall. A failed send keeps
+ * the words and offers to try again. "Leave another blessing" brings the form back.
+ *
+ * One way of moving throughout: the heading rises in, the centrepiece fades in, the two others
+ * follow a beat apart, the form rises in when it is reached. Reduced motion: plain fades.
  */
 type SendState =
   { kind: "idle" } | { kind: "sending" } | { kind: "sent"; wish: Wish } | { kind: "error"; message: string };
-
-/** How long the keepsake stays before the form is ready for another wish. */
-const KEEPSAKE_MS = 4600;
 
 /** Tidy a wish: no control characters, no runs of blank lines or spaces. */
 function clean(raw: string): string {
@@ -41,7 +48,10 @@ export function BlessingWall() {
   const { wishes: copy } = wedding;
   const { guestName, isPersonalized } = useGuest();
   const sectionRef = useRef<HTMLElement>(null);
+  const formRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLTextAreaElement>(null);
   const seen = useInView(sectionRef, { threshold: 0.12 });
+  const formSeen = useInView(formRef, { threshold: 0.2 });
   const reduced = usePrefersReducedMotion();
 
   const [real, setReal] = useState<Wish[]>([]);
@@ -60,17 +70,9 @@ export function BlessingWall() {
       });
   }, []);
 
-  useEffect(() => {
-    if (state.kind !== "sent") return;
-    const t = window.setTimeout(() => setState({ kind: "idle" }), reduced ? 2800 : KEEPSAKE_MS);
-    return () => clearTimeout(t);
-  }, [state, reduced]);
-
-  const all = useMemo(
-    () => [...real, ...copy.samples.filter((s) => !real.some((r) => r.id === s.id))],
-    [real, copy.samples],
-  );
+  const all = useMemo(() => [...real, ...copy.samples.filter((s) => !real.some((r) => r.id === s.id))], [real, copy.samples]);
   const [lead, ...pair] = all.slice(0, 3);
+  const t = (ms: number) => (reduced ? 0 : ms);
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
@@ -78,10 +80,12 @@ export function BlessingWall() {
     const message = clean(text);
     if (message.length < 2) {
       setHint("Please write a few words for the couple first.");
+      textRef.current?.focus();
       return;
     }
     if (message.length > copy.maxLength) {
       setHint(`Please keep your wish under ${copy.maxLength} characters.`);
+      textRef.current?.focus();
       return;
     }
     setHint(null);
@@ -90,6 +94,7 @@ export function BlessingWall() {
     const wish: Wish = { id: pendingId.current, name: isPersonalized ? guestName : null, message };
     try {
       await addWish(wish);
+      // saved: only now the confirmation, and the blessing takes the centre of the wall
       pendingId.current = null;
       setReal((r) => [wish, ...r.filter((w) => w.id !== wish.id)]);
       setText("");
@@ -100,71 +105,76 @@ export function BlessingWall() {
     }
   };
 
+  const invalid = Boolean(hint) || state.kind === "error";
+
   return (
-    <section
-      id="blessings"
-      ref={sectionRef}
-      aria-labelledby="blessings-heading"
-      className="relative px-[var(--gutter)] pt-[var(--section-gap)]"
-    >
-      {/* the RSVP's seal, now a small lotus at the heart of the wall */}
-      <div className="mb-4 flex justify-center text-gold-ink">
-        <Reveal show={seen}>
-          <span className="flex h-11 w-11 items-center justify-center rounded-full border border-gold bg-ivory/80">
-            <Icon name="lotus" className="h-6 w-6" />
-          </span>
-        </Reveal>
-      </div>
-      <SectionHeading id="blessings-heading" eyebrow={copy.eyebrow} title={copy.title} show={seen} delay={150} />
+    <section id="blessings" ref={sectionRef} aria-labelledby="blessings-heading" className="relative px-[var(--gutter)] pb-6 pt-[var(--section-gap)]">
+      <SectionHeading id="blessings-heading" eyebrow={copy.eyebrow} title={copy.title} show={seen} />
       <Reveal
         show={seen}
-        delay={450}
+        delay={t(300)}
         as="p"
-        className="mx-auto mt-3 max-w-[19rem] text-balance text-center font-display text-[20px] font-medium italic leading-snug text-slate"
+        className="mx-auto mt-2 max-w-[19rem] text-balance text-center font-display text-[20px] font-medium italic leading-snug text-slate"
       >
         “{copy.quote}”
       </Reveal>
+      <Reveal show={seen} delay={t(420)} className="mt-4 flex justify-center">
+        <LotusRule />
+      </Reveal>
 
-      {/* exactly three featured wishes */}
-      <div className="mt-8 space-y-3">
+      {/* the wall: one blessing at the centre, two beneath it */}
+      <div className="bw-wall">
         {lead && (
-          <Reveal show={seen} delay={600}>
-            <WishCard wish={lead} large tilt={-0.8} />
+          <Reveal key={lead.id} show={seen} delay={t(560)} rise={false}>
+            <Featured wish={lead} fresh={state.kind === "sent" && state.wish.id === lead.id} />
           </Reveal>
         )}
-        <div className="grid grid-cols-2 gap-3">
-          {pair.map((w, i) => (
-            <Reveal key={w.id} show={seen} delay={720 + i * 120}>
-              <WishCard wish={w} tilt={i === 0 ? 0.9 : -0.6} />
-            </Reveal>
-          ))}
-        </div>
+        {pair.length > 0 && (
+          <div className="bw-pair">
+            {pair.map((w, i) => (
+              <Reveal key={w.id} show={seen} delay={t(760 + i * 140)} className={i === 1 ? "bw-later" : undefined}>
+                <Secondary wish={w} />
+              </Reveal>
+            ))}
+          </div>
+        )}
       </div>
 
-      <Reveal show={seen} delay={900} className="mt-5 flex justify-center">
-        <button
-          type="button"
-          onClick={() => setViewAll(true)}
-          className="inline-flex items-center gap-1.5 rounded-full px-3 py-2 font-sans text-[13px] font-medium tracking-[0.08em] text-navy underline decoration-gold decoration-1 underline-offset-[6px] hover:decoration-gold-ink"
-        >
-          View All Wishes <span aria-hidden>↗</span>
+      <Reveal show={seen} delay={t(1000)} className="mt-8 flex justify-center">
+        <button type="button" onClick={() => setViewAll(true)} className="bw-link">
+          <span className="bw-link-text">View all wishes</span>
+          <svg aria-hidden viewBox="0 0 20 10" className="bw-link-arrow" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M1 5h17M14 1.5 18 5l-4 3.5" />
+          </svg>
         </button>
       </Reveal>
 
-      {/* one wish box, one button */}
-      <Reveal show={seen} delay={1000} className="mx-auto mt-8 max-w-[22.5rem]">
-        <div className="relative rounded-[26px] border border-gold/60 bg-ivory/80 px-5 pb-6 pt-6 shadow-[0_18px_40px_-28px_rgb(23_59_86/0.55)]">
+      {/* leave a blessing: on the page itself, no card */}
+      <div ref={formRef} className="mx-auto mt-14 max-w-[22.5rem] text-center">
+        <Reveal show={formSeen} delay={t(0)} className="flex justify-center">
+          <Lotus className="h-6 w-9" />
+        </Reveal>
+        <Reveal show={formSeen} delay={t(120)}>
+          <h3 className="mt-2 text-[28px] leading-tight">{copy.formTitle}</h3>
+        </Reveal>
+
+        <Reveal show={formSeen} delay={t(260)} className="mt-5">
           {state.kind === "sent" ? (
-            <Keepsake wish={state.wish} reduced={reduced} />
+            <Confirmation
+              thanks={copy.thanks}
+              reduced={reduced}
+              onAnother={() => {
+                setState({ kind: "idle" });
+                requestAnimationFrame(() => textRef.current?.focus());
+              }}
+            />
           ) : (
-            <form onSubmit={submit} noValidate>
-              <label
-                htmlFor="wish"
-                className="block text-center font-sans text-[11px] font-medium uppercase tracking-eyebrow text-gold-ink"
-              >
-                Leave a blessing
+            <form onSubmit={submit} noValidate className="text-left">
+              <label htmlFor="wish" className="sr-only">
+                {copy.formTitle}
               </label>
               <textarea
+                ref={textRef}
                 id="wish"
                 value={text}
                 onChange={(e) => {
@@ -176,14 +186,11 @@ export function BlessingWall() {
                 rows={4}
                 placeholder={copy.placeholder}
                 aria-describedby="wish-count wish-hint"
-                className="mt-3 block w-full resize-none rounded-[18px] border border-gold/60 bg-white/70 px-4 py-3 font-display text-[18px] font-medium italic leading-snug text-navy placeholder:text-slate/55 focus:border-gold-ink focus:outline-none focus:ring-2 focus:ring-gold/40"
+                aria-invalid={invalid || undefined}
+                className="bw-textarea"
               />
-              <div className="mt-1.5 flex justify-between gap-3 font-sans text-[11.5px] text-slate/80">
-                <span
-                  id="wish-hint"
-                  role={hint || state.kind === "error" ? "alert" : undefined}
-                  className={hint || state.kind === "error" ? "text-[#9a3b2e]" : ""}
-                >
+              <div className="mt-2 flex justify-between gap-3 font-sans text-[11.5px] text-slate/85">
+                <span id="wish-hint" role={invalid ? "alert" : undefined} className={invalid ? "text-[#9a3b2e]" : ""}>
                   {hint ??
                     (state.kind === "error"
                       ? `We couldn't send your blessing. ${state.message}`
@@ -195,27 +202,32 @@ export function BlessingWall() {
                   {text.length} / {copy.maxLength}
                 </span>
               </div>
-              <button
-                type="submit"
-                disabled={state.kind === "sending"}
-                className="mt-4 w-full rounded-full bg-navy px-6 py-3.5 font-sans text-[15px] font-medium tracking-[0.06em] text-ivory shadow-[0_12px_26px_-14px_rgb(23_59_86/0.9)] transition-transform duration-150 hover:bg-navy-deep active:scale-[0.97] disabled:opacity-80"
-              >
-                {state.kind === "sending" ? "Sending…" : state.kind === "error" ? "Try again" : "Leave Your Wish"}
+              <button type="submit" disabled={state.kind === "sending"} className="bw-send">
+                {state.kind === "sending" ? "Sending…" : state.kind === "error" ? "Try again" : copy.button}
+                {state.kind !== "sending" && (
+                  <svg aria-hidden viewBox="0 0 20 10" className="bw-send-arrow" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M1 5h17M14 1.5 18 5l-4 3.5" />
+                  </svg>
+                )}
               </button>
             </form>
           )}
-        </div>
-      </Reveal>
+        </Reveal>
+      </div>
 
       <Sheet open={viewAll} onClose={() => setViewAll(false)} label="All wishes">
         <h3 className="text-center text-[28px]">All Blessings</h3>
         <p className="mt-1 text-center font-sans text-[11px] font-medium uppercase tracking-[0.22em] text-gold-ink">
           {all.length} {all.length === 1 ? "wish" : "wishes"} with love
         </p>
-        <ul className="mt-6 space-y-3">
+        <div className="mt-3 flex justify-center">
+          <LotusRule />
+        </div>
+        <ul className="bw-list">
           {all.map((w) => (
             <li key={w.id}>
-              <WishCard wish={w} />
+              <p className="whitespace-pre-line text-balance font-display text-[18px] font-medium italic leading-snug text-navy">{w.message}</p>
+              <p className="bw-from mt-2">{signature(w)}</p>
             </li>
           ))}
         </ul>
@@ -224,64 +236,54 @@ export function BlessingWall() {
   );
 }
 
-function WishCard({ wish, large = false, tilt = 0 }: { wish: Wish; large?: boolean; tilt?: number }) {
+/** The centrepiece: a warm-ivory leaf, small gold corners, a large opening quotation mark (a blessing just left fades in). */
+function Featured({ wish, fresh }: { wish: Wish; fresh: boolean }) {
   return (
-    <figure
-      className={`relative h-full rounded-[20px] border border-gold/45 bg-ivory px-4 shadow-[0_14px_30px_-22px_rgb(23_59_86/0.6)] ${large ? "py-5" : "py-4"}`}
-      style={{ transform: tilt ? `rotate(${tilt}deg)` : undefined }}
-    >
-      <span aria-hidden className="absolute left-3 top-1 font-display text-[40px] leading-none text-gold/70">
+    <figure className="bw-featured" data-fresh={fresh || undefined}>
+      {(["tl", "tr", "bl", "br"] as const).map((c) => (
+        <svg key={c} aria-hidden viewBox="0 0 24 24" className={`bw-corner bw-corner-${c}`} fill="none" stroke="#b89554" strokeWidth="1" strokeLinecap="round">
+          <path d="M2 20V6c0-2.2 1.8-4 4-4h14M6 9c0-1.7 1.3-3 3-3" />
+          <circle cx="9" cy="9" r="1" fill="#b89554" stroke="none" />
+        </svg>
+      ))}
+      <span aria-hidden className="bw-quote-mark">
         “
       </span>
-      <blockquote
-        className={`whitespace-pre-line text-balance px-2 text-center font-display font-medium italic leading-snug text-navy ${large ? "text-[20px]" : "text-[16px]"}`}
-      >
-        {wish.message}
-      </blockquote>
-      <figcaption className="mt-2.5 text-center font-sans text-[10.5px] font-medium uppercase tracking-[0.18em] text-gold-ink">
+      <blockquote className="bw-featured-text">{wish.message}</blockquote>
+      <figcaption className="bw-from mt-4">
+        <span aria-hidden className="bw-from-rule" />
         {signature(wish)}
       </figcaption>
     </figure>
   );
 }
 
-/** After a successful send: a gold ripple, a lotus, and the wish as a little keepsake card. */
-function Keepsake({ wish, reduced }: { wish: Wish; reduced: boolean }) {
-  const t = (ms: number) => (reduced ? 0 : ms);
+/** One of the two beneath: no box, a small quotation mark, the words, the sender. */
+function Secondary({ wish }: { wish: Wish }) {
   return (
-    <div className="relative flex flex-col items-center text-center" aria-live="polite">
-      {!reduced && (
-        <span
-          aria-hidden
-          className="rsvp-ring absolute bottom-0 left-1/2 -ml-[34px] h-[68px] w-[68px] rounded-full border border-gold"
-        />
-      )}
-      <Reveal show delay={t(150)} className="text-gold-ink">
-        <span
-          className="flex h-12 w-12 items-center justify-center rounded-full border border-gold bg-ivory"
-          style={{ animation: reduced ? undefined : `keepsake-pop 700ms ${EASE.silk} both` }}
-        >
-          <Icon name="lotus" className="h-7 w-7" />
-        </span>
-      </Reveal>
-      <Reveal show delay={t(450)} className="mt-4 w-full">
-        <div className="rotate-[-1deg] rounded-[16px] border border-gold/50 bg-[#fffdf8] px-4 py-4 shadow-[0_12px_26px_-18px_rgb(138_100_47/0.7)]">
-          <p className="whitespace-pre-line font-display text-[17px] font-medium italic leading-snug text-navy">
-            {wish.message}
-          </p>
-          <p className="mt-2 font-sans text-[10.5px] font-medium uppercase tracking-[0.18em] text-gold-ink">
-            {signature(wish)}
-          </p>
-        </div>
-      </Reveal>
-      <Reveal show delay={t(900)} as="p" className="mt-4 font-script text-[27px] leading-tight text-gold-ink">
-        A little wish, a lifetime of love.
-      </Reveal>
-      <Reveal show delay={t(1300)} as="p" className="mt-2 font-sans text-[13px] font-medium text-navy">
-        {backendMode === "remote"
-          ? "Your blessing has been sent with love."
-          : "Your blessing is saved on this phone, with love."}
-      </Reveal>
+    <figure className="bw-secondary">
+      <span aria-hidden className="bw-quote-small">
+        “
+      </span>
+      <blockquote className="bw-secondary-text">{wish.message}</blockquote>
+      <figcaption className="bw-from mt-2.5">{signature(wish)}</figcaption>
+    </figure>
+  );
+}
+
+/** Saved: a small gold lotus draws itself, a fine rule opens, then the words and where it was kept. */
+function Confirmation({ thanks, reduced, onAnother }: { thanks: string; reduced: boolean; onAnother: () => void }) {
+  return (
+    <div className="bw-done" data-still={reduced || undefined} aria-live="polite">
+      <Lotus className="bw-done-lotus mx-auto h-10 w-[60px]" />
+      <span aria-hidden className="bw-done-rule" />
+      <p className="bw-done-thanks">{thanks}</p>
+      <p className="bw-done-where">
+        {backendMode === "remote" ? "It has been sent to the couple, with love." : "It is kept on this phone, with love."}
+      </p>
+      <button type="button" onClick={onAnother} className="bw-link bw-done-again">
+        <span className="bw-link-text">Leave another blessing</span>
+      </button>
     </div>
   );
 }

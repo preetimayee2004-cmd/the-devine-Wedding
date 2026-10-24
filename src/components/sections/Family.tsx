@@ -4,6 +4,7 @@ import type { FamilySide } from "@/config/types";
 import { useInView } from "@/hooks/useInView";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
 import { EASE } from "@/lib/motion";
+import { LotusRule } from "@/components/art/Ornaments";
 import { TempleBells, TempleSilhouette } from "@/components/art/Temple";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -137,19 +138,5 @@ function PeacockFrame({ photo, photoStyle }: { photo: FamilySide["photo"]; photo
         className="fam-peacock-art"
       />
     </div>
-  );
-}
-
-/** A small gold lotus between two fine lines. */
-function LotusRule() {
-  return (
-    <svg aria-hidden viewBox="0 0 140 14" className="h-[14px] w-[140px]" fill="none">
-      <path d="M0 8h56M84 8h56" stroke="#b89554" strokeOpacity="0.85" strokeWidth="0.8" />
-      <g fill="#e9d29a" fillOpacity="0.6" stroke="#b89554" strokeWidth="0.8" strokeLinejoin="round">
-        <path d="M70 12C66 11.5 62.5 9 61.5 5.5 65.5 5.5 68.5 8 70 12Z" />
-        <path d="M70 12C74 11.5 77.5 9 78.5 5.5 74.5 5.5 71.5 8 70 12Z" />
-        <path d="M70 12C67.5 8.5 67.5 5 70 1.5 72.5 5 72.5 8.5 70 12Z" />
-      </g>
-    </svg>
   );
 }

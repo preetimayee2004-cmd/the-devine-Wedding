@@ -1096,31 +1096,368 @@
     animation: rs-appear 400ms ease-out both;
   }
 
-  /* Blessing Wall: the gold ring that spreads from the lotus over a sent wish (once). */
-  .rsvp-ring {
-    animation: rsvp-ring 1100ms ease-out forwards;
+  /* Blessing Wall — a page of an old wedding manuscript: one blessing at the centre on a warm-ivory,
+     faintly textured leaf with small gold corners; two beneath it, unboxed, slightly staggered, a fine
+     gold line between them; then "Leave a Blessing" on the page itself. */
+  .bw-wall {
+    margin-top: 26px;
   }
-  @keyframes rsvp-ring {
+  .bw-featured {
+    position: relative;
+    padding: 34px 26px 24px;
+    border-radius: 4px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.55 0 0 0 0 0.42 0 0 0 0 0.22 0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"), linear-gradient(180deg, #fffbf3, #fbf3e2);
+    box-shadow:
+      0 1px 0 rgb(184 149 84 / 0.18),
+      0 18px 34px -26px rgb(84 60 24 / 0.45);
+    text-align: center;
+  }
+  .bw-featured[data-fresh] {
+    animation: bw-fade 900ms ease-out both;
+  }
+  @keyframes bw-fade {
     from {
-      transform: scale(1);
-      opacity: 0.8;
-    }
-    to {
-      transform: scale(2.7);
       opacity: 0;
     }
   }
-  /* Blessing Wall: the lotus that appears over a sent wish. */
-  @keyframes keepsake-pop {
-    from {
-      transform: scale(0.4);
+  /* small corner ornaments, not a frame */
+  .bw-corner {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+  }
+  .bw-corner-tl {
+    left: 8px;
+    top: 8px;
+  }
+  .bw-corner-tr {
+    right: 8px;
+    top: 8px;
+    transform: scaleX(-1);
+  }
+  .bw-corner-bl {
+    left: 8px;
+    bottom: 8px;
+    transform: scaleY(-1);
+  }
+  .bw-corner-br {
+    right: 8px;
+    bottom: 8px;
+    transform: scale(-1, -1);
+  }
+  .bw-quote-mark {
+    position: absolute;
+    left: 36px;
+    top: -4px;
+    font-family: var(--font-display);
+    font-size: 96px;
+    line-height: 1;
+    color: rgb(184 149 84 / 0.38);
+    pointer-events: none;
+  }
+  .bw-featured-text {
+    position: relative;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 9;
+    overflow: hidden;
+    white-space: pre-line;
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-style: italic;
+    font-weight: 500;
+    line-height: 1.42;
+    color: rgb(var(--navy));
+    text-wrap: balance;
+  }
+  /* the sender: small antique-gold capitals, after a short rule */
+  .bw-from {
+    font-family: var(--font-body);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgb(var(--gold-ink));
+  }
+  .bw-from-rule {
+    display: inline-block;
+    width: 18px;
+    height: 1px;
+    margin: 0 8px 3px 0;
+    vertical-align: middle;
+    background: rgb(184 149 84 / 0.8);
+  }
+  /* the two beneath: unboxed, side by side, the second a little lower, a fine line between */
+  .bw-pair {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 26px;
+    margin-top: 26px;
+    padding: 0 4px;
+  }
+  .bw-pair::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 6px;
+    bottom: -14px;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, rgb(184 149 84 / 0.55) 20%, rgb(184 149 84 / 0.55) 80%, transparent);
+  }
+  .bw-later {
+    margin-top: 30px;
+  }
+  .bw-secondary {
+    text-align: center;
+  }
+  .bw-quote-small {
+    display: block;
+    height: 22px;
+    font-family: var(--font-display);
+    font-size: 40px;
+    line-height: 1;
+    color: rgb(184 149 84 / 0.6);
+  }
+  .bw-secondary-text {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 7;
+    overflow: hidden;
+    white-space: pre-line;
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-style: italic;
+    font-weight: 500;
+    line-height: 1.4;
+    color: rgb(var(--slate));
+    text-wrap: balance;
+  }
+  /* "View all wishes →": a fine gold underline that fills on hover, the arrow stepping on */
+  .bw-link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 6px 2px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: rgb(var(--navy));
+    -webkit-tap-highlight-color: transparent;
+  }
+  .bw-link-text {
+    position: relative;
+    padding-bottom: 3px;
+    background:
+      linear-gradient(rgb(var(--gold-ink)), rgb(var(--gold-ink))) left bottom / 0% 1px no-repeat,
+      linear-gradient(rgb(184 149 84 / 0.6), rgb(184 149 84 / 0.6)) left bottom / 100% 1px no-repeat;
+    transition: background-size 350ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .bw-link-arrow {
+    width: 16px;
+    height: 8px;
+    color: rgb(var(--gold-ink));
+    transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  @media (hover: hover) {
+    .bw-link:hover .bw-link-text {
+      background-size:
+        100% 1px,
+        100% 1px;
     }
-    60% {
-      transform: scale(1.08);
+    .bw-link:hover .bw-link-arrow {
+      transform: translateX(3px);
     }
+  }
+  .bw-link:focus-visible {
+    outline: 2px solid rgb(var(--gold-ink));
+    outline-offset: 3px;
+    border-radius: 3px;
+  }
+  .bw-link:focus-visible .bw-link-arrow {
+    transform: translateX(3px);
+  }
+  /* the wish box: clean, a fine antique-gold edge; gold-ink when writing, a red edge when amiss */
+  .bw-textarea {
+    display: block;
+    width: 100%;
+    resize: none;
+    padding: 14px 16px;
+    border: 1px solid rgb(184 149 84 / 0.7);
+    border-radius: 10px;
+    background: rgb(255 252 245 / 0.85);
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-style: italic;
+    font-weight: 500;
+    line-height: 1.4;
+    color: rgb(var(--navy));
+    transition:
+      border-color 200ms ease,
+      box-shadow 200ms ease;
+  }
+  .bw-textarea::placeholder {
+    color: rgb(var(--slate) / 0.55);
+  }
+  .bw-textarea:focus {
+    outline: none;
+    border-color: rgb(var(--gold-ink));
+    box-shadow: 0 0 0 3px rgb(184 149 84 / 0.22);
+  }
+  .bw-textarea[aria-invalid] {
+    border-color: #9a3b2e;
+    box-shadow: 0 0 0 3px rgb(154 59 46 / 0.14);
+  }
+  /* "Send your blessing": deep navy, warm ivory words, a thin antique-gold edge, 10px corners */
+  .bw-send {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    height: 50px;
+    margin-top: 18px;
+    border: 1px solid #b89554;
+    border-radius: 10px;
+    background-color: rgb(var(--navy));
+    color: #fff9ef;
+    box-shadow:
+      inset 0 1px 0 rgb(255 249 239 / 0.12),
+      0 12px 24px -14px rgb(18 41 74 / 0.8);
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      background-color 200ms ease,
+      border-color 200ms ease,
+      box-shadow 200ms ease,
+      transform 150ms ease;
+  }
+  .bw-send-arrow {
+    width: 16px;
+    height: 8px;
+    color: #d4b26e;
+    transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  @media (hover: hover) {
+    .bw-send:not(:disabled):hover {
+      background-color: #1b3a63;
+      border-color: #d0b06f;
+      box-shadow:
+        inset 0 1px 0 rgb(255 249 239 / 0.16),
+        0 14px 28px -14px rgb(18 41 74 / 0.85),
+        0 0 0 3px rgb(184 149 84 / 0.18);
+    }
+    .bw-send:not(:disabled):hover .bw-send-arrow {
+      transform: translateX(3px);
+    }
+  }
+  .bw-send:not(:disabled):active {
+    background-color: #0c1d36;
+    box-shadow:
+      inset 0 2px 4px rgb(0 0 0 / 0.3),
+      0 6px 14px -10px rgb(18 41 74 / 0.7);
+    transform: scale(0.98);
+  }
+  .bw-send:focus-visible {
+    outline: 2px solid rgb(var(--gold-ink));
+    outline-offset: 3px;
+  }
+  .bw-send:disabled {
+    cursor: progress;
+    opacity: 0.85;
+  }
+  /* saved: the lotus draws itself, a fine rule opens, then the words */
+  .bw-done {
+    padding: 6px 0 4px;
+  }
+  .bw-done-lotus path {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: bw-draw 900ms cubic-bezier(0.45, 0, 0.25, 1) both;
+  }
+  .bw-done-lotus path:nth-child(2),
+  .bw-done-lotus path:nth-child(3) {
+    animation-delay: 120ms;
+  }
+  .bw-done-lotus path:nth-child(4),
+  .bw-done-lotus path:nth-child(5) {
+    animation-delay: 240ms;
+  }
+  .bw-done-lotus path:nth-child(6) {
+    animation-delay: 420ms;
+  }
+  @keyframes bw-draw {
     to {
-      transform: scale(1);
+      stroke-dashoffset: 0;
     }
+  }
+  .bw-done-rule {
+    display: block;
+    width: 90px;
+    height: 1px;
+    margin: 10px auto 0;
+    background: linear-gradient(90deg, transparent, rgb(184 149 84 / 0.85), transparent);
+    animation: bw-rule 600ms cubic-bezier(0.22, 1, 0.36, 1) 500ms both;
+  }
+  @keyframes bw-rule {
+    from {
+      transform: scaleX(0);
+    }
+  }
+  .bw-done-thanks {
+    margin-top: 14px;
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-style: italic;
+    font-weight: 500;
+    line-height: 1.35;
+    color: rgb(var(--navy));
+    animation: bw-rise 600ms cubic-bezier(0.22, 1, 0.36, 1) 700ms both;
+  }
+  .bw-done-where {
+    margin-top: 6px;
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    color: rgb(var(--slate) / 0.9);
+    animation: bw-rise 600ms cubic-bezier(0.22, 1, 0.36, 1) 850ms both;
+  }
+  .bw-done-again {
+    margin-top: 14px;
+    animation: bw-rise 600ms cubic-bezier(0.22, 1, 0.36, 1) 1000ms both;
+  }
+  @keyframes bw-rise {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+  .bw-done[data-still] .bw-done-lotus path {
+    stroke-dashoffset: 0;
+    animation: none;
+  }
+  .bw-done[data-still] .bw-done-rule,
+  .bw-done[data-still] .bw-done-thanks,
+  .bw-done[data-still] .bw-done-where,
+  .bw-done[data-still] .bw-done-again {
+    animation: bw-fade 300ms ease-out both;
+  }
+  /* all the blessings, in the sheet: each a short entry, a fine gold line between */
+  .bw-list {
+    margin-top: 18px;
+    text-align: center;
+  }
+  .bw-list li {
+    padding: 18px 6px;
+  }
+  .bw-list li + li {
+    border-top: 1px solid rgb(184 149 84 / 0.35);
   }
 
   /* Save the Date: a short shower of red petals (each falls once). */

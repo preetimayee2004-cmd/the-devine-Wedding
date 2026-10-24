@@ -299,6 +299,10 @@ export const wedding = {
     quote: "May your hearts always find their way home to each other.",
     placeholder: "Write a heartfelt wish for the couple…",
     maxLength: 280,
+    formTitle: "Leave a Blessing",
+    button: "Send your blessing",
+    /** Shown once a blessing is saved (never before). */
+    thanks: "Your blessing has found its place.",
     samples: list<Wish>([
       {
         id: "s1",
