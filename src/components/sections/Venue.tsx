@@ -16,7 +16,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
  * Shiv–Parvati key — cream cards on the pale sky, navy words, gold capitals, Cormorant headings.
  *
  * The venue: a cream card, a faint Kailash range along its top edge; the map cut into a temple arch
- * with a fine gold edge, a marigold garland and two small bells across its top, a gold lotus pin on
+ * with a fine gold edge, a small bell hanging from each shoulder, a gold lotus pin on
  * the place and a small gold "Maps" pill; then the venue's name, a small gold lotus rule, its
  * address and the date in gold capitals, and "Get Directions" (navy, a gold edge, a small lotus; a
  * soft ripple where it is pressed).
@@ -90,7 +90,7 @@ export function Venue() {
               <svg aria-hidden viewBox="0 0 100 115" preserveAspectRatio="none" className="fw-arch-line">
                 <path d={ARCH_PATH} vectorEffect="non-scaling-stroke" />
               </svg>
-              <Garland />
+              <ArchBells />
             </div>
             <h3 id="venue-name" className="mt-5 text-[28px] leading-tight">
               {venue.name}
@@ -273,49 +273,16 @@ function Kailash() {
   );
 }
 
-/** Marigold garland swagged across the arch's top, three short strands, a small bell at each shoulder. */
-function Garland() {
-  const blooms: string[] = [];
-  const swag = (x: number) => 12 + 22 * Math.sin((Math.PI * (x - 14)) / 272);
-  for (let x = 14; x <= 286; x += 11) blooms.push(`${x},${swag(x).toFixed(1)}`);
-  const strands = [70, 150, 230];
+/** Two small temple bells, each on a fine gold thread from one of the arch's shoulders. */
+function ArchBells() {
   return (
-    <svg aria-hidden viewBox="0 0 300 90" className="fw-garland">
-      <defs>
-        <radialGradient id="fw-marigold" cx="40%" cy="35%" r="65%">
-          <stop offset="0" stopColor="#ffd36b" />
-          <stop offset="0.55" stopColor="#f7a12a" />
-          <stop offset="1" stopColor="#d9731a" />
-        </radialGradient>
-      </defs>
-      <path d={`M14 ${swag(14)} ${blooms.map((b) => `L${b.replace(",", " ")}`).join(" ")}`} fill="none" stroke="#9c6b2f" strokeWidth="0.8" />
-      {strands.map((sx) => {
-        const y0 = swag(sx);
-        return (
-          <g key={sx}>
-            <path d={`M${sx} ${y0}V${y0 + 30}`} stroke="#9c6b2f" strokeWidth="0.7" />
-            {[10, 19, 28].map((dy) => (
-              <circle key={dy} cx={sx} cy={y0 + dy} r={dy === 28 ? 3.4 : 4.2} fill="url(#fw-marigold)" stroke="#c4661a" strokeWidth="0.4" />
-            ))}
-          </g>
-        );
-      })}
-      {blooms.map((b) => {
-        const [x, y] = b.split(",").map(Number);
-        return (
-          <g key={b}>
-            <circle cx={x} cy={y} r="6" fill="url(#fw-marigold)" stroke="#c4661a" strokeWidth="0.5" />
-            <circle cx={x} cy={y} r="2.6" fill="none" stroke="#e08a22" strokeWidth="0.6" opacity="0.8" />
-          </g>
-        );
-      })}
-      {[22, 278].map((bx) => (
-        <g key={bx}>
-          <path d={`M${bx} ${swag(bx)}V${swag(bx) + 14}`} stroke="#b89554" strokeWidth="0.8" />
-          <image href="/art/couple-bell-1.webp" x={bx - 6} y={swag(bx) + 12} width="12" height="19" />
-        </g>
+    <>
+      {(["left", "right"] as const).map((side) => (
+        <span key={side} aria-hidden className="fw-bell" style={{ [side]: "13%" }}>
+          <img src="/art/couple-bell-1.webp" alt="" width={13} height={20} draggable={false} />
+        </span>
       ))}
-    </svg>
+    </>
   );
 }
 
