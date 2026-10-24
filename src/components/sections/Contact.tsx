@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { wedding } from "@/config/wedding";
 import type { Coordinator, FamilyContact } from "@/config/types";
 import { useInView } from "@/hooks/useInView";
@@ -15,13 +15,14 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
  * "Here for You", the heading, one line and a small gold lotus rule. Then the two families, side by
  * side on a wider screen and one above the other on a phone: each under a fine gold temple arch on a
  * soft cream ground (no box) — the side in gold capitals, the person's name in navy serif, their
- * relationship in small gold capitals, the number, and a deep-maroon "Call" (a tel: link). Below a
- * gold rule that draws itself through a lotus, "Wedding Coordination": two compact rows — the role in
- * gold capitals, the name, the number, a round maroon call button — a fine gold line between them.
+ * relationship in small gold capitals, and a deep-maroon "Call" in place of the number. Below a gold
+ * rule that draws itself through a lotus, "Wedding Coordination": two compact rows — the role in gold
+ * capitals, the name, a round maroon call button — a fine gold line between them.
  *
- * Only real details are shown: what isn't given yet reads "Details to come" or "Number to come", and
- * has no call button (see \`contact\` in the config). Seen the first time: the heading, the lotus,
- * the two families a beat apart, the rule drawing, the rows. Reduced motion: plain fades.
+ * A call button dials its number (a tel: link, labelled with it for screen readers); until a number
+ * is given it only says, quietly, that the number is coming (see `contact` in the config). Seen the
+ * first time: the heading, the lotus, the two families a beat apart, the rule drawing, the rows.
+ * Reduced motion: plain fades.
  */
 export function Contact() {
   const { contact } = wedding;
@@ -76,12 +77,44 @@ export function Contact() {
   );
 }
 
-/** "919876543210" → "+91 98765 43210" (other numbers: "+" and the digits). */
+/** "919876543210" → "+91 98765 43210" (other numbers: "+" and the digits) — for the call's label. */
 function showPhone(phone: string) {
   const d = phone.replace(/\D/g, "");
   return d.length === 12 && d.startsWith("91") ? `+91 ${d.slice(2, 7)} ${d.slice(7)}` : `+${d}`;
 }
 const telHref = (phone: string) => `tel:+${phone.replace(/\D/g, "")}`;
+
+/**
+ * "Call": a tel: link when there is a number (labelled with it for screen readers); without one, the
+ * same button, which only says that the number is coming.
+ */
+function CallButton({ phone, who, round = false }: { phone: string | null; who: string; round?: boolean }) {
+  const [asked, setAsked] = useState(false);
+  const cls = round ? "ct-call-round" : "ct-call";
+  const inner = round ? (
+    <Icon name="phone" className="h-5 w-5" strokeWidth={1.6} />
+  ) : (
+    <>
+      <Icon name="phone" className="h-4 w-4" strokeWidth={1.6} /> Call
+    </>
+  );
+  if (phone)
+    return (
+      <a href={telHref(phone)} className={cls} aria-label={`Call ${who}, ${showPhone(phone)}`}>
+        {inner}
+      </a>
+    );
+  return (
+    <span className={round ? "ct-call-wrap ct-call-wrap-round" : "ct-call-wrap"}>
+      <button type="button" className={cls} aria-label={`Call ${who} (number coming soon)`} onClick={() => setAsked(true)}>
+        {inner}
+      </button>
+      <span className="ct-soon" role="status" data-on={asked || undefined}>
+        {asked ? "Number coming soon" : ""}
+      </span>
+    </span>
+  );
+}
 
 /** One family's contact, under a fine gold temple arch. */
 function FamilyCard({ person }: { person: FamilyContact }) {
@@ -101,35 +134,21 @@ function FamilyCard({ person }: { person: FamilyContact }) {
         ) : (
           <p className="ct-name ct-tbc">Details to come</p>
         )}
-        {person.phone ? (
-          <>
-            <p className="ct-phone">{showPhone(person.phone)}</p>
-            <a href={telHref(person.phone)} className="ct-call" aria-label={`Call ${person.name ?? person.side}, ${showPhone(person.phone)}`}>
-              <Icon name="phone" className="h-4 w-4" strokeWidth={1.6} /> Call
-            </a>
-          </>
-        ) : (
-          <p className="ct-phone ct-tbc">Number to come</p>
-        )}
+        <CallButton phone={person.phone} who={person.name ?? person.side} />
       </div>
     </article>
   );
 }
 
-/** A coordinator: role, name and number on the left, a round call button on the right. */
+/** A coordinator: role and name on the left, a round call button on the right. */
 function CoordinatorRow({ person }: { person: Coordinator }) {
   return (
     <>
       <div className="min-w-0 flex-1 text-left">
         <p className="ct-role">{person.role}</p>
         <p className={`ct-row-name${person.name ? "" : " ct-tbc"}`}>{person.name ?? "Details to come"}</p>
-        <p className={`ct-row-phone${person.phone ? "" : " ct-tbc"}`}>{person.phone ? showPhone(person.phone) : "Number to come"}</p>
       </div>
-      {person.phone && (
-        <a href={telHref(person.phone)} className="ct-call-round" aria-label={`Call ${person.name ? `${person.name}, ` : "the "}${person.role}, ${showPhone(person.phone)}`}>
-          <Icon name="phone" className="h-5 w-5" strokeWidth={1.6} />
-        </a>
-      )}
+      <CallButton phone={person.phone} who={person.name ? `${person.name}, ${person.role}` : `the ${person.role}`} round />
     </>
   );
 }

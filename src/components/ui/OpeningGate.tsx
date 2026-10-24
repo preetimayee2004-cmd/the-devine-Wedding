@@ -241,10 +241,10 @@ export function OpeningGate({ seal, sky, invited, label, devanagari = false, red
           e.stopPropagation();
           skip();
         }}
-        className="gate-chip fixed right-4 rounded-full px-4 py-1 font-display text-[17px] font-medium italic"
+        className="gate-chip fixed right-4 rounded-full px-4 py-1.5 font-display text-[15px] font-semibold tracking-[0.08em]"
         style={{ top: "calc(var(--status-bar) + 12px)" }}
       >
-        Skip <span aria-hidden className="not-italic">›</span>
+        Skip <span aria-hidden>›</span>
       </button>
     </div>
   );

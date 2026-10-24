@@ -8,6 +8,7 @@ import { glideTo, USER_INPUT_EVENTS } from "@/lib/scroll";
 import { readSessionFlag, writeSessionFlag } from "@/lib/session";
 import { formatVenueDate, parseVenueDateTime } from "@/lib/venueTime";
 import { Icon } from "@/components/art/Icons";
+import { ScratchReveal } from "@/components/ui/ScratchReveal";
 import { GoldMotes } from "@/components/ui/GoldMotes";
 import { LangToggle } from "@/components/ui/LangToggle";
 import { MusicToggle } from "@/components/ui/MusicToggle";
@@ -310,18 +311,23 @@ export function Invitation() {
           {t.request}
         </p>
 
-        {/* the date on one line: month | day | year */}
+        {/* the date on one line — month | day | year — waiting under gold foil to be scratched away */}
         {date && (
-          <p
-            className={`relative mt-[var(--std-gap)] flex items-center justify-center gap-3.5 font-semibold text-navy ${serif}`}
-            style={rise(3)}
-          >
-            <span className={`text-[15px] ${hindi ? "" : "uppercase tracking-[0.24em]"}`}>{date.month}</span>
-            <span aria-hidden className="h-7 w-px bg-gold" />
-            <span className="font-display text-[24px] leading-none">{date.day}</span>
-            <span aria-hidden className="h-7 w-px bg-gold" />
-            <span className="font-display text-[15px] tracking-[0.24em]">{date.year}</span>
-          </p>
+          <div className="relative mt-[var(--std-gap)]" style={rise(3)}>
+            <ScratchReveal
+              hint={t.scratchHint}
+              label={hindi ? "विवाह की तिथि सुनहरी परत के नीचे है: खुरचें, या Enter दबाएँ" : "The wedding date is under gold foil: scratch it away, or press Enter to reveal it"}
+              reduced={still}
+            >
+              <p className={`flex items-center justify-center gap-3.5 font-semibold text-navy ${serif}`}>
+                <span className={`text-[15px] ${hindi ? "" : "uppercase tracking-[0.24em]"}`}>{date.month}</span>
+                <span aria-hidden className="h-7 w-px bg-gold" />
+                <span className="font-display text-[24px] leading-none">{date.day}</span>
+                <span aria-hidden className="h-7 w-px bg-gold" />
+                <span className="font-display text-[15px] tracking-[0.24em]">{date.year}</span>
+              </p>
+            </ScratchReveal>
+          </div>
         )}
 
         {/* the venue: tap for directions (the tap area is taller than the line, so its top margin is less) */}

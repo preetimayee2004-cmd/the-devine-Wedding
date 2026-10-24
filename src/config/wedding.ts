@@ -54,6 +54,8 @@ export const wedding = {
     title: "Save the Date",
     blessing: "With the blessings of Mahadev and Maa Parvati, two hearts begin their sacred journey together.",
     request: "request the honour of your presence as they celebrate their union",
+    /** The date waits under gold foil to be scratched away: the words on the foil. */
+    scratchHint: "Scratch to reveal the date",
     /** The link at the foot of the card, under the blessing: it scrolls on to the next section. */
     viewInvitation: "View the Invitation",
     /**
@@ -72,6 +74,7 @@ export const wedding = {
       blessing: "महादेव और माँ पार्वती के आशीर्वाद से, दो हृदय अपनी पवित्र यात्रा आरंभ कर रहे हैं।",
       names: { bride: "प्रीति", groom: "शिवाशीष" },
       request: "अपने विवाह के शुभ अवसर पर आपकी गरिमामयी उपस्थिति की कामना करते हैं",
+      scratchHint: "तिथि देखने के लिए खुरचें",
       venue: "कैलाश वाटिका, वाराणसी",
       viewInvitation: "निमंत्रण देखें",
     },
@@ -401,9 +404,11 @@ export const wedding = {
   /**
    * Section 10½ — "Contact & Assistance", between the venue and the thank-you.
    *
-   * Fill in only real details. A contact with no `name` shows "Details to come"; with no `phone`,
-   * "Number to come" and no call button. Phones in international format without "+", e.g.
-   * "919876543210" (shown as +91 98765 43210, dialled from a tel: link).
+   * SAMPLE: the names and relations below are examples (the bride's brother and the groom's sister
+   * as in the family section; the coordinators made up) — replace them with the real people. Each
+   * shows a call button instead of a number: with a `phone` it dials it (a tel: link); without one
+   * it only says the number is coming. Phones in international format without "+", e.g.
+   * "919876543210".
    */
   contact: {
     eyebrow: "Here for You",
@@ -411,16 +416,16 @@ export const wedding = {
     intro: "For any questions or assistance, our families are always happy to help.",
     /** One for each side: who to call, and how they are related to the bride or the groom. */
     family: list<FamilyContact>([
-      // the bride's brother, as named in the family section above
+      // SAMPLE: the bride's brother and the groom's sister, as named in the family section above
       { side: "The Bride's Family", name: "Ankit", relation: "Bride's brother", phone: null },
-      // the groom's side: who it is (and their actual relationship) still to be given
-      { side: "The Groom's Family", name: null, relation: null, phone: null },
+      { side: "The Groom's Family", name: "Shreya", relation: "Groom's sister", phone: null },
     ]),
     coordinationTitle: "Wedding Coordination",
     coordinationNote: "For assistance with guest arrangements and wedding details.",
     coordinators: list<Coordinator>([
-      { role: "Guest Coordinator", name: null, phone: null },
-      { role: "Wedding Coordinator", name: null, phone: null },
+      // SAMPLE names
+      { role: "Guest Coordinator", name: "Rohan", phone: null },
+      { role: "Wedding Coordinator", name: "Neha Verma", phone: null },
     ]),
   },
 
