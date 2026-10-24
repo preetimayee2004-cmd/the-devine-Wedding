@@ -280,20 +280,16 @@ export const wedding = {
     ]),
   },
 
-  /** Section 08 — one-tap acceptance (no form). The button's words show in capitals. */
+  /**
+   * Section 08 — "The Sacred Union": a blessing scene (no form, nothing recorded). The title, closing
+   * and button show in capitals. "Add to calendar" uses wedding.dateTime and the venue above.
+   */
   rsvp: {
     title: "A Sacred Celebration",
-    message: "Your presence would make our celebration even more special.",
-    button: "Join the Celebration",
-    welcome: "Dear {guest}, we can't wait to celebrate with you!",
-    blessing: "Your presence is a blessing, your smiles a treasured gift.",
-    quote: "We look forward to celebrating this beautiful beginning with you.",
-    /**
-     * SAMPLE: the family's WhatsApp number ("919876543210"). Without a
-     * database (see README), acceptance stays on the guest's phone, and this
-     * lets them tell the family in one tap.
-     */
-    whatsapp: null as string | null,
+    blessing: "With the blessings of Mahadev and Maa Parvati, we look forward to celebrating this special occasion with you.",
+    closing: "Har Har Mahadev",
+    calendarButton: "Add to calendar",
+    returnLink: "Return to invitation",
   },
 
   /** Section 09 — the blessing wall. Sample wishes show until real ones arrive. */

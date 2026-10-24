@@ -771,110 +771,244 @@
     }
   }
 
-  /* RSVP: a deep night-blue box with a fine double edge of antique gold; temple bells hanging from
-     its top corners, a temple faint at its foot; gold words. */
-  .rsvp-card {
-    position: relative;
-    overflow: hidden;
-    border: 1px solid rgb(184 149 84 / 0.6);
-    border-radius: 22px;
+  /* RSVP — "The Sacred Union": the scene drawn straight onto the section's own deep blue, which runs
+     edge to edge and softens into the page above and below (no card). Seen the first time, each part
+     comes in once at its --at; reduced motion ([data-still]) simply fades it all in. */
+  .rs-bg {
+    position: absolute;
+    inset: 0;
     background:
-      radial-gradient(110% 70% at 50% 32%, rgb(44 86 142 / 0.55), transparent 72%),
+      radial-gradient(90% 50% at 50% 40%, rgb(44 86 142 / 0.55), transparent 72%),
       linear-gradient(180deg, #15365f 0%, #0f2a52 55%, #0b2045 100%);
-    box-shadow: 0 26px 50px -28px rgb(8 22 46 / 0.85);
-    color: #fff9ef;
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 36px, #000 calc(100% - 48px), transparent);
+    mask-image: linear-gradient(to bottom, transparent, #000 36px, #000 calc(100% - 48px), transparent);
   }
-  .rsvp-card::before {
-    content: "";
+  .rs-temple {
     position: absolute;
-    inset: 6px;
-    border: 1px solid rgb(184 149 84 / 0.22);
-    border-radius: 17px;
-    pointer-events: none;
-  }
-  /* a bell: a fine antique-gold thread from the top edge down to it (it swings from the top) */
-  .rsvp-bell {
-    position: absolute;
-    top: 0;
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    align-items: center;
-    transform-origin: 50% 0;
-    pointer-events: none;
-  }
-  .rsvp-bell::before {
-    content: "";
-    flex: 1;
-    width: 1px;
-    margin-bottom: -2px;
-    background: linear-gradient(to bottom, rgb(184 149 84 / 0.95), rgb(184 149 84 / 0.7));
-  }
-  .rsvp-bell img {
-    display: block;
-    width: 100%;
-    height: auto;
-    filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.35));
-  }
-  /* the temple: small, faint, set inside the gold edge */
-  .rsvp-temple {
-    position: absolute;
-    right: 16px;
-    bottom: 12px;
-    width: 72px;
+    bottom: 22px;
+    width: 92px;
     color: rgb(140 172 216);
-    opacity: 0.22;
+    opacity: 0.16;
     pointer-events: none;
   }
-  /* its one gleam: a band of gold crossing it once, as the box comes in */
-  .rsvp-temple-gleam {
-    color: #e3c27e;
+  .rs-temple-right {
+    right: 6px;
+  }
+  .rs-temple-left {
+    left: 6px;
+    transform: scaleX(-1);
+  }
+  /* the arch and the couple: 3:4, the pillars' feet melting into the blue */
+  .rs-art {
+    position: relative;
+    width: min(80vw, 320px);
+    aspect-ratio: 3 / 4;
+    margin-top: 16px;
+  }
+  .rs-arch {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    -webkit-mask-image: linear-gradient(to bottom, #000 76%, transparent 99%);
+    mask-image: linear-gradient(to bottom, #000 76%, transparent 99%);
+  }
+  .rs-stroke {
+    stroke: #b89554;
+    stroke-width: 1.4;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+  .rs-fine {
+    stroke: #d4b26e;
+    stroke-width: 0.9;
+    stroke-opacity: 0.75;
+  }
+  .rs[data-shown] .rs-stroke {
+    animation: rs-draw var(--dur) cubic-bezier(0.45, 0, 0.25, 1) var(--at) both;
+  }
+  @keyframes rs-draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  .rs-kalash {
     opacity: 0;
-    -webkit-mask-image: linear-gradient(100deg, transparent 38%, #000 50%, transparent 62%);
-    mask-image: linear-gradient(100deg, transparent 38%, #000 50%, transparent 62%);
-    -webkit-mask-size: 300% 100%;
-    mask-size: 300% 100%;
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
   }
-  .rsvp-title {
+  .rs[data-shown] .rs-kalash {
+    animation: rs-kalash 320ms ease-out var(--at) both;
+  }
+  @keyframes rs-kalash {
+    from {
+      opacity: 0;
+      transform: scale(0.6);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  /* one gleam along the arch, once */
+  .rs-gleam {
+    stroke: #fff3d0;
+    stroke-width: 2;
+    stroke-dasharray: 0.07 1;
+    stroke-dashoffset: 0.07;
+    opacity: 0;
+    filter: drop-shadow(0 0 2px #f3d68c);
+  }
+  .rs[data-shown] .rs-gleam {
+    animation: rs-gleam 650ms ease-in-out var(--at) both;
+  }
+  @keyframes rs-gleam {
+    0% {
+      stroke-dashoffset: 0.07;
+      opacity: 0;
+    }
+    12%,
+    85% {
+      opacity: 0.9;
+    }
+    100% {
+      stroke-dashoffset: -1;
+      opacity: 0;
+    }
+  }
+  /* Mahadev and Maa Parvati, from 97%, a soft warm light behind them */
+  .rs-glow {
+    position: absolute;
+    left: 50%;
+    top: 30%;
+    width: 84%;
+    height: 60%;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(240 206 132 / 0.34), rgb(232 198 128 / 0.1) 60%, transparent);
+    filter: blur(6px);
+    transform: translateX(-50%);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .rs-figures {
+    position: absolute;
+    left: 50%;
+    bottom: 2.5%;
+    height: 82%;
+    width: auto;
+    max-width: none;
+    translate: -50% 0;
+    transform-origin: 50% 80%;
+    -webkit-mask-image: linear-gradient(to bottom, #000 64%, transparent 97%);
+    mask-image: linear-gradient(to bottom, #000 64%, transparent 97%);
+    opacity: 0;
+    user-select: none;
+  }
+  .rs[data-shown] .rs-glow {
+    animation: rs-appear 900ms ease-out var(--at) both;
+  }
+  .rs[data-shown] .rs-figures {
+    animation: rs-figures 800ms ease-out var(--at) both;
+  }
+  @keyframes rs-appear {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes rs-figures {
+    from {
+      opacity: 0;
+      transform: scale(0.97);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  /* the words and the button, each rising softly in */
+  .rs-in {
+    opacity: 0;
+  }
+  .rs[data-shown] .rs-in {
+    animation: rs-rise 600ms cubic-bezier(0.22, 1, 0.36, 1) var(--at) both;
+  }
+  @keyframes rs-rise {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .rs-heading {
+    margin-top: 20px;
     font-family: var(--font-display);
-    font-size: 31px;
-    font-weight: 500;
-    line-height: 1.12;
+    font-size: 25px;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
     color: #e3c27e;
+    text-wrap: balance;
   }
-  .rsvp-message {
+  .rs-blessing {
+    max-width: 19rem;
+    margin-top: 12px;
     font-family: var(--font-display);
-    font-size: 18px;
+    font-size: 18.5px;
     font-style: italic;
-    line-height: 1.45;
-    color: rgb(255 249 239 / 0.86);
+    line-height: 1.55;
+    color: rgb(255 249 239 / 0.9);
+    text-wrap: balance;
   }
-  /* the button: solid deep maroon, warm ivory words, a thin antique-gold edge, 10px corners */
-  .rsvp-btn {
+  .rs-closing {
+    margin-top: 16px;
+    font-family: var(--font-body);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: #d4b26e;
+  }
+  /* "Add to calendar": solid deep maroon, warm ivory words, a thin antique-gold edge, 10px corners */
+  .rs-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    height: 50px;
+    padding: 0 28px;
     border: 1px solid #b89554;
+    border-radius: 10px;
     background-color: #702d35;
     color: #fff9ef;
     box-shadow:
       inset 0 1px 0 rgb(255 249 239 / 0.14),
       0 12px 24px -12px rgb(0 0 0 / 0.6);
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
-  }
-  .rsvp-btn-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 13px;
-    font-family: var(--font-body);
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
+    transition:
+      background-color 200ms ease,
+      border-color 200ms ease,
+      box-shadow 200ms ease,
+      transform 150ms ease;
   }
   @media (hover: hover) {
-    .rsvp-btn:not(:disabled):hover {
+    .rs-btn:hover {
       background-color: #7e3640;
       border-color: #d0b06f;
       box-shadow:
@@ -883,184 +1017,30 @@
         0 0 0 3px rgb(184 149 84 / 0.18);
     }
   }
-  /* the arrow steps 4px on when the button is pointed at or focused */
-  .rsvp-arrow {
-    flex: none;
-    transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  @media (hover: hover) {
-    .rsvp-btn:not([aria-disabled]):hover .rsvp-arrow {
-      transform: translateX(4px);
-    }
-  }
-  .rsvp-btn:focus-visible .rsvp-arrow {
-    transform: translateX(4px);
-  }
-  .rsvp-btn:not(:disabled):active {
+  .rs-btn:active {
     background-color: #5d242b;
     box-shadow:
       inset 0 2px 4px rgb(0 0 0 / 0.3),
       0 6px 14px -10px rgb(0 0 0 / 0.6);
     transform: scale(0.98);
   }
-  .rsvp-btn:focus-visible {
+  .rs-btn:focus-visible,
+  .rs-chip:focus-visible,
+  .rs-return:focus-visible {
     outline: 2px solid #d4b26e;
     outline-offset: 3px;
   }
-  /* the box's entrance, once (about 1.9s, one easing): it rises in; the trishul (0.3s), then the
-     bells drop in and settle with one small swing toward the middle; the heading and its line; the
-     button last (0.9s); one gleam over the temple (1.05–1.95s). Then all is still. */
-  .rsvp-card {
-    --rsvp-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  .rs-options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
+    animation: rs-rise 260ms ease-out both;
   }
-  .rsvp-card:not([data-shown]),
-  .rsvp-card:not([data-shown]) .rsvp-in,
-  .rsvp-card:not([data-shown]) .rsvp-bell,
-  .rsvp-card:not([data-shown]) .rsvp-temple {
-    opacity: 0;
-  }
-  .rsvp-card[data-shown] {
-    animation: rsvp-card-in 650ms var(--rsvp-ease) both;
-  }
-  @keyframes rsvp-card-in {
-    from {
-      opacity: 0;
-      transform: translateY(18px);
-    }
-  }
-  .rsvp-card[data-shown] .rsvp-in {
-    animation: rsvp-in 600ms var(--rsvp-ease) var(--at) both;
-  }
-  @keyframes rsvp-in {
-    from {
-      opacity: 0;
-      transform: translateY(8px);
-    }
-  }
-  .rsvp-card[data-shown] .rsvp-bell {
-    animation:
-      rsvp-bell-in 550ms var(--rsvp-ease) calc(250ms + var(--i) * 70ms) both,
-      rsvp-bell-sway 1300ms ease-out calc(450ms + var(--i) * 70ms) both;
-  }
-  @keyframes rsvp-bell-in {
-    from {
-      opacity: 0;
-      translate: 0 -12px;
-    }
-  }
-  @keyframes rsvp-bell-sway {
-    0% {
-      rotate: 0deg;
-    }
-    22% {
-      rotate: calc(var(--dir) * 3deg);
-    }
-    48% {
-      rotate: calc(var(--dir) * -1.8deg);
-    }
-    72% {
-      rotate: calc(var(--dir) * 0.8deg);
-    }
-    100% {
-      rotate: 0deg;
-    }
-  }
-  .rsvp-card[data-shown] .rsvp-temple {
-    animation: rsvp-fade 700ms var(--rsvp-ease) 200ms both;
-  }
-  .rsvp-card[data-shown] .rsvp-temple-gleam {
-    animation: rsvp-gleam 900ms ease-in-out 1050ms both;
-  }
-  @keyframes rsvp-fade {
-    from {
-      opacity: 0;
-    }
-  }
-  @keyframes rsvp-gleam {
-    0% {
-      opacity: 0;
-      -webkit-mask-position: 100% 0;
-      mask-position: 100% 0;
-    }
-    20%,
-    80% {
-      opacity: 0.5;
-    }
-    100% {
-      opacity: 0;
-      -webkit-mask-position: 0% 0;
-      mask-position: 0% 0;
-    }
-  }
-  /* reduced motion: it all simply fades in; no swing, no gleam */
-  .rsvp-card[data-still][data-shown],
-  .rsvp-card[data-still][data-shown] .rsvp-in,
-  .rsvp-card[data-still][data-shown] .rsvp-bell,
-  .rsvp-card[data-still][data-shown] .rsvp-temple {
-    animation: rsvp-fade 400ms ease-out both;
-  }
-  .rsvp-card[data-still] .rsvp-temple-gleam {
-    display: none;
-  }
-
-  /* tapped: a thin line of gold light runs once round its edge (0.45s); then it fades away */
-  .rsvp-btn[data-phase="sending"] {
-    cursor: progress;
-  }
-  .rsvp-sweep {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    overflow: visible;
-    pointer-events: none;
-  }
-  .rsvp-sweep rect {
-    fill: none;
-    stroke: #fff1c9;
-    stroke-width: 1.6;
-    stroke-dasharray: 0.16 0.84;
-    filter: drop-shadow(0 0 2px #f3d68c);
-    animation: rsvp-sweep 450ms linear both;
-  }
-  @keyframes rsvp-sweep {
-    from {
-      stroke-dashoffset: 0.16;
-    }
-    to {
-      stroke-dashoffset: -0.84;
-    }
-  }
-  .rsvp-btn[data-phase="leaving"] {
-    pointer-events: none;
-    animation: rsvp-leave 220ms ease-in both;
-  }
-  @keyframes rsvp-leave {
-    to {
-      opacity: 0;
-      transform: scale(0.96);
-    }
-  }
-  /* accepted: a small round gold seal in the box */
-  .rsvp-seal {
-    display: grid;
-    place-items: center;
-    width: 56px;
-    height: 56px;
-    border: 1px solid rgb(184 149 84 / 0.9);
-    border-radius: 9999px;
-    background: linear-gradient(to bottom, #e2c690, #b98f4e);
-    color: #fff9ef;
-    box-shadow:
-      0 0 0 4px #10294f,
-      0 0 0 5px rgb(184 149 84 / 0.8),
-      0 10px 26px -10px rgb(0 0 0 / 0.7);
-  }
-  /* Add to calendar, on the blue: gold-edged, ivory words */
-  .rsvp-chip {
+  .rs-chip {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
     padding: 10px 16px;
     border: 1px solid rgb(184 149 84 / 0.8);
     border-radius: 10px;
@@ -1072,312 +1052,67 @@
     transition: background-color 200ms ease;
   }
   @media (hover: hover) {
-    .rsvp-chip:hover {
+    .rs-chip:hover {
       background: rgb(255 249 239 / 0.12);
     }
   }
-  .rsvp-chip:focus-visible {
-    outline: 2px solid #d4b26e;
-    outline-offset: 2px;
-  }
-
-  /* RSVP, accepted: the scene, full screen on the box's own blue. Everything in it is a one-time
-     animation timed from the moment it opens (--at); [data-instant] shows it finished at once. */
-  .rv-bg {
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(110% 70% at 50% 32%, rgb(44 86 142 / 0.55), transparent 72%),
-      linear-gradient(180deg, #15365f 0%, #0f2a52 55%, #0b2045 100%);
-  }
-  .rv-layer,
-  .rv-deco {
-    position: absolute;
-    inset: 0;
-  }
-  .rv-deco {
-    overflow: hidden;
-    pointer-events: none;
-  }
-  .rv-scene {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    overflow-x: hidden;
-    overflow-y: auto;
-    padding: calc(var(--status-bar, 0px) + 30px) 20px 28px;
-    color: #fff9ef;
-    text-align: center;
-    scrollbar-width: none;
-  }
-  .rv-scene::-webkit-scrollbar {
-    display: none;
-  }
-  /* a narrow gold light rising from the bottom centre toward the middle (0.2–1.1s), then gone */
-  .rv-light {
-    position: absolute;
-    left: 50%;
-    bottom: 0;
-    width: 2px;
-    height: 20dvh;
-    margin-left: -1px;
-    border-radius: 2px;
-    background: linear-gradient(to top, rgb(243 214 140 / 0), rgb(243 214 140 / 0.85) 70%, #fff4d6);
-    box-shadow: 0 0 10px 1px rgb(232 198 128 / 0.4);
-    opacity: 0;
-    pointer-events: none;
-    animation: rv-light 900ms cubic-bezier(0.4, 0, 0.2, 1) 200ms both;
-  }
-  @keyframes rv-light {
-    0% {
-      opacity: 0;
-      transform: translateY(20dvh);
-    }
-    15% {
-      opacity: 1;
-    }
-    80% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 0;
-      transform: translateY(-38dvh);
-    }
-  }
-  /* what it brings faintly into view: the temples at the foot, then the bells above */
-  .rv-temple {
-    position: absolute;
-    bottom: -2px;
-    width: 120px;
-    color: rgb(136 172 220 / 0.16);
-    pointer-events: none;
-    animation: rv-fade 600ms ease-out 250ms both;
-  }
-  .rv-temple-right {
-    right: -6px;
-  }
-  .rv-temple-left {
-    left: -6px;
-    transform: scaleX(-1);
-  }
-  .rv-bells {
-    position: absolute;
-    top: var(--status-bar, 0px);
-    left: 0;
-    right: 0;
-    pointer-events: none;
-    animation: rv-fade 500ms ease-out 650ms both;
-  }
-  @keyframes rv-fade {
-    from {
-      opacity: 0;
-    }
-  }
-  /* the arch and the couple: 3:4, as large as the screen allows beside the words and buttons */
-  .rv-art {
-    position: relative;
-    flex: none;
-    width: max(190px, min(76vw, 320px, calc((100dvh - var(--status-bar, 0px) - 420px) * 0.75)));
-    aspect-ratio: 3 / 4;
-  }
-  .rv-arch {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    overflow: visible;
-  }
-  /* each line draws itself once (pillars upward, the arch from each side to its peak) */
-  .rv-stroke {
-    stroke: #b89554;
-    stroke-width: 1.4;
-    stroke-dasharray: 1;
-    stroke-dashoffset: 1;
-    animation: rv-draw var(--dur) cubic-bezier(0.45, 0, 0.25, 1) var(--at) both;
-  }
-  .rv-fine {
-    stroke: #d4b26e;
-    stroke-width: 0.9;
-    stroke-opacity: 0.75;
-  }
-  @keyframes rv-draw {
-    to {
-      stroke-dashoffset: 0;
-    }
-  }
-  .rv-kalash {
-    transform-box: fill-box;
-    transform-origin: 50% 100%;
-    animation: rv-kalash 300ms ease-out 1750ms both;
-  }
-  @keyframes rv-kalash {
-    from {
-      opacity: 0;
-      transform: scale(0.6);
-    }
-  }
-  /* one gleam along the arch, once */
-  .rv-shine {
-    stroke: #fff3d0;
-    stroke-width: 2;
-    stroke-dasharray: 0.07 1;
-    stroke-dashoffset: 0.07;
-    opacity: 0;
-    filter: drop-shadow(0 0 3px #f3d68c);
-    animation: rv-shine 650ms ease-in-out 1800ms both;
-  }
-  @keyframes rv-shine {
-    0% {
-      stroke-dashoffset: 0.07;
-      opacity: 0;
-    }
-    12%,
-    85% {
-      opacity: 1;
-    }
-    100% {
-      stroke-dashoffset: -1;
-      opacity: 0;
-    }
-  }
-  /* Mahadev and Maa Parvati inside it, from 97% (1.9–2.7s), a warm gold light behind them */
-  .rv-glow {
-    position: absolute;
-    left: 50%;
-    top: 30%;
-    width: 86%;
-    height: 62%;
-    border-radius: 50%;
-    background: radial-gradient(closest-side, rgb(240 206 132 / 0.42), rgb(232 198 128 / 0.14) 60%, transparent);
-    filter: blur(6px);
-    transform: translateX(-50%);
-    pointer-events: none;
-    animation: rv-fade 900ms ease-out 1900ms both;
-  }
-  .rv-figures {
-    position: absolute;
-    left: 50%;
-    bottom: 2.5%;
-    height: 82%;
-    width: auto;
-    max-width: none;
-    translate: -50% 0;
-    transform-origin: 50% 80%;
-    -webkit-mask-image: linear-gradient(to bottom, #000 66%, transparent 97%);
-    mask-image: linear-gradient(to bottom, #000 66%, transparent 97%);
-    user-select: none;
-    animation: rv-figures 800ms ease-out 1900ms both;
-  }
-  @keyframes rv-figures {
-    from {
-      opacity: 0;
-      transform: scale(0.97);
-    }
-  }
-  /* the blessing (2.7s, 2.9s, 3.1s), then the buttons (3.5s, 3.62s), each rising softly */
-  .rv-rise {
-    animation: rv-rise 500ms ease-out var(--at) both;
-  }
-  @keyframes rv-rise {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-  }
-  .rv-words {
-    position: relative;
-    max-width: 20rem;
-    margin-top: 16px;
-  }
-  .rv-heading {
-    font-family: var(--font-display);
-    font-size: 21px;
-    font-weight: 600;
-    line-height: 1.25;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: #e3c27e;
-    text-wrap: balance;
-  }
-  .rv-text {
-    margin-top: 10px;
-    font-family: var(--font-display);
-    font-size: 17.5px;
-    font-style: italic;
-    line-height: 1.5;
-    color: rgb(255 249 239 / 0.88);
-    text-wrap: balance;
-  }
-  .rv-closing {
-    margin-top: 12px;
-    font-family: var(--font-body);
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.32em;
-    text-transform: uppercase;
-    color: #d4b26e;
-  }
-  .rv-actions {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    margin-top: 20px;
-  }
-  .rv-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 9px;
-    width: 236px;
-    height: 46px;
-    border-radius: 10px;
-    font-family: var(--font-body);
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    transition:
-      background-color 200ms ease,
-      border-color 200ms ease,
-      box-shadow 200ms ease,
-      transform 150ms ease;
-  }
-  .rv-options {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 10px;
-    animation: rv-rise 260ms ease-out both;
-  }
-  .rv-feedback {
+  .rs-feedback {
     max-width: 18rem;
     font-family: var(--font-body);
     font-size: 12px;
     line-height: 1.45;
     color: rgb(255 249 239 / 0.8);
   }
-  .rv-feedback:not(:empty) {
-    margin-top: 8px;
+  .rs-feedback:not(:empty) {
+    margin-top: 10px;
   }
-  .rv-note {
-    max-width: 17rem;
+  /* "Return to invitation": a plain link */
+  .rs-return {
+    margin-top: 18px;
+    padding: 6px 4px;
     font-family: var(--font-body);
-    font-size: 12px;
-    line-height: 1.45;
-    color: rgb(255 249 239 / 0.7);
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    color: rgb(255 249 239 / 0.82);
+    text-decoration: underline;
+    text-decoration-color: rgb(184 149 84 / 0.75);
+    text-underline-offset: 4px;
+    transition: color 200ms ease;
   }
-  /* shown finished at once: reduced motion, or opened again */
-  .rv[data-instant] * {
-    animation-duration: 0s !important;
-    animation-delay: 0s !important;
+  @media (hover: hover) {
+    .rs-return:hover {
+      color: #fff9ef;
+    }
+  }
+  /* reduced motion: everything simply fades in */
+  .rs[data-still] .rs-stroke {
+    stroke-dashoffset: 0;
+    animation: none !important;
+  }
+  .rs[data-still] .rs-gleam {
+    display: none;
+  }
+  .rs[data-still][data-shown] .rs-in,
+  .rs[data-still][data-shown] .rs-glow,
+  .rs[data-still][data-shown] .rs-figures,
+  .rs[data-still][data-shown] .rs-kalash {
+    animation: rs-appear 400ms ease-out both;
   }
 
+  /* Blessing Wall: the gold ring that spreads from the lotus over a sent wish (once). */
+  .rsvp-ring {
+    animation: rsvp-ring 1100ms ease-out forwards;
+  }
+  @keyframes rsvp-ring {
+    from {
+      transform: scale(1);
+      opacity: 0.8;
+    }
+    to {
+      transform: scale(2.7);
+      opacity: 0;
+    }
+  }
   /* Blessing Wall: the lotus that appears over a sent wish. */
   @keyframes keepsake-pop {
     from {
