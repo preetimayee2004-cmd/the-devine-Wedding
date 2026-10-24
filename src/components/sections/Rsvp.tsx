@@ -7,13 +7,12 @@ import { Icon } from "@/components/art/Icons";
 import { TempleBells, TempleSilhouette } from "@/components/art/Temple";
 
 /**
- * Section 08 — "The Sacred Union": a divine wedding scene, drawn straight onto the deep night-blue
- * of the section (no card, no box: the blue runs edge to edge, softening into the page above and
- * below).
+ * Section 08 — "The Sacred Union": a divine wedding scene, drawn straight onto the page's own sky
+ * (mist-blue warming into ivory, as every section) — no card, no box.
  *
  * At the top a gold trishul with a fine rule beneath it, temple bells hanging alike from the upper
  * corners. In the middle a temple arch in thin antique-gold lines, Mahadev and Maa Parvati within it
- * (the Save the Date painting's own figures), the pillars and the figures melting into the blue at
+ * (the Save the Date painting's own figures), the pillars and the figures melting into the sky at
  * their foot, faint temples at the corners. Beneath: "A Sacred Celebration", the blessing and "Har
  * Har Mahadev"; then one maroon button, "Add to calendar" (Google Calendar or an .ics file of the
  * wedding as configured — and it says exactly what happened, never that the date is saved), and a
@@ -43,13 +42,11 @@ export function Rsvp() {
       id="rsvp"
       ref={ref}
       aria-labelledby="rsvp-heading"
-      className="rs relative px-[var(--gutter)] pb-20 pt-16 text-center"
+      className="rs relative px-[var(--gutter)] pb-14 pt-16 text-center"
       data-shown={seen || undefined}
       data-still={reduced || undefined}
       data-bells={seen ? (reduced ? "still" : "in") : "hidden"}
     >
-      {/* the blue, edge to edge, softening into the page above and below */}
-      <div aria-hidden className="rs-bg" />
       <TempleBells />
       <TempleSilhouette className="rs-temple rs-temple-left" />
       <TempleSilhouette className="rs-temple rs-temple-right" />
@@ -166,7 +163,7 @@ function Arch() {
       {/* the kalash on the peak */}
       <g className="rs-kalash" style={{ "--at": `${AT.kalash}ms` } as CSSProperties}>
         <path d="M150 28V18M150 22c-4-2-7-1-8 2M150 22c4-2 7-1 8 2" stroke="#b89554" strokeWidth="1.2" />
-        <circle cx="150" cy="14" r="3.2" stroke="#d4b26e" strokeWidth="1.2" fill="#d4b26e" fillOpacity="0.35" />
+        <circle cx="150" cy="14" r="3.2" stroke="#a8741f" strokeWidth="1.2" fill="#c9a45c" fillOpacity="0.45" />
       </g>
       {/* one gleam running along the arch, left to right */}
       <path className="rs-gleam" pathLength={1} style={{ "--at": `${AT.gleam}ms` } as CSSProperties} d={`${half}C156 48 166 64 184 78 214 100 264 122 264 166`} />
@@ -177,15 +174,15 @@ function Arch() {
 /** Mahadev's trishul, in fine gold line. */
 function Trishul() {
   return (
-    <svg aria-hidden viewBox="0 0 32 46" className="mx-auto h-[52px] w-9" fill="none" stroke="#d4b26e" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg aria-hidden viewBox="0 0 32 46" className="mx-auto h-[52px] w-9" fill="none" stroke="#a8741f" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       {/* the middle blade, the two curving side prongs, the shaft */}
-      <path d="M16 2.5 13.6 9 16 15l2.4-6Z" fill="#d4b26e" fillOpacity="0.35" />
+      <path d="M16 2.5 13.6 9 16 15l2.4-6Z" fill="#c9a45c" fillOpacity="0.45" />
       <path d="M16 15v29" />
       <path d="M16 17.5c-6.2 0-9-4.2-8.6-11.5M16 17.5c6.2 0 9-4.2 8.6-11.5" />
       <path d="M7.4 6 6 2.5 5.2 7.4M24.6 6 26 2.5l.8 4.9" />
       {/* the binding where the prongs meet the shaft */}
       <path d="M13.2 21h5.6M13.6 23.4h4.8" strokeWidth="1.1" />
-      <circle cx="16" cy="44" r="1" fill="#d4b26e" stroke="none" />
+      <circle cx="16" cy="44" r="1" fill="#a8741f" stroke="none" />
     </svg>
   );
 }
@@ -204,7 +201,7 @@ function Rule() {
       <path d="M0 5h68M92 5h68" stroke="url(#rs-rule)" strokeWidth="0.8" />
       <circle cx="72" cy="5" r="1.1" fill="#b89554" />
       <circle cx="88" cy="5" r="1.1" fill="#b89554" />
-      <path d="M80 1.2 83.8 5 80 8.8 76.2 5Z" fill="#d4b26e" fillOpacity="0.4" stroke="#d4b26e" strokeWidth="0.8" />
+      <path d="M80 1.2 83.8 5 80 8.8 76.2 5Z" fill="#c9a45c" fillOpacity="0.45" stroke="#a8741f" strokeWidth="0.8" />
     </svg>
   );
 }
