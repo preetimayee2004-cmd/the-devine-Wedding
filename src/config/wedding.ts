@@ -462,8 +462,8 @@ export const wedding = {
     omSeal: "/art/om-seal.webp",
     /**
      * Section 02, made from one painting (its text and sky taken out, so the site's sky shows
-     * through): the carved arch — recoloured to the gold of Parvati's saree in the Save the Date
-     * painting — with bells and jasmine strings across the top (1220 × 600), and
+     * through): the carved arch — recoloured to Mahadev's own blue in the Save the Date painting
+     * (his skin's tones, shadow to highlight, so the carving keeps its depth) — with bells and jasmine strings across the top (1220 × 600), and
      * the scene at the foot (1220 × 1448) — palms, petals, hills, a temple by the river, a diya,
      * lotuses, and the couple offering water to the Shivling.
      */
