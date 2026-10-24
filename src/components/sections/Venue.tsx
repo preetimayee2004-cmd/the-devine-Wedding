@@ -1,4 +1,4 @@
-import { useId, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
+import { useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { wedding } from "@/config/wedding";
 import type { Stay, TravelPoint } from "@/config/types";
 import { useInView } from "@/hooks/useInView";
@@ -6,32 +6,33 @@ import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
 import { directionsUrl, mapEmbedUrl, whatsappUrl } from "@/lib/maps";
 import { formatVenueDate, parseVenueDateTime, venueInstant, zoneLabel } from "@/lib/venueTime";
 import { Icon } from "@/components/art/Icons";
-import { LotusRule } from "@/components/art/Ornaments";
 import { TempleSilhouette } from "@/components/art/Temple";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 
 /**
- * Section 10 — "Finding Your Way": the venue, how to get there, and where to stay, in the
- * Shiv–Parvati key — cream cards on the pale sky, navy words, gold capitals, Cormorant headings.
+ * Section 10 — "Finding Your Way": the venue, how to get there, and where to stay, on the page's own
+ * sky — navy words, gold capitals, Cormorant headings, and no more boxes than needed.
  *
- * The venue: a cream card, a faint Kailash range along its top edge; the map cut into a temple arch
- * with a fine gold edge, a small bell hanging from each shoulder, a gold lotus pin on
- * the place and a small gold "Maps" pill; then the venue's name, a small gold lotus rule, its
- * address and the date in gold capitals, and "Get Directions" (navy, a gold edge, a small lotus; a
- * soft ripple where it is pressed).
+ * The Wedding Destination: the real map (Google's, its roads, labels and pin left clear) set in a
+ * temple arch with a fine antique-gold edge and a finer line just outside it, a small lotus above its
+ * peak and a faint Himalayan range behind; then "The Wedding Destination", the venue's name in navy
+ * serif, its address, the date and time in gold capitals, and "Find your way" (navy, a gold edge, a
+ * small compass; a soft ripple where it is pressed) to the directions.
  *
- * The way in: three stops on a thin wavy line of Ganga blue, a small lotus at each — by air, by
- * rail, by road — each with its distance and time on one line; a tap opens (or closes) its detail.
- * Then a small tip: pickup details come on WhatsApp.
+ * A Sacred Journey: by air, by rail, by road — editorial rows, each with a small line icon in a fine
+ * gold ring, its gold label, the place, and its distance and time on one line; a fine gold line
+ * between rows; a tap (or Enter) opens a row's detail, the chevron turning. A curved gold route runs
+ * behind the icons from the first to the last, never under the words. Then a small tip: pickup
+ * details come on WhatsApp.
  *
  * Blessed Stays (a small bilva leaf by the label): cards to swipe across — each with its photo in an
  * arch (or a soft painted one until there is a photo), its name, distance and a line, Call (when
  * there is a number) and Map; the first the family hosts is marked so, in a gold edge. Then the point
  * of contact, with WhatsApp when there is a number.
  *
- * As it is reached, each card rises softly in and the lotus nodes open one after another along the
- * river line. Buttons are at least 48px tall. Reduced motion: plain fades, no ripple.
+ * As it is reached: the map fades in, the route draws itself, the icons follow a beat apart, the rows
+ * rise in. Buttons are at least 48px tall. Reduced motion: plain fades, no ripple.
  */
 export function Venue() {
   const { venue, travel } = wedding;
@@ -51,76 +52,70 @@ export function Venue() {
     const zone = p.hour === null ? null : zoneLabel(venueInstant(p, wedding.wedding.timeZone), wedding.wedding.timeZone);
     return `${d.weekday}, ${d.day} ${d.month} ${d.year}${d.time ? ` · ${d.time}${zone ? ` ${zone}` : ""}` : ""}`;
   }, []);
-  const placeUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${venue.name}, ${venue.address}`)}`;
+  const [mapLoaded, setMapLoaded] = useState(false);
 
   return (
     <section id="venue" ref={sectionRef} aria-labelledby="venue-heading" className="relative px-[var(--gutter)] pb-8 pt-[var(--section-gap)]">
       <SectionHeading id="venue-heading" eyebrow={travel.eyebrow} title={travel.title} show={seen} />
 
-      <div className="mx-auto mt-8 max-w-[23rem] space-y-10">
-        {/* the venue */}
+      <div className="mx-auto mt-8 max-w-[23rem] space-y-12">
+        {/* the wedding destination */}
         <Reveal show={seen} delay={t(250)}>
-          <article className="fw-card" aria-labelledby="venue-name">
-            <Kailash />
-            <div className="fw-map-wrap">
+          <article className="fw-venue" aria-labelledby="venue-name">
+            <div className="fw-frame" data-shown={seen || undefined}>
+              <Himalaya />
               {/* the arch the map is cut to (in the box's own 0–1 units) */}
               <svg aria-hidden width="0" height="0" className="absolute">
                 <defs>
                   <clipPath id="fw-arch-clip" clipPathUnits="objectBoundingBox">
-                    <path transform="scale(0.01 0.0086957)" d={ARCH_PATH} />
+                    <path transform="scale(0.01 0.0108696)" d={ARCH_PATH} />
                   </clipPath>
                 </defs>
               </svg>
-              <div className="fw-map">
+              <div className="fw-map" data-loaded={mapLoaded || undefined}>
                 {seen && (
                   <iframe
                     src={mapEmbedUrl(venue)}
                     title={`Map of ${venue.name}`}
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
-                    className="absolute inset-0 h-full w-full border-0"
+                    className="fw-map-frame absolute left-0 w-full border-0"
+                    onLoad={() => setMapLoaded(true)}
                   />
                 )}
-                <LotusPin />
-                <a href={placeUrl} target="_blank" rel="noopener noreferrer" className="fw-maps-pill" aria-label={`Open ${venue.name} in Google Maps`}>
-                  Maps
-                  <Icon name="external" className="h-3.5 w-3.5" strokeWidth={1.6} />
-                </a>
               </div>
-              <svg aria-hidden viewBox="0 0 100 115" preserveAspectRatio="none" className="fw-arch-line">
+              {/* its gold edge, and a finer line just outside — the frame only, nothing over the map */}
+              <svg aria-hidden viewBox="0 0 100 92" preserveAspectRatio="none" className="fw-arch-line">
                 <path d={ARCH_PATH} vectorEffect="non-scaling-stroke" />
               </svg>
-              <ArchBells />
+              <svg aria-hidden viewBox="0 0 100 92" preserveAspectRatio="none" className="fw-arch-line fw-arch-outer">
+                <path d={ARCH_PATH} vectorEffect="non-scaling-stroke" />
+              </svg>
+              <span aria-hidden className="fw-finial">
+                <SmallLotus />
+              </span>
             </div>
-            <h3 id="venue-name" className="mt-5 text-[28px] leading-tight">
+            <p className="fw-kicker">The Wedding Destination</p>
+            <h3 id="venue-name" className="fw-venue-name">
               {venue.name}
             </h3>
-            <div className="mt-2 flex justify-center">
-              <LotusRule />
-            </div>
-            <p className="mt-2 text-[14.5px] leading-relaxed text-slate">{venue.address}</p>
-            {when && <p className="mt-2 font-sans text-[11px] font-semibold uppercase tracking-[0.18em] text-gold-ink">{when}</p>}
+            <p className="fw-address">{venue.address}</p>
+            {when && <p className="fw-when">{when}</p>}
             <a href={directionsUrl(venue)} target="_blank" rel="noopener noreferrer" className="fw-directions" onPointerDown={reduced ? undefined : ripple}>
-              <SmallLotus />
-              Get Directions
+              <Compass />
+              Find your way
             </a>
           </article>
         </Reveal>
 
-        {/* the way in */}
-        <div ref={travelRef}>
+        {/* a sacred journey */}
+        <div ref={travelRef} className="fw-journey" data-shown={travelSeen || undefined} data-still={reduced || undefined}>
           <Reveal show={travelSeen} delay={t(0)}>
             <p className="fw-label">How to Reach</p>
+            <h3 className="fw-journey-title">A Sacred Journey</h3>
           </Reveal>
-          <ol className="fw-stops" data-shown={travelSeen || undefined} data-still={reduced || undefined}>
-            <svg aria-hidden viewBox="0 0 20 100" preserveAspectRatio="none" className="fw-river">
-              <path d={RIVER_PATH} pathLength={1} />
-            </svg>
-            {travel.points.map((p, i) => (
-              <Stop key={p.name} point={p} index={i} show={travelSeen} reduced={reduced} />
-            ))}
-          </ol>
-          <Reveal show={travelSeen} delay={t(900)} className="mt-4 flex justify-center">
+          <Journey points={travel.points} show={travelSeen} reduced={reduced} />
+          <Reveal show={travelSeen} delay={t(1200)} className="mt-5 flex justify-center">
             <p className="fw-tip">
               <Icon name="chat" className="h-4 w-4 shrink-0 text-gold-ink" strokeWidth={1.5} />
               {travel.pickupTip}
@@ -184,39 +179,75 @@ function ripple(e: PointerEvent<HTMLElement>) {
   s.addEventListener("animationend", () => s.remove());
 }
 
-/** One way in: a lotus node on the river, its card; a tap opens or closes its detail. */
-function Stop({ point, index, show, reduced }: { point: TravelPoint; index: number; show: boolean; reduced: boolean }) {
+/**
+ * The ways in, as rows on a curved gold route: the route is drawn (in pixels, so its line stays fine)
+ * from the first icon's centre to the last, behind the icons and never under the words; it is redrawn
+ * when a row opens or the width changes.
+ */
+function Journey({ points, show, reduced }: { points: readonly TravelPoint[]; show: boolean; reduced: boolean }) {
+  const list = useRef<HTMLOListElement>(null);
+  const [route, setRoute] = useState<{ top: number; height: number } | null>(null);
+  useLayoutEffect(() => {
+    const el = list.current;
+    if (!el) return;
+    const measure = () => {
+      const icons = el.querySelectorAll<HTMLElement>(".fw-row-icon");
+      if (icons.length < 2) return setRoute(null);
+      const base = el.getBoundingClientRect().top;
+      const first = icons[0].getBoundingClientRect();
+      const lastIcon = icons[icons.length - 1].getBoundingClientRect();
+      const top = first.top + first.height / 2 - base;
+      setRoute({ top, height: lastIcon.top + lastIcon.height / 2 - base - top });
+    };
+    measure();
+    if (!("ResizeObserver" in window)) return;
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [points.length]);
+  const h = route?.height ?? 0;
+  // a gentle S between the icons' centre line (x = 22), swinging 9px either side
+  const d = h ? `M22 0C9 ${h * 0.16} 9 ${h * 0.34} 22 ${h * 0.5}S35 ${h * 0.84} 22 ${h}` : "";
+  return (
+    <ol ref={list} className="fw-rows">
+      {route && (
+        <svg aria-hidden className="fw-route" viewBox={`0 0 44 ${h}`} style={{ top: route.top, height: h }}>
+          <path d={d} pathLength={1} />
+        </svg>
+      )}
+      {points.map((p, i) => (
+        <Row key={p.name} point={p} index={i} show={show} reduced={reduced} />
+      ))}
+    </ol>
+  );
+}
+
+/** One way in: its icon in a fine gold ring, label, place, distance and time; a tap opens its detail. */
+function Row({ point, index, show, reduced }: { point: TravelPoint; index: number; show: boolean; reduced: boolean }) {
   const [open, setOpen] = useState(false);
   const id = useId();
   return (
-    <li className="fw-stop" style={{ "--i": index } as CSSProperties}>
-      <span aria-hidden className="fw-node">
-        <SmallLotus />
-      </span>
-      <Reveal show={show} delay={reduced ? 0 : 200 + index * 220}>
-        <div className="fw-stop-card" data-open={open || undefined}>
-          <button type="button" className="fw-stop-head" aria-expanded={open} aria-controls={id} onClick={() => setOpen((o) => !o)}>
-            <span className="fw-stop-icon">
-              <Icon name={point.kind} className="h-[19px] w-[19px]" />
-            </span>
-            <span className="min-w-0 flex-1 text-left">
-              <span className="block font-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-gold-ink">{point.label}</span>
-              <span className="block font-display text-[18.5px] font-semibold leading-snug text-navy">{point.name}</span>
-              <span className="block font-sans text-[12.5px] text-slate">
-                {[point.place, point.distance, point.time].map((x) => x.split(" ").join(NBSP)).join(" · ")}
-              </span>
-            </span>
-            <svg aria-hidden viewBox="0 0 24 24" className="fw-chevron" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-              <path d="m6 9 6 6 6-6" />
-            </svg>
-          </button>
-          <div id={id} className="fw-stop-body" role="region" aria-label={`${point.label}: details`}>
-            <div className="overflow-hidden">
-              <p className="px-4 pb-4 text-[14px] leading-relaxed text-slate">{point.detail}</p>
-            </div>
-          </div>
+    <li className="fw-row" data-open={open || undefined} style={{ "--i": index } as CSSProperties}>
+      <button type="button" className="fw-row-head" aria-expanded={open} aria-controls={id} onClick={() => setOpen((o) => !o)}>
+        <span className="fw-row-icon">
+          <Icon name={point.kind} className="h-[18px] w-[18px]" strokeWidth={1.4} />
+        </span>
+        <Reveal as="span" show={show} delay={reduced ? 0 : 450 + index * 220} className="block min-w-0 flex-1 text-left">
+          <span className="block font-sans text-[10px] font-semibold uppercase tracking-[0.22em] text-gold-ink">{point.label}</span>
+          <span className="block font-display text-[19px] font-semibold leading-snug text-navy">{point.name}</span>
+          <span className="block font-sans text-[12.5px] text-slate">
+            {[point.place, point.distance, point.time].map((x) => x.split(" ").join(NBSP)).join(" · ")}
+          </span>
+        </Reveal>
+        <svg aria-hidden viewBox="0 0 24 24" className="fw-chevron" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      </button>
+      <div id={id} className="fw-row-body" role="region" aria-label={`${point.label}: details`}>
+        <div className="overflow-hidden">
+          <p className="fw-row-detail">{point.detail}</p>
         </div>
-      </Reveal>
+      </div>
     </li>
   );
 }
@@ -256,52 +287,27 @@ function StayCard({ stay, featured }: { stay: Stay; featured: boolean }) {
 /** A space that never breaks: keeps "about 25 km" and "50 min" each on one line. */
 const NBSP = "\u00a0";
 
-/** The map's temple arch, in a 100 × 115 box: a pointed, gently lobed top. */
-const ARCH_PATH =
-  "M0.5 114.5V40C0.5 30 8 23 19 19C29 15.5 35 11 40 6.5C44 3 47.5 1.5 50 0.5C52.5 1.5 56 3 60 6.5C65 11 71 15.5 81 19C92 23 99.5 30 99.5 40V114.5Z";
-/** The river: a thin wave down the stops (20 × 100, stretched to their height). */
-const RIVER_PATH = "M10 0C16 6 16 10 10 16S4 26 10 32 16 42 10 48 4 58 10 64 16 74 10 80 4 90 10 100";
+/** The map's temple arch, in a 100 × 92 box: a rounded top rising to a soft point. */
+const ARCH_PATH = "M0.5 91.5V28C0.5 12.5 22 3 50 0.6C78 3 99.5 12.5 99.5 28V91.5Z";
 
-/** A faint Kailash range along the card's top edge: pale blue on cream. */
-function Kailash() {
+/** A faint Himalayan range behind the arch's top — outside the map, never over it. */
+function Himalaya() {
   return (
-    <svg aria-hidden viewBox="0 0 300 60" preserveAspectRatio="none" className="fw-kailash">
-      <path d="M0 60V42L22 34 40 40 62 26 82 36 104 22 124 30 138 14Q150 2 162 14L176 28 196 20 216 34 238 24 260 36 280 30 300 38V60Z" fill="rgb(168 194 222 / 0.42)" />
-      <path d="M0 60V50L30 44 58 48 92 40 122 46 150 38 182 46 214 40 246 47 276 42 300 46V60Z" fill="rgb(168 194 222 / 0.32)" />
-      <path d="M144 12Q150 6 156 12L152 16 150 13 148 16Z" fill="#fffaf0" opacity="0.9" />
+    <svg aria-hidden viewBox="0 0 300 70" preserveAspectRatio="none" className="fw-himalaya">
+      <path d="M0 70V50L24 40 42 46 66 30 86 40 108 24 128 34 142 16Q150 6 158 16L172 32 194 22 214 38 236 28 258 40 280 34 300 42V70Z" fill="rgb(150 180 214 / 0.32)" />
+      <path d="M0 70V58L30 52 60 56 94 47 124 54 150 45 182 54 214 47 246 55 276 50 300 54V70Z" fill="rgb(150 180 214 / 0.22)" />
+      <path d="M146 14Q150 9 154 14L151.5 17 150 15 148.5 17Z" fill="#fffaf0" />
     </svg>
   );
 }
 
-/** Two small temple bells, each on a fine gold thread from one of the arch's shoulders. */
-function ArchBells() {
+/** A small compass: a fine ring and a needle (for "Find your way"). */
+function Compass() {
   return (
-    <>
-      {(["left", "right"] as const).map((side) => (
-        <span key={side} aria-hidden className="fw-bell" style={{ [side]: "13%" }}>
-          <img src="/art/couple-bell-1.webp" alt="" width={13} height={20} draggable={false} />
-        </span>
-      ))}
-    </>
-  );
-}
-
-/** The gold lotus pin on the place. */
-function LotusPin() {
-  return (
-    <svg aria-hidden viewBox="0 0 32 42" className="fw-pin">
-      <defs>
-        <linearGradient id="fw-pin-gold" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#e9c46a" />
-          <stop offset="1" stopColor="#a8741f" />
-        </linearGradient>
-      </defs>
-      <path d="M16 1C7.7 1 1 7.6 1 15.6 1 26 16 41 16 41S31 26 31 15.6C31 7.6 24.3 1 16 1Z" fill="url(#fw-pin-gold)" stroke="#8a5e17" strokeWidth="1" />
-      <g fill="#fffaf0" stroke="#fffaf0" strokeWidth="0.4" strokeLinejoin="round">
-        <path d="M16 21C14 18 14 14 16 10 18 14 18 18 16 21Z" />
-        <path d="M16 21C13 20.5 10.5 18.5 10 15 13 15.5 15 17.5 16 21Z" />
-        <path d="M16 21C19 20.5 21.5 18.5 22 15 19 15.5 17 17.5 16 21Z" />
-      </g>
+    <svg aria-hidden viewBox="0 0 24 24" className="fw-compass" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M15.5 8.5 13.2 13.2 8.5 15.5 10.8 10.8Z" fill="currentColor" fillOpacity="0.35" />
+      <path d="M12 2.6V4.2M12 19.8V21.4M2.6 12H4.2M19.8 12H21.4" strokeLinecap="round" />
     </svg>
   );
 }

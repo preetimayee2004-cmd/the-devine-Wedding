@@ -1627,30 +1627,25 @@
     border-top: 1px solid rgb(184 149 84 / 0.35);
   }
 
-  /* Finding Your Way — cream cards on the pale sky, navy words, gold capitals. */
-  .fw-card {
-    position: relative;
-    overflow: hidden;
-    padding: 0 18px 22px;
-    border: 1px solid rgb(184 149 84 / 0.5);
-    border-radius: 22px;
-    background: linear-gradient(180deg, #fffaf0, #fdf6ea);
-    box-shadow: 0 18px 40px -28px rgb(18 41 74 / 0.5);
+  /* Finding Your Way — on the page's own sky: navy words, gold capitals, few boxes. */
+  /* the wedding destination: the real map in a temple arch with a fine gold edge, a finer line just
+     outside it, a small lotus above its peak and a faint Himalayan range behind — nothing over the map */
+  .fw-venue {
     text-align: center;
   }
-  /* a faint Kailash range along the card's top edge */
-  .fw-kailash {
-    position: absolute;
-    inset: 0 0 auto;
-    width: 100%;
-    height: 64px;
-    pointer-events: none;
-  }
-  /* the map, cut into a temple arch with a fine gold edge; a small bell from each shoulder */
-  .fw-map-wrap {
+  .fw-frame {
     position: relative;
-    margin: 34px 4px 0;
-    aspect-ratio: 100 / 115;
+    margin: 44px 10px 0;
+    aspect-ratio: 100 / 92;
+  }
+  .fw-himalaya {
+    position: absolute;
+    left: -16%;
+    top: -40px;
+    z-index: -1;
+    width: 132%;
+    height: 78px;
+    pointer-events: none;
   }
   .fw-map {
     position: absolute;
@@ -1658,6 +1653,18 @@
     overflow: hidden;
     background: linear-gradient(rgb(var(--sky-pale)), #f3efe4);
     clip-path: url(#fw-arch-clip);
+  }
+  /* the map starts below the arch's curve, so Google's own corner links sit in its straight part */
+  .fw-map-frame {
+    top: 34px;
+    height: calc(100% - 34px);
+  }
+  .fw-map iframe {
+    opacity: 0;
+    transition: opacity 900ms ease-out;
+  }
+  .fw-map[data-loaded] iframe {
+    opacity: 1;
   }
   .fw-arch-line {
     position: absolute;
@@ -1670,47 +1677,75 @@
   .fw-arch-line path {
     fill: none;
     stroke: #b89554;
-    stroke-width: 1.5;
+    stroke-width: 1.4;
   }
-  /* a small bell on a fine gold thread from each of the arch's shoulders */
-  .fw-bell {
-    position: absolute;
-    top: 15.5%;
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 13px;
-    height: 46px;
-    margin-left: -6px;
-    margin-right: -6px;
-    pointer-events: none;
+  .fw-arch-outer {
+    inset: -6px;
+    width: calc(100% + 12px);
+    height: calc(100% + 12px);
   }
-  .fw-bell::before {
-    content: "";
-    flex: 1;
-    width: 1px;
-    margin-bottom: -2px;
-    background: rgb(184 149 84 / 0.9);
+  .fw-arch-outer path {
+    stroke: #c9a45c;
+    stroke-width: 0.8;
+    opacity: 0.7;
   }
-  .fw-bell img {
-    display: block;
-    width: 13px;
-    height: auto;
-    filter: drop-shadow(0 2px 2px rgb(18 41 74 / 0.3));
-  }
-  .fw-pin {
+  .fw-finial {
     position: absolute;
     left: 50%;
-    top: 50%;
-    width: 30px;
-    height: 40px;
-    margin: -40px 0 0 -15px;
-    pointer-events: none;
-    filter: drop-shadow(0 3px 4px rgb(18 41 74 / 0.35));
+    top: -26px;
+    color: rgb(var(--gold-ink));
+    transform: translateX(-50%);
   }
-  /* small pills: "Maps", Call, Map, WhatsApp (48px tall to tap) */
-  .fw-maps-pill,
+  .fw-finial .fw-small-lotus {
+    width: 26px;
+    height: 18px;
+  }
+  .fw-kicker {
+    margin-top: 20px;
+    font-family: var(--font-body);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: rgb(var(--gold-ink));
+  }
+  .fw-venue-name {
+    margin-top: 6px;
+    font-family: var(--font-display);
+    font-size: 30px;
+    font-weight: 600;
+    line-height: 1.1;
+    color: rgb(var(--navy));
+  }
+  .fw-address {
+    margin-top: 8px;
+    font-family: var(--font-body);
+    font-size: 14.5px;
+    line-height: 1.5;
+    color: rgb(var(--slate));
+  }
+  .fw-when {
+    margin-top: 8px;
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgb(var(--gold-ink));
+  }
+  .fw-compass {
+    width: 18px;
+    height: 18px;
+    flex: none;
+    color: #e3c27e;
+    transition: transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  @media (hover: hover) {
+    .fw-directions:hover .fw-compass {
+      transform: rotate(35deg);
+    }
+  }
+  /* small pills: Call, Map, WhatsApp (48px tall to tap) */
   .fw-pill {
     display: inline-flex;
     align-items: center;
@@ -1730,22 +1765,6 @@
       border-color 200ms ease,
       transform 150ms ease;
   }
-  .fw-maps-pill {
-    position: absolute;
-    right: 10px;
-    bottom: 10px;
-    min-height: 36px;
-    padding: 0 13px;
-    background: linear-gradient(#f0d48a, #d9b062);
-    color: rgb(var(--navy));
-    box-shadow: 0 6px 14px -8px rgb(18 41 74 / 0.6);
-  }
-  .fw-maps-pill::after {
-    /* a 48px target round the small pill */
-    content: "";
-    position: absolute;
-    inset: -6px;
-  }
   .fw-pill {
     background: rgb(255 251 242 / 0.9);
     color: rgb(var(--navy));
@@ -1763,22 +1782,20 @@
     .fw-pill-solid:hover {
       background: #1b3a63;
     }
-    .fw-maps-pill:hover {
-      filter: brightness(1.05);
-    }
   }
-  .fw-pill:active,
-  .fw-maps-pill:active {
+  .fw-pill:active {
     transform: scale(0.97);
   }
   .fw-pill:focus-visible,
-  .fw-maps-pill:focus-visible,
-  .fw-directions:focus-visible,
-  .fw-stop-head:focus-visible {
+  .fw-directions:focus-visible {
     outline: 2px solid rgb(var(--gold-ink));
     outline-offset: 3px;
   }
-  /* "Get Directions": navy, a gold edge, a small lotus; a soft ripple where it is pressed */
+  .fw-row-head:focus-visible {
+    outline: 1.5px solid rgb(var(--gold-ink) / 0.8);
+    outline-offset: 0;
+  }
+  /* "Find your way": navy, a gold edge, a small compass; a soft ripple where it is pressed */
   .fw-directions {
     position: relative;
     overflow: hidden;
@@ -1805,9 +1822,6 @@
     transition:
       background-color 200ms ease,
       transform 150ms ease;
-  }
-  .fw-directions .fw-small-lotus {
-    color: #e3c27e;
   }
   @media (hover: hover) {
     .fw-directions:hover {
@@ -1852,107 +1866,103 @@
     text-transform: uppercase;
     color: rgb(var(--gold-ink));
   }
-  /* the stops on a thin wavy line of Ganga blue, a lotus at each, opening one after another */
-  .fw-stops {
+  /* a sacred journey: editorial rows on a curved gold route that runs behind the icons only */
+  .fw-journey-title {
+    margin-top: 6px;
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 600;
+    line-height: 1.15;
+    text-align: center;
+    color: rgb(var(--navy));
+  }
+  .fw-rows {
     position: relative;
-    display: grid;
-    gap: 14px;
     margin-top: 16px;
-    padding-left: 40px;
   }
-  .fw-river {
+  .fw-route {
     position: absolute;
-    left: 6px;
-    top: 10px;
-    bottom: 10px;
-    width: 22px;
-    height: calc(100% - 20px);
+    left: 0;
+    width: 44px;
     overflow: visible;
+    pointer-events: none;
   }
-  .fw-river path {
+  .fw-route path {
     fill: none;
-    stroke: #6f9cc6;
-    stroke-width: 1.5;
-    stroke-linecap: round;
-    stroke-dasharray: 1;
+    stroke: #b89554;
+    stroke-width: 1.2;
+    stroke-linecap: butt;
+    stroke-dasharray: 1 1;
     stroke-dashoffset: 1;
     opacity: 0.85;
   }
-  .fw-stops[data-shown] .fw-river path {
-    animation: fw-draw 1400ms cubic-bezier(0.45, 0, 0.25, 1) 100ms both;
+  .fw-journey[data-shown] .fw-route path {
+    animation: fw-draw 1400ms cubic-bezier(0.45, 0, 0.25, 1) 200ms both;
+  }
+  .fw-journey[data-still] .fw-route path {
+    stroke-dashoffset: 0;
+    animation: none;
   }
   @keyframes fw-draw {
     to {
       stroke-dashoffset: 0;
     }
   }
-  .fw-stop {
+  .fw-row {
     position: relative;
   }
-  .fw-node {
+  /* a fine gold line between rows, clear of the icon column */
+  .fw-row + .fw-row::before {
+    content: "";
     position: absolute;
-    left: -41px;
-    top: 18px;
-    display: grid;
-    place-items: center;
-    width: 26px;
-    height: 26px;
-    border: 1px solid rgb(184 149 84 / 0.7);
-    border-radius: 9999px;
-    background: #fffaf0;
-    color: rgb(var(--gold-ink));
-    box-shadow: 0 3px 8px -4px rgb(18 41 74 / 0.4);
-    transform: scale(0);
+    left: 56px;
+    right: 0;
+    top: 0;
+    height: 1px;
+    background: linear-gradient(90deg, rgb(184 149 84 / 0.5), rgb(184 149 84 / 0.15));
   }
-  .fw-node .fw-small-lotus {
-    width: 16px;
-    height: 11px;
-  }
-  .fw-stops[data-shown] .fw-node {
-    animation: fw-node 420ms cubic-bezier(0.22, 1, 0.36, 1) calc(300ms + var(--i) * 260ms) both;
-  }
-  @keyframes fw-node {
-    from {
-      transform: scale(0);
-    }
-    to {
-      transform: scale(1);
-    }
-  }
-  .fw-stops[data-still] .fw-river path {
-    stroke-dashoffset: 0;
-    animation: none;
-  }
-  .fw-stops[data-still] .fw-node {
-    transform: none;
-    animation: none;
-  }
-  .fw-stop-card {
-    overflow: hidden;
-    border: 1px solid rgb(184 149 84 / 0.45);
-    border-radius: 16px;
-    background: rgb(255 251 242 / 0.88);
-    box-shadow: 0 12px 26px -22px rgb(18 41 74 / 0.6);
-  }
-  .fw-stop-head {
+  .fw-row-head {
     display: flex;
     align-items: center;
     gap: 12px;
     width: 100%;
-    min-height: 64px;
-    padding: 12px 14px;
-    border-radius: 16px;
+    min-height: 72px;
+    padding: 12px 2px 12px 0;
+    border-radius: 12px;
     -webkit-tap-highlight-color: transparent;
   }
-  .fw-stop-icon {
+  .fw-row-icon {
+    position: relative;
     display: grid;
     place-items: center;
-    width: 38px;
-    height: 38px;
+    width: 44px;
+    height: 44px;
     flex: none;
-    border: 1px solid rgb(184 149 84 / 0.6);
+    border: 1px solid rgb(184 149 84 / 0.75);
     border-radius: 9999px;
+    background: rgb(var(--ivory));
     color: rgb(var(--gold-ink));
+    box-shadow: 0 0 0 4px rgb(var(--ivory) / 0.6);
+  }
+  .fw-journey:not([data-shown]) .fw-row-icon {
+    opacity: 0;
+  }
+  .fw-journey[data-shown] .fw-row-icon {
+    animation: fw-icon 500ms cubic-bezier(0.22, 1, 0.36, 1) calc(350ms + var(--i) * 220ms) both;
+  }
+  .fw-journey[data-still] .fw-row-icon {
+    animation: fw-fade 300ms ease-out both;
+  }
+  @keyframes fw-icon {
+    from {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+  }
+  @keyframes fw-fade {
+    from {
+      opacity: 0;
+    }
   }
   .fw-chevron {
     width: 20px;
@@ -1961,20 +1971,32 @@
     color: rgb(var(--gold-ink));
     transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
   }
-  .fw-stop-card[data-open] .fw-chevron {
+  .fw-row[data-open] .fw-chevron {
     transform: rotate(180deg);
   }
-  /* the detail opens smoothly to its own height */
-  .fw-stop-body {
+  /* the detail opens smoothly to its own height, under the words */
+  .fw-row-body {
     display: grid;
     grid-template-rows: 0fr;
     transition: grid-template-rows 360ms cubic-bezier(0.22, 1, 0.36, 1);
   }
-  .fw-stop-card[data-open] .fw-stop-body {
+  .fw-row[data-open] .fw-row-body {
     grid-template-rows: 1fr;
   }
-  .fw-stop-body > div {
+  .fw-row-body > div {
     min-height: 0;
+  }
+  .fw-row-detail {
+    padding: 0 8px 14px 56px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: rgb(var(--slate));
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .fw-row-body,
+    .fw-chevron {
+      transition: none;
+    }
   }
   .fw-tip {
     display: inline-flex;
