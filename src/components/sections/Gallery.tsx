@@ -18,8 +18,8 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 /**
  * Section 07 — "Our Gallery": the couple's photos as a heart.
  *
- * Fourteen photos of different sizes, the same thin cream gap between all of them (and round the
- * heart's edge), together make a heart: its outline is the classic heart curve, each tile clipped
+ * Fourteen photos of different sizes, the same thin antique-gold gap between all of them (and round
+ * the heart's edge), together make a heart: its outline is the classic heart curve, each tile clipped
  * to it, so the edge is smooth; a faint, soft shadow under it. Seen the first time, the tiles fly
  * in from the edges (turned up to ±15°, 70ms apart, about 1.4s) and settle with a little spring;
  * then the heart beats now and then, barely (a soft double beat, 1 → 1.012, every 3.2s).
@@ -420,8 +420,16 @@ export function Gallery() {
         >
           <div className="hc-beat">
             <div ref={tiltRef} className="hc-tilt">
-              {/* the cream mount: the gaps between the tiles, and a rim round the heart as thin as they are */}
+              {/* the gilded mount: the gaps between the tiles, and a rim round the heart as thin as they are */}
               <svg className="hc-mount" viewBox="0 0 100 90.4" preserveAspectRatio="none" aria-hidden>
+                <defs>
+                  <linearGradient id="hc-gold" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stopColor="#d9bd82" />
+                    <stop offset="0.45" stopColor="#b89554" />
+                    <stop offset="0.7" stopColor="#cdaa68" />
+                    <stop offset="1" stopColor="#9c7a3e" />
+                  </linearGradient>
+                </defs>
                 <path d={HEART_PATH} />
               </svg>
               {TILES.map((_, i) => {

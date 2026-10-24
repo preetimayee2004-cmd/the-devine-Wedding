@@ -2631,12 +2631,13 @@
     height: 100%;
     overflow: visible;
     transform: translateZ(-1px);
-    filter: drop-shadow(0 8px 22px rgb(18 41 74 / 0.08));
+    filter: drop-shadow(0 8px 22px rgb(84 60 24 / 0.16));
     transition: opacity 700ms ease-out;
   }
+  /* the mount in the site's antique gold, gently gilded */
   .hc-mount path {
-    fill: rgb(252 248 239);
-    stroke: rgb(252 248 239);
+    fill: url(#hc-gold);
+    stroke: url(#hc-gold);
     stroke-width: 1.8;
     stroke-linejoin: round;
   }
@@ -2673,7 +2674,7 @@
     inset: 0;
     overflow: hidden;
     border-radius: 4px;
-    background: rgb(233 223 204);
+    background: rgb(214 192 148);
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
   }
