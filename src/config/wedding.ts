@@ -416,15 +416,14 @@ export const wedding = {
     mantra: "ॐ नमः शिवाय",
   },
 
-  /** Section 12 — a last little note. */
+  /** Section 12 — the last page: a letter in a sacred envelope; the couple's names and the sign-off on its pocket. */
   loveNote: {
-    eyebrow: "A Little Note from the Couple",
-    title: "Before You Go…",
-    /** Above the note, for a guest named in the link only. */
+    eyebrow: "With love, blessed by Mahadev",
+    /** Above the letter's heading, for a guest named in the link only. */
     greetingFor: "Dear {guest},",
-    message: "Our story is made more beautiful by the people who share it with us. Thank you for being part of ours.",
-    signoff: "With love,",
-    closing: "Har Har Mahadev",
+    title: "Two Souls. One Sacred Journey.",
+    message: "May your love find strength in Shiva, grace in Parvati, and blessings in every step of your journey together.",
+    closing: "Jai Mahadev",
   },
 
   /**
