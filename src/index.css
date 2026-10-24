@@ -1745,56 +1745,6 @@
       transform: rotate(35deg);
     }
   }
-  /* small pills: Call, Map, WhatsApp (48px tall to tap) */
-  .fw-pill {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    min-height: 48px;
-    padding: 0 16px;
-    border: 1px solid rgb(184 149 84 / 0.8);
-    border-radius: 9999px;
-    font-family: var(--font-body);
-    font-size: 12.5px;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    -webkit-tap-highlight-color: transparent;
-    transition:
-      background-color 200ms ease,
-      border-color 200ms ease,
-      transform 150ms ease;
-  }
-  .fw-pill {
-    background: rgb(255 251 242 / 0.9);
-    color: rgb(var(--navy));
-  }
-  .fw-pill-solid {
-    background: rgb(var(--navy));
-    color: #fff9ef;
-    border-color: #b89554;
-  }
-  @media (hover: hover) {
-    .fw-pill:hover {
-      border-color: rgb(var(--gold-ink));
-      background: #fffdf8;
-    }
-    .fw-pill-solid:hover {
-      background: #1b3a63;
-    }
-  }
-  .fw-pill:active {
-    transform: scale(0.97);
-  }
-  .fw-pill:focus-visible,
-  .fw-directions:focus-visible {
-    outline: 2px solid rgb(var(--gold-ink));
-    outline-offset: 3px;
-  }
-  .fw-row-head:focus-visible {
-    outline: 1.5px solid rgb(var(--gold-ink) / 0.8);
-    outline-offset: 0;
-  }
   /* "Find your way": navy, a gold edge, a small compass; a soft ripple where it is pressed */
   .fw-directions {
     position: relative;
@@ -1853,7 +1803,7 @@
     height: 14px;
     flex: none;
   }
-  /* a small gold label: "How to Reach", "Blessed Stays" */
+  /* a small gold label: "How to Reach" */
   .fw-label {
     display: flex;
     align-items: center;
@@ -2011,94 +1961,6 @@
     line-height: 1.35;
     color: rgb(var(--slate));
   }
-  /* Blessed Stays: cards to swipe across (no scrollbar), each with its photo in an arch */
-  .fw-carousel {
-    display: flex;
-    gap: 14px;
-    margin: 18px calc(var(--gutter) * -1) 0;
-    padding: 6px var(--gutter) 14px;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: var(--gutter);
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-  }
-  .fw-carousel::-webkit-scrollbar {
-    display: none;
-  }
-  .fw-slide {
-    flex: 0 0 min(76%, 270px);
-    scroll-snap-align: start;
-  }
-  .fw-stay {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    padding: 14px 14px 16px;
-    border: 1px solid rgb(184 149 84 / 0.45);
-    border-radius: 18px;
-    background: rgb(255 251 242 / 0.9);
-    box-shadow: 0 12px 26px -22px rgb(18 41 74 / 0.6);
-    text-align: left;
-  }
-  .fw-stay[data-featured] {
-    border: 1.5px solid #b89554;
-    box-shadow:
-      0 0 0 3px rgb(184 149 84 / 0.14),
-      0 14px 28px -20px rgb(120 80 20 / 0.55);
-  }
-  .fw-hosted {
-    position: absolute;
-    left: 50%;
-    top: -11px;
-    z-index: 1;
-    padding: 3px 12px;
-    border-radius: 9999px;
-    background: linear-gradient(#f0d48a, #d9b062);
-    font-family: var(--font-body);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    white-space: nowrap;
-    color: rgb(var(--navy));
-    transform: translateX(-50%);
-  }
-  .fw-stay-photo {
-    aspect-ratio: 4 / 3;
-    overflow: hidden;
-    border: 1px solid rgb(184 149 84 / 0.55);
-    border-radius: 50% 50% 8px 8px / 36% 36% 8px 8px;
-  }
-  .fw-stay-wash {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    background:
-      radial-gradient(circle at 50% 30%, #fff8e6 0, transparent 55%),
-      linear-gradient(rgb(var(--sky-pale)), #efe6d4);
-  }
-  .fw-stay-temple {
-    position: absolute;
-    left: 50%;
-    bottom: 0;
-    width: 56%;
-    color: rgb(18 41 74 / 0.12);
-    transform: translateX(-50%);
-  }
-  /* the point of contact */
-  .fw-contact {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    margin-top: 10px;
-    padding: 12px 16px;
-    border-top: 1px solid rgb(184 149 84 / 0.45);
-    border-bottom: 1px solid rgb(184 149 84 / 0.45);
-  }
-
   /* Contact & Assistance — a small wedding directory: the two families under fine gold arches on a
      soft cream ground, then two compact coordinator rows. */
   .ct-family {

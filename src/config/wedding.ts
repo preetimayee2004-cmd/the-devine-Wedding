@@ -12,7 +12,6 @@ import {
   type FamilyContact,
   type FamilySide,
   type Photo,
-  type Stay,
   type TravelPoint,
   type Wish,
 } from "./types";
@@ -330,10 +329,9 @@ export const wedding = {
   },
 
   /**
-   * Section 10 — "Finding Your Way": the venue, how to get there, and where to stay.
-   * SAMPLE: every distance, time, place, name and number below is a placeholder — check each one
-   * before sharing the link. A null phone hides its Call / WhatsApp button; a null photo shows a
-   * soft painted arch in its place.
+   * Section 10 — "Finding Your Way": the venue and how to get there.
+   * SAMPLE: every distance, time and place below is a placeholder — check each one before sharing
+   * the link.
    */
   travel: {
     eyebrow: "Venue & Guest Arrangements",
@@ -370,37 +368,6 @@ export const wedding = {
     ]),
     /** The little tip under the stops. */
     pickupTip: "Guest pickup details will be shared on WhatsApp",
-    /** Who to ask (a null phone shows "number to come" instead of the WhatsApp button). */
-    contact: { name: "Rohan", role: "Your point of contact", phone: null as string | null },
-    stayTitle: "Blessed Stays",
-    stayNote: "Rooms are reserved for our outstation guests. Let us know your dates and we'll take care of the rest.",
-    /** Swipe cards; the first marked `hosted` is shown as hosted by the family. */
-    stays: list<Stay>([
-      {
-        name: "Riverside Guest House",
-        distance: "2 km from the venue",
-        note: "Reserved for the bride's guests, by the river",
-        phone: null,
-        photo: null,
-        hosted: true,
-      },
-      {
-        name: "Sarnath Residency",
-        distance: "3.5 km from the venue",
-        note: "Reserved for the groom's guests, near Sarnath",
-        phone: null,
-        photo: null,
-        hosted: true,
-      },
-      {
-        name: "Ganga View Homestay",
-        distance: "6 km from the venue",
-        note: "A quiet homestay near the ghats, if you'd like your own",
-        phone: null,
-        photo: null,
-        hosted: false,
-      },
-    ]),
   },
 
   /**

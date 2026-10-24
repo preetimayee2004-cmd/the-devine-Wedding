@@ -90,18 +90,5 @@ export interface Coordinator {
   phone: string | null;
 }
 
-export interface Stay {
-  name: string;
-  distance: string;
-  /** One line about it. */
-  note: string;
-  /** International format without "+"; null hides Call. */
-  phone: string | null;
-  /** A photo of the place (shown in an arch); null shows a soft painted arch instead. */
-  photo: string | null;
-  /** Arranged by the family (the first such stay is marked "Hosted by family"). */
-  hosted: boolean;
-}
-
 /** Widens a list written inside the `as const` config to its real type. */
 export const list = <T>(items: T[]): T[] => items;

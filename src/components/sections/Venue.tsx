@@ -1,17 +1,16 @@
 import { useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { wedding } from "@/config/wedding";
-import type { Stay, TravelPoint } from "@/config/types";
+import type { TravelPoint } from "@/config/types";
 import { useInView } from "@/hooks/useInView";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
-import { directionsUrl, mapEmbedUrl, whatsappUrl } from "@/lib/maps";
+import { directionsUrl, mapEmbedUrl } from "@/lib/maps";
 import { formatVenueDate, parseVenueDateTime, venueInstant, zoneLabel } from "@/lib/venueTime";
 import { Icon } from "@/components/art/Icons";
-import { TempleSilhouette } from "@/components/art/Temple";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 
 /**
- * Section 10 — "Finding Your Way": the venue, how to get there, and where to stay, on the page's own
+ * Section 10 — "Finding Your Way": the venue and how to get there, on the page's own
  * sky — navy words, gold capitals, Cormorant headings, and no more boxes than needed.
  *
  * The Wedding Destination: the real map (Google's, its roads, labels and pin left clear) set in a
@@ -26,11 +25,6 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
  * behind the icons from the first to the last, never under the words. Then a small tip: pickup
  * details come on WhatsApp.
  *
- * Blessed Stays (a small bilva leaf by the label): cards to swipe across — each with its photo in an
- * arch (or a soft painted one until there is a photo), its name, distance and a line, Call (when
- * there is a number) and Map; the first the family hosts is marked so, in a gold edge. Then the point
- * of contact, with WhatsApp when there is a number.
- *
  * As it is reached: the map fades in, the route draws itself, the icons follow a beat apart, the rows
  * rise in. Buttons are at least 48px tall. Reduced motion: plain fades, no ripple.
  */
@@ -38,10 +32,8 @@ export function Venue() {
   const { venue, travel } = wedding;
   const sectionRef = useRef<HTMLElement>(null);
   const travelRef = useRef<HTMLDivElement>(null);
-  const staysRef = useRef<HTMLDivElement>(null);
   const seen = useInView(sectionRef, { threshold: 0.06 });
   const travelSeen = useInView(travelRef, { threshold: 0.2 });
-  const staysSeen = useInView(staysRef, { threshold: 0.15 });
   const reduced = usePrefersReducedMotion();
   const t = (ms: number) => (reduced ? 0 : ms);
 
@@ -123,43 +115,6 @@ export function Venue() {
           </Reveal>
         </div>
 
-        {/* blessed stays */}
-        <div ref={staysRef}>
-          <Reveal show={staysSeen} delay={t(0)}>
-            <p className="fw-label">
-              <Bilva />
-              {travel.stayTitle}
-            </p>
-            {travel.stayNote && <p className="mx-auto mt-2 max-w-[19rem] text-center text-[14px] leading-relaxed text-slate">{travel.stayNote}</p>}
-          </Reveal>
-          <div className="fw-carousel" role="list" aria-label={travel.stayTitle}>
-            {travel.stays.map((s, i) => (
-              <Reveal key={s.name} show={staysSeen} delay={t(150 + i * 120)} className="fw-slide">
-                <StayCard stay={s} featured={s.hosted && travel.stays.findIndex((x) => x.hosted) === i} />
-              </Reveal>
-            ))}
-          </div>
-          <Reveal show={staysSeen} delay={t(500)}>
-            <div className="fw-contact">
-              <div className="text-left">
-                <p className="font-display text-[19px] font-semibold leading-tight text-navy">{travel.contact.name}</p>
-                <p className="mt-0.5 font-sans text-[10.5px] font-semibold uppercase tracking-[0.18em] text-gold-ink">{travel.contact.role}</p>
-              </div>
-              {travel.contact.phone ? (
-                <a
-                  href={whatsappUrl(travel.contact.phone, "Namaste! I'd like some help with travel for the wedding.")}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="fw-pill fw-pill-solid"
-                >
-                  <Icon name="chat" className="h-4 w-4" strokeWidth={1.5} /> WhatsApp
-                </a>
-              ) : (
-                <span className="font-sans text-[12px] italic text-slate/80">number to come</span>
-              )}
-            </div>
-          </Reveal>
-        </div>
       </div>
     </section>
   );
@@ -252,38 +207,6 @@ function Row({ point, index, show, reduced }: { point: TravelPoint; index: numbe
   );
 }
 
-/** A stay, to swipe across: its photo in an arch, name, distance, a line, Call and Map. */
-function StayCard({ stay, featured }: { stay: Stay; featured: boolean }) {
-  const map = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${stay.name}, ${wedding.venue.city}`)}`;
-  return (
-    <article className="fw-stay" data-featured={featured || undefined} role="listitem">
-      {featured && <span className="fw-hosted">Hosted by family</span>}
-      <div className="fw-stay-photo">
-        {stay.photo ? (
-          <img src={stay.photo} alt={stay.name} loading="lazy" decoding="async" className="h-full w-full object-cover" />
-        ) : (
-          <div role="img" aria-label={`${stay.name} (photo to come)`} className="fw-stay-wash">
-            <TempleSilhouette className="fw-stay-temple" />
-          </div>
-        )}
-      </div>
-      <h4 className="mt-3 font-display text-[20px] font-semibold leading-snug text-navy">{stay.name}</h4>
-      <p className="mt-0.5 font-sans text-[10.5px] font-semibold uppercase tracking-[0.18em] text-gold-ink">{stay.distance}</p>
-      <p className="mt-1.5 text-[13.5px] leading-snug text-slate">{stay.note}</p>
-      <div className="mt-auto flex gap-2 pt-3">
-        {stay.phone && (
-          <a href={`tel:+${stay.phone.replace(/\D/g, "")}`} className="fw-pill">
-            <Icon name="phone" className="h-4 w-4 text-gold-ink" strokeWidth={1.5} /> Call
-          </a>
-        )}
-        <a href={map} target="_blank" rel="noopener noreferrer" className="fw-pill">
-          <Icon name="pin" className="h-4 w-4 text-gold-ink" strokeWidth={1.5} /> Map
-        </a>
-      </div>
-    </article>
-  );
-}
-
 /** A space that never breaks: keeps "about 25 km" and "50 min" each on one line. */
 const NBSP = "\u00a0";
 
@@ -320,18 +243,6 @@ function SmallLotus() {
       <path d="M12 14C9 13.5 6.5 11 6 7.5 9 8 11 10.5 12 14Z" />
       <path d="M12 14C15 13.5 17.5 11 18 7.5 15 8 13 10.5 12 14Z" />
       <path d="M6.5 15H17.5" />
-    </svg>
-  );
-}
-
-/** A bilva leaf: three leaflets on one stalk. */
-function Bilva() {
-  return (
-    <svg aria-hidden viewBox="0 0 24 24" className="h-[18px] w-[18px]" fill="rgb(184 149 84 / 0.18)" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round">
-      <path d="M12 13C9.5 9.5 9.5 5 12 2c2.5 3 2.5 7.5 0 11Z" />
-      <path d="M11.5 13.5C8 13.8 4.5 11.8 3 8.5c3.6-.6 6.9 1.4 8.5 5Z" />
-      <path d="M12.5 13.5c3.5.3 7-1.7 8.5-5-3.6-.6-6.9 1.4-8.5 5Z" />
-      <path d="M12 13v9" fill="none" />
     </svg>
   );
 }
