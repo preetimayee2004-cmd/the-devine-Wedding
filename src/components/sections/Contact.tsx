@@ -12,8 +12,8 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
  * Section 10½ — "Contact & Assistance": a small wedding directory, between the venue and the
  * thank-you.
  *
- * "Here for You", the heading, one line and a small gold lotus rule. Then the two families, side by
- * side on a wider screen and one above the other on a phone: each under a fine gold temple arch on a
+ * "Here for You", the heading, one line and a small gold lotus rule. Then the two families side by
+ * side (on a phone too, so the whole section fits one screen): each under a small gold temple arch on a
  * soft cream ground (no box) — the side in gold capitals, the person's name in navy serif, their
  * relationship in small gold capitals, and a deep-navy "Call" in place of the number. Below a gold
  * rule that draws itself through a lotus, "Wedding Coordination": two compact rows — the role in gold
@@ -36,12 +36,12 @@ export function Contact() {
       id="contact"
       ref={ref}
       aria-labelledby="contact-heading"
-      className="relative px-[var(--gutter)] pb-8 pt-[var(--section-gap)]"
+      className="relative px-[var(--gutter)] pb-5 pt-[var(--section-gap)]"
       data-shown={seen || undefined}
       data-still={reduced || undefined}
     >
       <SectionHeading id="contact-heading" eyebrow={contact.eyebrow} title={contact.title} intro={contact.intro} show={seen} />
-      <Reveal show={seen} delay={t(380)} className="mt-4 flex justify-center">
+      <Reveal show={seen} delay={t(380)} className="mt-3 flex justify-center">
         <LotusRule />
       </Reveal>
 
@@ -63,7 +63,7 @@ export function Contact() {
       <div className="mx-auto max-w-[24rem]">
         <Reveal show={seen} delay={t(1150)}>
           <h3 className="ct-coord-title">{contact.coordinationTitle}</h3>
-          <p className="mt-1.5 text-center text-[14px] leading-relaxed text-slate">{contact.coordinationNote}</p>
+          <p className="mt-1 text-center text-[13px] leading-snug text-slate">{contact.coordinationNote}</p>
         </Reveal>
         <ul className="ct-rows">
           {contact.coordinators.map((c, i) => (
