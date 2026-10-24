@@ -23,8 +23,8 @@ import { Sheet } from "@/components/ui/Sheet";
  * underline that fills on hover, the arrow stepping on) opens every blessing in the sheet.
  *
  * "Leave a Blessing" follows on the page itself, no card: a tiny gold lotus, the heading, a clean box
- * with a fine gold edge (its placeholder, a counter, who it is signed by), and a deep-maroon "Offer
- * your blessing". A wish is trimmed, checked and cleaned before it's sent; only once it is saved does
+ * with a fine gold edge (its placeholder, a counter, who it is signed by), and a deep-navy "Offer
+ * your blessing" (as the RSVP's buttons). A wish is trimmed, checked and cleaned before it's sent; only once it is saved does
  * the form give way to a small gold lotus drawing itself and "Your blessing joins their journey of
  * love.", where it was kept — and the new blessing takes the scroll. A failed send keeps the words
  * and offers to try again. "Leave another blessing" brings the form back.
