@@ -2568,6 +2568,9 @@
   }
   .couple-arch {
     top: var(--couple-top);
+    /* its top edge (and the bells' chains there) melts into the sky, no hard line */
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 11%);
+    mask-image: linear-gradient(to bottom, transparent, #000 11%);
   }
   /* The three temple bells sway gently from their chains (±2°, 4s), each a little out of step. As the
      section arrives they first swing once, a little wider, settling into that sway. */
