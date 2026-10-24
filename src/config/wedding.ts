@@ -280,12 +280,11 @@ export const wedding = {
     ]),
   },
 
-  /** Section 08 — one-tap acceptance (no form). */
+  /** Section 08 — one-tap acceptance (no form). The button's words show in capitals. */
   rsvp: {
-    eyebrow: "You Are Cordially Invited",
-    title: "Will You Join Our Celebration?",
-    message: "Your presence will make our special day even more beautiful.",
-    button: "Accept with Joy",
+    title: "A Sacred Celebration",
+    message: "Your presence would make our celebration even more special.",
+    button: "Join the Celebration",
     welcome: "Dear {guest}, we can't wait to celebrate with you!",
     blessing: "Your presence is a blessing, your smiles a treasured gift.",
     quote: "We look forward to celebrating this beautiful beginning with you.",

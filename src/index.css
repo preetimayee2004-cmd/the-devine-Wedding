@@ -674,6 +674,153 @@
     }
   }
 
+  /* RSVP: a deep night-blue box with a fine double edge of antique gold; temple bells hanging from
+     its top corners, a temple faint at its foot; gold words. */
+  .rsvp-card {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgb(184 149 84 / 0.6);
+    border-radius: 22px;
+    background:
+      radial-gradient(110% 70% at 50% 32%, rgb(44 86 142 / 0.55), transparent 72%),
+      linear-gradient(180deg, #15365f 0%, #0f2a52 55%, #0b2045 100%);
+    box-shadow: 0 26px 50px -28px rgb(8 22 46 / 0.85);
+    color: #fff9ef;
+  }
+  .rsvp-card::before {
+    content: "";
+    position: absolute;
+    inset: 6px;
+    border: 1px solid rgb(184 149 84 / 0.22);
+    border-radius: 17px;
+    pointer-events: none;
+  }
+  /* a bell: a fine gold chain from the top edge down to it */
+  .rsvp-bell {
+    position: absolute;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    pointer-events: none;
+  }
+  .rsvp-bell::before {
+    content: "";
+    flex: 1;
+    width: 1.2px;
+    margin-bottom: -3px;
+    background: repeating-linear-gradient(to bottom, #c9a45c 0 2px, rgb(201 164 92 / 0.25) 2px 3.5px);
+  }
+  .rsvp-bell img {
+    display: block;
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.35));
+  }
+  .rsvp-temple {
+    position: absolute;
+    right: -4px;
+    bottom: -2px;
+    width: 104px;
+    color: rgb(136 172 220 / 0.16);
+    pointer-events: none;
+  }
+  .rsvp-title {
+    font-family: var(--font-display);
+    font-size: 31px;
+    font-weight: 500;
+    line-height: 1.12;
+    color: #e3c27e;
+  }
+  .rsvp-message {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-style: italic;
+    line-height: 1.4;
+    color: rgb(255 249 239 / 0.86);
+  }
+  /* the button: solid deep maroon, warm ivory words, a thin antique-gold edge, 10px corners */
+  .rsvp-btn {
+    border: 1px solid #b89554;
+    background-color: #702d35;
+    color: #fff9ef;
+    box-shadow:
+      inset 0 1px 0 rgb(255 249 239 / 0.14),
+      0 12px 24px -12px rgb(0 0 0 / 0.6);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .rsvp-btn-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  @media (hover: hover) {
+    .rsvp-btn:not(:disabled):hover {
+      background-color: #7e3640;
+      border-color: #d0b06f;
+      box-shadow:
+        inset 0 1px 0 rgb(255 249 239 / 0.18),
+        0 14px 28px -12px rgb(0 0 0 / 0.65),
+        0 0 0 3px rgb(184 149 84 / 0.18);
+    }
+  }
+  .rsvp-btn:not(:disabled):active {
+    background-color: #5d242b;
+    box-shadow:
+      inset 0 2px 4px rgb(0 0 0 / 0.3),
+      0 6px 14px -10px rgb(0 0 0 / 0.6);
+    transform: scale(0.98);
+  }
+  .rsvp-btn:focus-visible {
+    outline: 2px solid #d4b26e;
+    outline-offset: 3px;
+  }
+  .rsvp-btn:disabled:not([data-sealed]) {
+    cursor: progress;
+  }
+  /* accepted: a round gold seal, ringed in gold on the blue */
+  .rsvp-btn[data-sealed] {
+    cursor: default;
+    border-color: rgb(184 149 84 / 0.9);
+    background-image: linear-gradient(to bottom, #e2c690, #b98f4e);
+    box-shadow:
+      0 0 0 4px #10294f,
+      0 0 0 5px rgb(184 149 84 / 0.8),
+      0 10px 26px -10px rgb(0 0 0 / 0.7);
+  }
+  /* Add to calendar, on the blue: gold-edged, ivory words */
+  .rsvp-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: 1px solid rgb(184 149 84 / 0.8);
+    border-radius: 10px;
+    background: rgb(255 249 239 / 0.06);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    color: #fff9ef;
+    transition: background-color 200ms ease;
+  }
+  @media (hover: hover) {
+    .rsvp-chip:hover {
+      background: rgb(255 249 239 / 0.12);
+    }
+  }
+  .rsvp-chip:focus-visible {
+    outline: 2px solid #d4b26e;
+    outline-offset: 2px;
+  }
+
   /* RSVP: the seal's glow, ring and scatter of gold. */
   .rsvp-ring {
     animation: rsvp-ring 1100ms ease-out forwards;
