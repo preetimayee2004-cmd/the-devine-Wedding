@@ -302,9 +302,9 @@ export const wedding = {
     placeholder: "Write a heartfelt wish for the couple…",
     maxLength: 280,
     formTitle: "Leave a Blessing",
-    button: "Send your blessing",
+    button: "Offer your blessing",
     /** Shown once a blessing is saved (never before). */
-    thanks: "Your blessing has found its place.",
+    thanks: "Your blessing joins their journey of love.",
     samples: list<Wish>([
       {
         id: "s1",

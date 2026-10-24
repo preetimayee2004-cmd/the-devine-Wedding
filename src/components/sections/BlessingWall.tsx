@@ -11,24 +11,28 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Sheet } from "@/components/ui/Sheet";
 
 /**
- * Section 09 — the Blessing Wall (PRD §4), laid out like a page of an old wedding manuscript.
+ * Section 09 — the Blessing Wall: "Blessings of the Divine Union" (PRD §4).
  *
- * The heading and its line, a small gold lotus rule. Then three blessings, not as cards: the first
- * is the centrepiece — on a warm-ivory, faintly textured leaf with only small gold corner ornaments,
- * an oversized opening quotation mark, the words in italic serif and the sender beneath in small
- * gold capitals; the next two sit below it, unboxed, side by side and slightly staggered, a fine
- * gold line between them. "View all wishes →" (a fine gold underline that fills on hover, the arrow
- * stepping on) opens every blessing in the sheet.
+ * The heading and its line, a small gold lotus rule. Then three blessings, not as cards. The first is
+ * a keepsake scroll laid across the page: warm-ivory paper with a faint texture, a slim rolled edge at
+ * each side (gold-capped), a small seal at its head — Shiva and Shakti as one, after Ardhanarishvara:
+ * a circle halved by a fine line, his crescent moon on one side, her lotus on the other — an
+ * oversized opening quotation mark, the words in italic serif and the sender beneath in small gold
+ * capitals. The next two follow as editorial blocks, unboxed — one set to the left, one to the right
+ * — joined by a thin gold curve through a small gold lotus. "View all wishes →" (a fine gold
+ * underline that fills on hover, the arrow stepping on) opens every blessing in the sheet.
  *
- * "Leave a Blessing" follows on the page itself, no card: a small gold lotus, the heading, a clean
- * box with a fine gold edge (its placeholder, a counter, who it is signed by), and "Send your
- * blessing". A wish is trimmed, checked and cleaned before it's sent; only once it is saved does
- * the form give way to its confirmation — a gold lotus drawing itself, "Your blessing has found its
- * place.", where it was kept — and the new blessing takes the centre of the wall. A failed send keeps
- * the words and offers to try again. "Leave another blessing" brings the form back.
+ * "Leave a Blessing" follows on the page itself, no card: a tiny gold lotus, the heading, a clean box
+ * with a fine gold edge (its placeholder, a counter, who it is signed by), and a deep-maroon "Offer
+ * your blessing". A wish is trimmed, checked and cleaned before it's sent; only once it is saved does
+ * the form give way to a small gold lotus drawing itself and "Your blessing joins their journey of
+ * love.", where it was kept — and the new blessing takes the scroll. A failed send keeps the words
+ * and offers to try again. "Leave another blessing" brings the form back.
  *
- * One way of moving throughout: the heading rises in, the centrepiece fades in, the two others
- * follow a beat apart, the form rises in when it is reached. Reduced motion: plain fades.
+ * In order, once: the heading and its lotus rise in; the scroll unrolls from its middle, its rolled
+ * edges travelling out, and the blessing fades in on it; the two blocks appear a beat apart while the
+ * gold curve draws itself between them; then "View all wishes"; the form rises in when it is reached.
+ * Reduced motion: plain fades.
  */
 type SendState =
   { kind: "idle" } | { kind: "sending" } | { kind: "sent"; wish: Wish } | { kind: "error"; message: string };
@@ -122,25 +126,33 @@ export function BlessingWall() {
         <LotusRule />
       </Reveal>
 
-      {/* the wall: one blessing at the centre, two beneath it */}
-      <div className="bw-wall">
-        {lead && (
-          <Reveal key={lead.id} show={seen} delay={t(560)} rise={false}>
-            <Featured wish={lead} fresh={state.kind === "sent" && state.wish.id === lead.id} />
-          </Reveal>
-        )}
+      {/* the wall: the keepsake scroll, then two blessings joined by a gold curve */}
+      <div className="bw-wall" data-shown={seen || undefined} data-still={reduced || undefined}>
+        {lead && <Featured key={lead.id} wish={lead} fresh={state.kind === "sent" && state.wish.id === lead.id} />}
         {pair.length > 0 && (
           <div className="bw-pair">
-            {pair.map((w, i) => (
-              <Reveal key={w.id} show={seen} delay={t(760 + i * 140)} className={i === 1 ? "bw-later" : undefined}>
-                <Secondary wish={w} />
-              </Reveal>
-            ))}
+            <Reveal show={seen} delay={t(1500)} className="bw-block bw-block-left">
+              <Secondary wish={pair[0]} />
+            </Reveal>
+            {pair[1] && (
+              <>
+                <div aria-hidden className="bw-link-curve">
+                  <svg viewBox="0 0 300 70" preserveAspectRatio="none" className="bw-curve">
+                    <path d="M40 4C40 30 90 34 128 35" pathLength={1} />
+                    <path d="M172 35C210 36 260 40 260 66" pathLength={1} />
+                  </svg>
+                  <Lotus className="bw-curve-lotus" />
+                </div>
+                <Reveal show={seen} delay={t(1900)} className="bw-block bw-block-right">
+                  <Secondary wish={pair[1]} />
+                </Reveal>
+              </>
+            )}
           </div>
         )}
       </div>
 
-      <Reveal show={seen} delay={t(1000)} className="mt-8 flex justify-center">
+      <Reveal show={seen} delay={t(2300)} className="mt-8 flex justify-center">
         <button type="button" onClick={() => setViewAll(true)} className="bw-link">
           <span className="bw-link-text">View all wishes</span>
           <svg aria-hidden viewBox="0 0 20 10" className="bw-link-arrow" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
@@ -236,29 +248,57 @@ export function BlessingWall() {
   );
 }
 
-/** The centrepiece: a warm-ivory leaf, small gold corners, a large opening quotation mark (a blessing just left fades in). */
+/**
+ * The keepsake scroll: warm-ivory paper between two slim rolled edges, the union seal at its head, a
+ * large opening quotation mark, the blessing and its sender (a blessing just left fades in).
+ */
 function Featured({ wish, fresh }: { wish: Wish; fresh: boolean }) {
   return (
-    <figure className="bw-featured" data-fresh={fresh || undefined}>
-      {(["tl", "tr", "bl", "br"] as const).map((c) => (
-        <svg key={c} aria-hidden viewBox="0 0 24 24" className={`bw-corner bw-corner-${c}`} fill="none" stroke="#b89554" strokeWidth="1" strokeLinecap="round">
-          <path d="M2 20V6c0-2.2 1.8-4 4-4h14M6 9c0-1.7 1.3-3 3-3" />
-          <circle cx="9" cy="9" r="1" fill="#b89554" stroke="none" />
-        </svg>
-      ))}
-      <span aria-hidden className="bw-quote-mark">
-        “
-      </span>
-      <blockquote className="bw-featured-text">{wish.message}</blockquote>
-      <figcaption className="bw-from mt-4">
-        <span aria-hidden className="bw-from-rule" />
-        {signature(wish)}
-      </figcaption>
+    <figure className="bw-scroll" data-fresh={fresh || undefined}>
+      <span aria-hidden className="bw-roll bw-roll-left" />
+      <span aria-hidden className="bw-roll bw-roll-right" />
+      <div className="bw-paper">
+        <UnionSeal />
+        <span aria-hidden className="bw-quote-mark">
+          “
+        </span>
+        <div className="bw-paper-words">
+          <blockquote className="bw-featured-text">{wish.message}</blockquote>
+          <figcaption className="bw-from mt-4">
+            <span aria-hidden className="bw-from-rule" />
+            {signature(wish)}
+          </figcaption>
+        </div>
+      </div>
     </figure>
   );
 }
 
-/** One of the two beneath: no box, a small quotation mark, the words, the sender. */
+/**
+ * The seal at the scroll's head, after Ardhanarishvara — Shiva and Shakti as one: a fine gold circle
+ * halved by a line, his crescent moon on the left half, her lotus on the right, a bindu where they meet.
+ */
+function UnionSeal() {
+  return (
+    <svg aria-hidden viewBox="0 0 44 44" className="bw-seal" fill="none" stroke="#a8741f" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="22" cy="22" r="19" />
+      <circle cx="22" cy="22" r="16.5" strokeWidth="0.6" opacity="0.7" />
+      <path d="M22 5.5V38.5" strokeWidth="0.7" opacity="0.8" />
+      {/* his crescent */}
+      <path d="M17.5 13.5a8.5 8.5 0 1 0 0 17 6.6 6.6 0 1 1 0-17Z" fill="#e9d29a" fillOpacity="0.45" />
+      {/* her lotus */}
+      <g fill="#e9d29a" fillOpacity="0.45">
+        <path d="M28 29C26.4 26.6 26.4 23.4 28 20.4 29.6 23.4 29.6 26.6 28 29Z" />
+        <path d="M28 29C25.6 28.6 23.8 26.8 23.4 24.2 25.8 24.6 27.4 26.4 28 29Z" />
+        <path d="M28 29C30.4 28.6 32.2 26.8 32.6 24.2 30.2 24.6 28.6 26.4 28 29Z" />
+        <path d="M24.6 30.6H31.4" fill="none" />
+      </g>
+      <circle cx="22" cy="22" r="1.3" fill="#a8741f" stroke="none" />
+    </svg>
+  );
+}
+
+/** One of the two beneath: an editorial block — no box, a small quotation mark, the words, the sender. */
 function Secondary({ wish }: { wish: Wish }) {
   return (
     <figure className="bw-secondary">

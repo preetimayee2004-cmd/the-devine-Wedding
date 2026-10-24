@@ -1136,59 +1136,148 @@
     animation: rs-appear 400ms ease-out both;
   }
 
-  /* Blessing Wall — a page of an old wedding manuscript: one blessing at the centre on a warm-ivory,
-     faintly textured leaf with small gold corners; two beneath it, unboxed, slightly staggered, a fine
-     gold line between them; then "Leave a Blessing" on the page itself. */
+  /* Blessing Wall — "Blessings of the Divine Union": one blessing on a keepsake scroll laid across
+     the page, two more as editorial blocks joined by a thin gold curve through a lotus; then "Leave a
+     Blessing" on the page itself. */
   .bw-wall {
-    margin-top: 26px;
+    margin-top: 28px;
   }
-  .bw-featured {
+  /* the scroll: paper between two slim rolled edges (gold-capped); it unrolls from its middle */
+  .bw-scroll {
     position: relative;
-    padding: 34px 26px 24px;
-    border-radius: 4px;
-    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.55 0 0 0 0 0.42 0 0 0 0 0.22 0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"), linear-gradient(180deg, #fffbf3, #fbf3e2);
+    margin: 0 2px;
+    padding: 10px 0;
+    container-type: inline-size;
+  }
+  .bw-paper {
+    position: relative;
+    margin: 0 9px;
+    padding: 30px 24px 26px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.55 0 0 0 0 0.42 0 0 0 0 0.22 0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"), linear-gradient(180deg, #fffbf3, #faf1df);
     box-shadow:
-      0 1px 0 rgb(184 149 84 / 0.18),
-      0 18px 34px -26px rgb(84 60 24 / 0.45);
+      inset 0 10px 14px -12px rgb(120 86 30 / 0.25),
+      inset 0 -10px 14px -12px rgb(120 86 30 / 0.25),
+      0 18px 30px -24px rgb(84 60 24 / 0.5);
     text-align: center;
   }
-  .bw-featured[data-fresh] {
+  .bw-roll {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    z-index: 1;
+    width: 14px;
+    border-radius: 7px;
+    background: linear-gradient(90deg, #d9c49a, #fbf3df 38%, #fffaf0 50%, #e7d6b0 75%, #c2a874);
+    box-shadow: 0 4px 8px -4px rgb(84 60 24 / 0.45);
+  }
+  .bw-roll::before,
+  .bw-roll::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    width: 8px;
+    height: 7px;
+    margin-left: -4px;
+    border-radius: 3px;
+    background: linear-gradient(90deg, #9c7a3e, #e3c27e 50%, #9c7a3e);
+  }
+  .bw-roll::before {
+    top: -5px;
+  }
+  .bw-roll::after {
+    bottom: -5px;
+  }
+  .bw-roll-left {
+    left: 0;
+  }
+  .bw-roll-right {
+    right: 0;
+  }
+  .bw-seal {
+    display: block;
+    width: 38px;
+    height: 38px;
+    margin: 0 auto 6px;
+  }
+  /* the unrolling (once): the paper opens from its middle as the rolled edges travel out; then the
+     seal and the blessing fade in on it */
+  .bw-wall:not([data-shown]) .bw-scroll {
+    opacity: 0;
+  }
+  .bw-wall[data-shown] .bw-scroll {
+    animation: bw-fade 300ms ease-out 450ms both;
+  }
+  .bw-wall[data-shown] .bw-paper {
+    animation: bw-unroll 900ms cubic-bezier(0.45, 0, 0.2, 1) 500ms both;
+  }
+  .bw-wall[data-shown] .bw-roll-left {
+    animation: bw-roll-left 900ms cubic-bezier(0.45, 0, 0.2, 1) 500ms both;
+  }
+  .bw-wall[data-shown] .bw-roll-right {
+    animation: bw-roll-right 900ms cubic-bezier(0.45, 0, 0.2, 1) 500ms both;
+  }
+  .bw-wall[data-shown] .bw-seal,
+  .bw-wall[data-shown] .bw-paper-words,
+  .bw-wall[data-shown] .bw-quote-mark {
+    animation: bw-words 700ms ease-out 1250ms both;
+  }
+  @keyframes bw-unroll {
+    from {
+      clip-path: inset(0 calc(50% - 2px));
+    }
+    to {
+      clip-path: inset(0);
+    }
+  }
+  @keyframes bw-roll-left {
+    from {
+      transform: translateX(calc(50cqw - 14px));
+    }
+  }
+  @keyframes bw-roll-right {
+    from {
+      transform: translateX(calc(14px - 50cqw));
+    }
+  }
+  @keyframes bw-words {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+  /* a blessing just left takes the scroll: it simply fades in */
+  .bw-wall .bw-scroll[data-fresh] {
     animation: bw-fade 900ms ease-out both;
+  }
+  .bw-wall .bw-scroll[data-fresh] .bw-paper,
+  .bw-wall .bw-scroll[data-fresh] .bw-roll,
+  .bw-wall .bw-scroll[data-fresh] .bw-seal,
+  .bw-wall .bw-scroll[data-fresh] .bw-paper-words,
+  .bw-wall .bw-scroll[data-fresh] .bw-quote-mark {
+    animation: none;
   }
   @keyframes bw-fade {
     from {
       opacity: 0;
     }
   }
-  /* small corner ornaments, not a frame */
-  .bw-corner {
-    position: absolute;
-    width: 22px;
-    height: 22px;
+  /* reduced motion: no unrolling, all simply fades in */
+  .bw-wall[data-still][data-shown] .bw-paper,
+  .bw-wall[data-still][data-shown] .bw-roll,
+  .bw-wall[data-still][data-shown] .bw-seal,
+  .bw-wall[data-still][data-shown] .bw-paper-words,
+  .bw-wall[data-still][data-shown] .bw-quote-mark,
+  .bw-wall[data-still][data-shown] .bw-curve path,
+  .bw-wall[data-still][data-shown] .bw-curve-lotus {
+    animation: none;
   }
-  .bw-corner-tl {
-    left: 8px;
-    top: 8px;
-  }
-  .bw-corner-tr {
-    right: 8px;
-    top: 8px;
-    transform: scaleX(-1);
-  }
-  .bw-corner-bl {
-    left: 8px;
-    bottom: 8px;
-    transform: scaleY(-1);
-  }
-  .bw-corner-br {
-    right: 8px;
-    bottom: 8px;
-    transform: scale(-1, -1);
+  .bw-wall[data-still][data-shown] .bw-scroll {
+    animation: bw-fade 400ms ease-out both;
   }
   .bw-quote-mark {
     position: absolute;
-    left: 36px;
-    top: -4px;
+    left: 18px;
+    top: 8px;
     font-family: var(--font-display);
     font-size: 96px;
     line-height: 1;
@@ -1227,29 +1316,66 @@
     vertical-align: middle;
     background: rgb(184 149 84 / 0.8);
   }
-  /* the two beneath: unboxed, side by side, the second a little lower, a fine line between */
+  /* the two beneath: editorial blocks — one set left, one right — a thin gold curve drawn between
+     them through a small lotus */
   .bw-pair {
-    position: relative;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    column-gap: 26px;
-    margin-top: 26px;
-    padding: 0 4px;
-  }
-  .bw-pair::before {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: 6px;
-    bottom: -14px;
-    width: 1px;
-    background: linear-gradient(to bottom, transparent, rgb(184 149 84 / 0.55) 20%, rgb(184 149 84 / 0.55) 80%, transparent);
-  }
-  .bw-later {
     margin-top: 30px;
   }
+  .bw-block {
+    width: 78%;
+  }
+  .bw-block-left {
+    text-align: left;
+  }
+  .bw-block-right {
+    margin-left: auto;
+    text-align: right;
+  }
+  .bw-link-curve {
+    position: relative;
+    height: 64px;
+    margin: 6px 0;
+  }
+  .bw-curve {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .bw-curve path {
+    fill: none;
+    stroke: #b89554;
+    stroke-width: 1;
+    stroke-linecap: butt;
+    stroke-dasharray: 1 1;
+    stroke-dashoffset: 1;
+  }
+  .bw-wall[data-shown] .bw-curve path {
+    animation: bw-draw 550ms cubic-bezier(0.45, 0, 0.55, 1) 1650ms both;
+  }
+  .bw-wall[data-shown] .bw-curve path + path {
+    animation-delay: 2200ms;
+  }
+  .bw-wall[data-still] .bw-curve path {
+    stroke-dashoffset: 0;
+  }
+  .bw-curve-lotus {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 34px;
+    height: 23px;
+    margin: -14px 0 0 -17px;
+  }
+  .bw-wall[data-shown] .bw-curve-lotus {
+    animation: bw-words 500ms ease-out 2050ms both;
+  }
+  .bw-wall:not([data-shown]) .bw-curve-lotus {
+    opacity: 0;
+  }
   .bw-secondary {
-    text-align: center;
+    text-align: inherit;
   }
   .bw-quote-small {
     display: block;
@@ -1350,7 +1476,7 @@
     border-color: #9a3b2e;
     box-shadow: 0 0 0 3px rgb(154 59 46 / 0.14);
   }
-  /* "Send your blessing": deep navy, warm ivory words, a thin antique-gold edge, 10px corners */
+  /* "Offer your blessing": deep maroon, warm ivory words, a thin antique-gold edge, 10px corners */
   .bw-send {
     display: flex;
     align-items: center;
@@ -1361,11 +1487,11 @@
     margin-top: 18px;
     border: 1px solid #b89554;
     border-radius: 10px;
-    background-color: rgb(var(--navy));
+    background-color: #702d35;
     color: #fff9ef;
     box-shadow:
-      inset 0 1px 0 rgb(255 249 239 / 0.12),
-      0 12px 24px -14px rgb(18 41 74 / 0.8);
+      inset 0 1px 0 rgb(255 249 239 / 0.14),
+      0 12px 24px -14px rgb(112 45 53 / 0.75);
     font-family: var(--font-body);
     font-size: 12.5px;
     font-weight: 600;
@@ -1387,11 +1513,11 @@
   }
   @media (hover: hover) {
     .bw-send:not(:disabled):hover {
-      background-color: #1b3a63;
+      background-color: #7e3640;
       border-color: #d0b06f;
       box-shadow:
-        inset 0 1px 0 rgb(255 249 239 / 0.16),
-        0 14px 28px -14px rgb(18 41 74 / 0.85),
+        inset 0 1px 0 rgb(255 249 239 / 0.18),
+        0 14px 28px -14px rgb(112 45 53 / 0.85),
         0 0 0 3px rgb(184 149 84 / 0.18);
     }
     .bw-send:not(:disabled):hover .bw-send-arrow {
@@ -1399,10 +1525,10 @@
     }
   }
   .bw-send:not(:disabled):active {
-    background-color: #0c1d36;
+    background-color: #5d242b;
     box-shadow:
       inset 0 2px 4px rgb(0 0 0 / 0.3),
-      0 6px 14px -10px rgb(18 41 74 / 0.7);
+      0 6px 14px -10px rgb(112 45 53 / 0.7);
     transform: scale(0.98);
   }
   .bw-send:focus-visible {
