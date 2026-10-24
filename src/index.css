@@ -2367,148 +2367,137 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* The Save the Date's date, under a small gold seal (SealReveal). The seal and the date share one
-     box, so nothing around them moves. Gold: the hero's own (gold-ink). */
-  .seal-reveal {
-    position: relative;
-    display: grid;
-    place-items: center;
-    min-height: 62px;
-  }
-  .seal-reveal > * {
-    grid-area: 1 / 1;
-  }
-  .seal-button {
+  /* The Save the Date's date under a "Golden Veil" (ScratchReveal): a compact strip of antique-gold
+     foil to scratch away, "or tap to reveal" beneath. One box throughout, so nothing around it moves. */
+  .veil {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 0 14px;
-    border-radius: 12px;
-    color: rgb(var(--gold-ink));
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-    transition: opacity 260ms ease;
   }
-  .seal-button:focus-visible {
-    outline: 2px solid rgb(var(--gold-ink) / 0.8);
-    outline-offset: 2px;
+  .veil-stage {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 258px;
+    height: 44px;
   }
-  .seal-mark {
-    width: 30px;
-    height: 30px;
-    transition: transform 160ms ease-out;
+  .veil-stage > * {
+    grid-area: 1 / 1;
   }
-  .seal-ring {
-    stroke: rgb(var(--gold-ink));
-    stroke-width: 1.1;
-    stroke-dasharray: 1 1;
-    stroke-dashoffset: 0;
+  .veil-foil {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 4px;
+    cursor: grab;
+    /* scratching never scrolls the page */
+    touch-action: none;
+    box-shadow: 0 3px 8px -5px rgb(110 76 24 / 0.5);
   }
-  .seal-ring-fine {
-    stroke: rgb(var(--gold-ink));
-    stroke-width: 0.6;
-    opacity: 0.55;
+  .veil-foil:active {
+    cursor: grabbing;
   }
-  .seal-lotus path {
-    fill: rgb(233 210 154 / 0.45);
-    stroke: rgb(var(--gold-ink));
-    stroke-width: 0.9;
+  .veil[data-lifting] .veil-foil {
+    pointer-events: none;
+    animation: veil-lift 480ms ease-in both;
   }
-  .seal-title {
-    margin-top: 4px;
-    line-height: 1.25;
-    font-family: var(--font-body);
-    font-size: 10.5px;
-    font-weight: 600;
-    letter-spacing: 0.26em;
-    text-transform: uppercase;
-    color: rgb(var(--gold-ink));
+  .veil[data-still][data-lifting] .veil-foil {
+    animation-duration: 220ms;
   }
-  .seal-note {
-    margin-top: 1px;
-    line-height: 1.25;
+  @keyframes veil-lift {
+    to {
+      opacity: 0;
+    }
+  }
+  /* a fingertip glides across, a few times, once the card shows; it rests at the first touch */
+  .veil-finger {
+    position: absolute;
+    left: 50%;
+    top: 58%;
+    z-index: 1;
+    width: 20px;
+    height: 20px;
+    margin-left: -10px;
+    color: rgb(var(--navy));
+    opacity: 0;
+    pointer-events: none;
+    filter: drop-shadow(0 1px 1px rgb(255 248 228 / 0.8));
+  }
+  .veil-finger svg {
+    width: 100%;
+    height: 100%;
+  }
+  .veil[data-shown] .veil-finger {
+    animation: veil-swipe 1700ms ease-in-out calc(var(--veil-at) + 900ms) 3 both;
+  }
+  .veil[data-touched] .veil-finger {
+    display: none;
+  }
+  @keyframes veil-swipe {
+    0% {
+      opacity: 0;
+      transform: translateX(-62px) rotate(-8deg);
+    }
+    18%,
+    72% {
+      opacity: 0.7;
+    }
+    100% {
+      opacity: 0;
+      transform: translateX(62px) rotate(6deg);
+    }
+  }
+  /* revealed: one faint gleam of gold across the date */
+  .veil-gleam {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 26%;
+    pointer-events: none;
+    background: linear-gradient(90deg, rgb(255 236 190 / 0), rgb(255 236 190 / 0.55), rgb(255 236 190 / 0));
+    mix-blend-mode: screen;
+    transform: translateX(-120%) skewX(-14deg);
+    animation: veil-gleam 1100ms cubic-bezier(0.45, 0, 0.25, 1) 60ms both;
+  }
+  @keyframes veil-gleam {
+    to {
+      transform: translateX(420%) skewX(-14deg);
+    }
+  }
+  /* the alternative for anyone who can't scratch */
+  .veil-tap {
+    min-height: 24px;
+    margin-top: 2px;
+    padding: 2px 8px;
+    border-radius: 6px;
     font-family: var(--font-display);
     font-size: 13px;
     font-style: italic;
     color: rgb(var(--slate) / 0.9);
+    text-decoration: underline dotted rgb(184 149 84 / 0.8);
+    text-underline-offset: 3px;
+    -webkit-tap-highlight-color: transparent;
+    transition: opacity 300ms ease;
   }
-  /* shown with the card: the outer ring draws itself once */
-  .seal-reveal:not([data-shown]) .seal-ring {
-    stroke-dashoffset: 1;
+  .veil-tap {
+    position: relative;
   }
-  .seal-reveal[data-shown] .seal-ring {
-    animation: seal-draw 800ms cubic-bezier(0.45, 0, 0.25, 1) calc(var(--seal-at) + 250ms) both;
+  /* a 44px-tall target round the small words */
+  .veil-tap::after {
+    content: "";
+    position: absolute;
+    inset: -10px -6px;
   }
-  @keyframes seal-draw {
-    from {
-      stroke-dashoffset: 1;
-    }
-    to {
-      stroke-dashoffset: 0;
-    }
+  .veil-tap:focus-visible {
+    outline: 2px solid rgb(var(--gold-ink));
+    outline-offset: 2px;
   }
-  /* tapped: pressed in a little; then the seal fades as a soft gold light opens from it */
-  .seal-button:active .seal-mark,
-  .seal-reveal[data-phase="pressing"] .seal-mark {
-    transform: scale(0.9);
-  }
-  .seal-reveal[data-phase="open"] .seal-button {
+  .veil[data-lifting] .veil-tap,
+  .veil[data-revealed] .veil-tap {
     opacity: 0;
     pointer-events: none;
-  }
-  .seal-light {
-    width: 56px;
-    height: 56px;
-    border-radius: 9999px;
-    background: radial-gradient(closest-side, rgb(246 214 140 / 0.7), rgb(246 214 140 / 0.22) 55%, rgb(246 214 140 / 0));
-    opacity: 0;
-    pointer-events: none;
-  }
-  .seal-reveal[data-phase="open"] .seal-light {
-    animation: seal-light 850ms ease-out both;
-  }
-  @keyframes seal-light {
-    0% {
-      opacity: 0;
-      transform: scale(0.5);
-    }
-    35% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 0;
-      transform: scale(3.2, 1.5);
-    }
-  }
-  /* the date, rising gently into the same place */
-  .seal-date {
-    visibility: hidden;
-  }
-  .seal-reveal[data-phase="open"] .seal-date {
-    visibility: visible;
-    animation: seal-date 600ms cubic-bezier(0.22, 1, 0.36, 1) 200ms both;
-  }
-  @keyframes seal-date {
-    from {
-      opacity: 0;
-      transform: translateY(6px);
-    }
-  }
-  /* reduced motion: a short crossfade, no light, the ring already drawn */
-  .seal-reveal[data-still] .seal-ring {
-    stroke-dashoffset: 0;
-    animation: none;
-  }
-  .seal-reveal[data-still] .seal-light {
-    display: none;
-  }
-  .seal-reveal[data-still][data-phase="open"] .seal-date {
-    animation: seal-fade 250ms linear both;
-  }
-  @keyframes seal-fade {
-    from {
-      opacity: 0;
-    }
   }
 
   /* Save the Date: a short shower of red petals (each falls once). */

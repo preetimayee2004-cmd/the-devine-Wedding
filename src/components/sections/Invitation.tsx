@@ -8,7 +8,7 @@ import { glideTo, USER_INPUT_EVENTS } from "@/lib/scroll";
 import { readSessionFlag, writeSessionFlag } from "@/lib/session";
 import { formatVenueDate, parseVenueDateTime } from "@/lib/venueTime";
 import { Icon } from "@/components/art/Icons";
-import { SealReveal } from "@/components/ui/SealReveal";
+import { ScratchReveal } from "@/components/ui/ScratchReveal";
 import { GoldMotes } from "@/components/ui/GoldMotes";
 import { LangToggle } from "@/components/ui/LangToggle";
 import { MusicToggle } from "@/components/ui/MusicToggle";
@@ -311,12 +311,12 @@ export function Invitation() {
           {t.request}
         </p>
 
-        {/* the date on one line — month | day | year — kept under a small gold seal until it is tapped */}
+        {/* the date on one line — month | day | year — under a strip of gold foil to scratch away */}
         {date && (
           <div className="relative mt-[var(--std-gap)]" style={rise(3)}>
-            <SealReveal
-              title={t.revealTitle}
-              note={t.revealNote}
+            <ScratchReveal
+              hint={t.scratchHint}
+              tapLabel={t.tapToReveal}
               shown={card}
               delay={quiet ? 0 : 3 * MOTION.staggerMs * pace}
               reduced={still}
@@ -328,7 +328,7 @@ export function Invitation() {
                 <span aria-hidden className="h-7 w-px bg-gold" />
                 <span className="font-display text-[15px] tracking-[0.24em]">{date.year}</span>
               </p>
-            </SealReveal>
+            </ScratchReveal>
           </div>
         )}
 
