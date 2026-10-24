@@ -695,7 +695,7 @@
     border-radius: 17px;
     pointer-events: none;
   }
-  /* a bell: a fine gold chain from the top edge down to it */
+  /* a bell: a fine antique-gold thread from the top edge down to it (it swings from the top) */
   .rsvp-bell {
     position: absolute;
     top: 0;
@@ -704,14 +704,15 @@
     flex-direction: column;
     justify-content: flex-end;
     align-items: center;
+    transform-origin: 50% 0;
     pointer-events: none;
   }
   .rsvp-bell::before {
     content: "";
     flex: 1;
-    width: 1.2px;
-    margin-bottom: -3px;
-    background: repeating-linear-gradient(to bottom, #c9a45c 0 2px, rgb(201 164 92 / 0.25) 2px 3.5px);
+    width: 1px;
+    margin-bottom: -2px;
+    background: linear-gradient(to bottom, rgb(184 149 84 / 0.95), rgb(184 149 84 / 0.7));
   }
   .rsvp-bell img {
     display: block;
@@ -719,13 +720,26 @@
     height: auto;
     filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.35));
   }
+  /* the temple: small, faint, set inside the gold edge */
   .rsvp-temple {
     position: absolute;
-    right: -4px;
-    bottom: -2px;
-    width: 104px;
-    color: rgb(136 172 220 / 0.16);
+    right: 16px;
+    bottom: 12px;
+    width: 72px;
+    color: rgb(140 172 216);
+    opacity: 0.22;
     pointer-events: none;
+  }
+  /* its one gleam: a band of gold crossing it once, as the box comes in */
+  .rsvp-temple-gleam {
+    color: #e3c27e;
+    opacity: 0;
+    -webkit-mask-image: linear-gradient(100deg, transparent 38%, #000 50%, transparent 62%);
+    mask-image: linear-gradient(100deg, transparent 38%, #000 50%, transparent 62%);
+    -webkit-mask-size: 300% 100%;
+    mask-size: 300% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
   }
   .rsvp-title {
     font-family: var(--font-display);
@@ -738,7 +752,7 @@
     font-family: var(--font-display);
     font-size: 18px;
     font-style: italic;
-    line-height: 1.4;
+    line-height: 1.45;
     color: rgb(255 249 239 / 0.86);
   }
   /* the button: solid deep maroon, warm ivory words, a thin antique-gold edge, 10px corners */
@@ -755,7 +769,7 @@
   .rsvp-btn-label {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+    gap: 13px;
     font-family: var(--font-body);
     font-size: 12px;
     font-weight: 600;
@@ -772,6 +786,19 @@
         0 0 0 3px rgb(184 149 84 / 0.18);
     }
   }
+  /* the arrow steps 4px on when the button is pointed at or focused */
+  .rsvp-arrow {
+    flex: none;
+    transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  @media (hover: hover) {
+    .rsvp-btn:not([aria-disabled]):hover .rsvp-arrow {
+      transform: translateX(4px);
+    }
+  }
+  .rsvp-btn:focus-visible .rsvp-arrow {
+    transform: translateX(4px);
+  }
   .rsvp-btn:not(:disabled):active {
     background-color: #5d242b;
     box-shadow:
@@ -783,6 +810,102 @@
     outline: 2px solid #d4b26e;
     outline-offset: 3px;
   }
+  /* the box's entrance, once (about 1.9s, one easing): it rises in; the trishul (0.3s), then the
+     bells drop in and settle with one small swing toward the middle; the heading and its line; the
+     button last (0.9s); one gleam over the temple (1.05–1.95s). Then all is still. */
+  .rsvp-card {
+    --rsvp-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .rsvp-card:not([data-shown]),
+  .rsvp-card:not([data-shown]) .rsvp-in,
+  .rsvp-card:not([data-shown]) .rsvp-bell,
+  .rsvp-card:not([data-shown]) .rsvp-temple {
+    opacity: 0;
+  }
+  .rsvp-card[data-shown] {
+    animation: rsvp-card-in 650ms var(--rsvp-ease) both;
+  }
+  @keyframes rsvp-card-in {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+  }
+  .rsvp-card[data-shown] .rsvp-in {
+    animation: rsvp-in 600ms var(--rsvp-ease) var(--at) both;
+  }
+  @keyframes rsvp-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+  .rsvp-card[data-shown] .rsvp-bell {
+    animation:
+      rsvp-bell-in 550ms var(--rsvp-ease) calc(250ms + var(--i) * 70ms) both,
+      rsvp-bell-sway 1300ms ease-out calc(450ms + var(--i) * 70ms) both;
+  }
+  @keyframes rsvp-bell-in {
+    from {
+      opacity: 0;
+      translate: 0 -12px;
+    }
+  }
+  @keyframes rsvp-bell-sway {
+    0% {
+      rotate: 0deg;
+    }
+    22% {
+      rotate: calc(var(--dir) * 3deg);
+    }
+    48% {
+      rotate: calc(var(--dir) * -1.8deg);
+    }
+    72% {
+      rotate: calc(var(--dir) * 0.8deg);
+    }
+    100% {
+      rotate: 0deg;
+    }
+  }
+  .rsvp-card[data-shown] .rsvp-temple {
+    animation: rsvp-fade 700ms var(--rsvp-ease) 200ms both;
+  }
+  .rsvp-card[data-shown] .rsvp-temple-gleam {
+    animation: rsvp-gleam 900ms ease-in-out 1050ms both;
+  }
+  @keyframes rsvp-fade {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes rsvp-gleam {
+    0% {
+      opacity: 0;
+      -webkit-mask-position: 100% 0;
+      mask-position: 100% 0;
+    }
+    20%,
+    80% {
+      opacity: 0.5;
+    }
+    100% {
+      opacity: 0;
+      -webkit-mask-position: 0% 0;
+      mask-position: 0% 0;
+    }
+  }
+  /* reduced motion: it all simply fades in; no swing, no gleam */
+  .rsvp-card[data-still][data-shown],
+  .rsvp-card[data-still][data-shown] .rsvp-in,
+  .rsvp-card[data-still][data-shown] .rsvp-bell,
+  .rsvp-card[data-still][data-shown] .rsvp-temple {
+    animation: rsvp-fade 400ms ease-out both;
+  }
+  .rsvp-card[data-still] .rsvp-temple-gleam {
+    display: none;
+  }
+
   /* tapped: a thin line of gold light runs once round its edge (0.45s); then it fades away */
   .rsvp-btn[data-phase="sending"] {
     cursor: progress;

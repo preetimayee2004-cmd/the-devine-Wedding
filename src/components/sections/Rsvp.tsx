@@ -8,13 +8,16 @@ import { acceptInvitation, BackendError, type Acceptance } from "@/lib/backend";
 import { downloadIcs, googleCalendarUrl, weddingCalendarItem } from "@/lib/calendar";
 import { whatsappUrl } from "@/lib/maps";
 import { Icon } from "@/components/art/Icons";
-import { Reveal } from "@/components/ui/Reveal";
 
 /**
  * Section 08 — a personal confirmation (PRD §4). No form, no fields: a deep night-blue box with
- * temple bells hanging from its top corners and a faint temple at its foot; a gold trishul, "A
- * Sacred Celebration" in gold, one line of invitation, and one deep-maroon button, "Join the
- * Celebration".
+ * temple bells hanging alike from its top corners and a small, faint temple at its foot; a gold
+ * trishul, "A Sacred Celebration" in gold, one line of invitation, and one deep-maroon button, "Join
+ * the Celebration →" (the arrow steps 4px on when pointed at).
+ *
+ * Seen the first time (about 1.9s, one easing): the box rises in; the trishul, then the bells drop
+ * in and settle with one small swing; the heading and its line; the button last; and one gleam
+ * passes over the temple. Then all is still. Reduced motion: everything simply fades in.
  *
  * Tapped (once — more taps are ignored), it presses in and a thin line of gold light runs round
  * its edge (0.45s) while the acceptance is sent; only when that has succeeded does the scene open
@@ -41,63 +44,23 @@ import { Reveal } from "@/components/ui/Reveal";
 type Phase = "idle" | "sending" | "leaving" | "accepted";
 
 /**
- * The temple bells (the couple arch's own) hanging from the box's top corners: which bell, how far
- * in from its side, how far down it hangs (to its foot) and how wide it is (px).
+ * The temple bells (the couple arch's own), hung the same on both sides from the box's top corners on
+ * fine antique-gold threads, the outermost longest: which bell, how far in from its side, how far down
+ * it hangs (to its foot) and how wide it is (px).
  */
-const BELLS = {
-  left: [
-    {
-      src: "/art/couple-bell-1.webp",
-      ratio: 148 / 93,
-      at: 13,
-      drop: 62,
-      w: 15,
-    },
-    {
-      src: "/art/couple-bell-2.webp",
-      ratio: 204 / 100,
-      at: 31,
-      drop: 44,
-      w: 13,
-    },
-    {
-      src: "/art/couple-bell-3.webp",
-      ratio: 148 / 94,
-      at: 47,
-      drop: 24,
-      w: 11,
-    },
-  ],
-  right: [
-    {
-      src: "/art/couple-bell-3.webp",
-      ratio: 148 / 94,
-      at: 13,
-      drop: 40,
-      w: 14,
-    },
-    {
-      src: "/art/couple-bell-1.webp",
-      ratio: 148 / 93,
-      at: 30,
-      drop: 64,
-      w: 13,
-    },
-    {
-      src: "/art/couple-bell-2.webp",
-      ratio: 204 / 100,
-      at: 46,
-      drop: 26,
-      w: 11,
-    },
-  ],
-} as const;
+const BELLS = [
+  { src: "/art/couple-bell-1.webp", ratio: 148 / 93, at: 16, drop: 58, w: 14 },
+  { src: "/art/couple-bell-2.webp", ratio: 204 / 100, at: 33, drop: 40, w: 12 },
+  { src: "/art/couple-bell-3.webp", ratio: 148 / 94, at: 49, drop: 24, w: 11 },
+] as const;
 
 /** The button's gold light runs round its edge this long (ms); then it fades away (ms). */
 const SWEEP = 450;
 const LEAVE = 220;
 
 const pause = (ms: number) => new Promise((r) => setTimeout(r, ms));
+/** When a part of the box comes in, in its entrance (ms). */
+const at = (ms: number) => ({ "--at": `${ms}ms` }) as CSSProperties;
 
 export function Rsvp() {
   const { rsvp, couple } = wedding;
@@ -158,22 +121,36 @@ export function Rsvp() {
 
   return (
     <section id="rsvp" ref={ref} aria-labelledby="rsvp-heading" className="relative px-[var(--gutter)] pt-[var(--section-gap)]">
-      <Reveal show={seen} className="mx-auto max-w-[22.5rem]">
-        <div ref={cardRef} className="rsvp-card px-6 pb-12 pt-8 text-center">
+      <div className="mx-auto max-w-[22.5rem]">
+        <div
+          ref={cardRef}
+          className="rsvp-card px-6 pb-[72px] pt-9 text-center"
+          data-shown={seen || undefined}
+          data-still={reduced || undefined}
+        >
           <Bells />
           <Temple className="rsvp-temple" />
+          <Temple className="rsvp-temple rsvp-temple-gleam" />
 
           <div className="relative">
-            <Trishul />
-            <Divider wide />
-            <h2 id="rsvp-heading" className="rsvp-title mt-3 text-balance">
+            <div className="rsvp-in" style={at(300)}>
+              <Trishul />
+            </div>
+            <div className="rsvp-in" style={at(420)}>
+              <Divider wide />
+            </div>
+            <h2 id="rsvp-heading" className="rsvp-title rsvp-in mt-3.5 text-balance" style={at(520)}>
               {rsvp.title}
             </h2>
-            <p className="rsvp-message mx-auto mt-2 max-w-[16.5rem] text-balance">{rsvp.message}</p>
-            <Divider />
+            <p className="rsvp-message rsvp-in mx-auto mt-2.5 max-w-[16.5rem] text-balance" style={at(640)}>
+              {rsvp.message}
+            </p>
+            <div className="rsvp-in" style={at(760)}>
+              <Divider />
+            </div>
 
             {phase !== "accepted" ? (
-              <div className="mx-auto mt-4 flex h-[76px] items-center justify-center">
+              <div className="rsvp-in mx-auto mt-6 flex items-center justify-center" style={at(900)}>
                 <button
                   type="button"
                   onClick={accept}
@@ -194,7 +171,7 @@ export function Rsvp() {
                     <svg
                       aria-hidden
                       viewBox="0 0 20 10"
-                      className="h-[8px] w-[16px]"
+                      className="rsvp-arrow h-[8px] w-[16px]"
                       fill="none"
                       stroke="currentColor"
                       strokeWidth="1.3"
@@ -258,7 +235,7 @@ export function Rsvp() {
             )}
           </div>
         </div>
-      </Reveal>
+      </div>
 
       {scene && (
         <BlessingScene
@@ -529,13 +506,18 @@ function Arch() {
   );
 }
 
-/** The bells from the box's top corners. */
+/** The bells from the box's top corners, the same on each side (each swings first toward the middle). */
 function Bells() {
   return (
     <>
       {(["left", "right"] as const).map((side) =>
-        BELLS[side].map((b, i) => (
-          <span key={`${side}${i}`} aria-hidden className="rsvp-bell" style={{ [side]: b.at, width: b.w, height: b.drop }}>
+        BELLS.map((b, i) => (
+          <span
+            key={`${side}${i}`}
+            aria-hidden
+            className="rsvp-bell"
+            style={{ [side]: b.at, width: b.w, height: b.drop, "--i": i, "--dir": side === "left" ? 1 : -1 } as CSSProperties}
+          >
             <img src={b.src} alt="" width={b.w} height={Math.round(b.w * b.ratio)} draggable={false} />
           </span>
         )),
@@ -572,7 +554,7 @@ function Trishul() {
 /** A fine gold rule with a small ornament in its middle (the wide one under the trishul). */
 function Divider({ wide = false }: { wide?: boolean }) {
   return wide ? (
-    <svg aria-hidden viewBox="0 0 160 10" className="mx-auto mt-2 h-[10px] w-40" fill="none">
+    <svg aria-hidden viewBox="0 0 160 10" className="mx-auto mt-1.5 h-[10px] w-40" fill="none">
       <defs>
         <linearGradient id="rsvp-rule" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="160" y2="0">
           <stop offset="0" stopColor="#b89554" stopOpacity="0" />
@@ -586,7 +568,7 @@ function Divider({ wide = false }: { wide?: boolean }) {
       <path d="M80 1.2 83.8 5 80 8.8 76.2 5Z" fill="#d4b26e" fillOpacity="0.4" stroke="#d4b26e" strokeWidth="0.8" />
     </svg>
   ) : (
-    <svg aria-hidden viewBox="0 0 70 8" className="mx-auto mt-4 h-2 w-[70px]" fill="none">
+    <svg aria-hidden viewBox="0 0 70 8" className="mx-auto mt-5 h-2 w-[70px]" fill="none">
       <path d="M0 4h29M41 4h29" stroke="#b89554" strokeOpacity="0.8" strokeWidth="0.8" />
       <path d="M35 1.4 37.6 4 35 6.6 32.4 4Z" fill="#d4b26e" />
     </svg>
