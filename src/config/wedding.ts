@@ -281,11 +281,15 @@ export const wedding = {
   },
 
   /**
-   * Section 08 — "The Sacred Union": a blessing scene (no form, nothing recorded). The title, closing
-   * and button show in capitals. "Add to calendar" uses wedding.dateTime and the venue above.
+   * Section 08 — the invitation and "The Sacred Union": one button (no form) accepts — saved to the
+   * family's database when there is one, never remembered on the phone — and opens the blessing
+   * scene. The buttons, the scene's title and closing show in capitals. "Add to calendar" uses
+   * wedding.dateTime and the venue above.
    */
   rsvp: {
     title: "A Sacred Celebration",
+    message: "Your presence would make our celebration even more special.",
+    button: "Join the Celebration",
     blessing: "With the blessings of Mahadev and Maa Parvati, we look forward to celebrating this special occasion with you.",
     closing: "Har Har Mahadev",
     calendarButton: "Add to calendar",

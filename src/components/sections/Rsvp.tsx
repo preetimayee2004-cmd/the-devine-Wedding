@@ -1,7 +1,9 @@
 import { useMemo, useRef, useState, type CSSProperties } from "react";
 import { wedding } from "@/config/wedding";
+import { useGuest } from "@/context/GuestContext";
 import { useInView } from "@/hooks/useInView";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
+import { acceptInvitation, BackendError, type Acceptance } from "@/lib/backend";
 import { downloadIcs, googleCalendarUrl, weddingCalendarItem } from "@/lib/calendar";
 import { Icon } from "@/components/art/Icons";
 import { TempleBells, TempleSilhouette } from "@/components/art/Temple";
@@ -11,31 +13,85 @@ import { TempleBells, TempleSilhouette } from "@/components/art/Temple";
  * (mist-blue warming into ivory, as every section) — no card, no box.
  *
  * At the top a gold trishul with a fine rule beneath it, temple bells hanging alike from the upper
- * corners. In the middle a temple arch in thin antique-gold lines, Mahadev and Maa Parvati within it
+ * corners. Beneath them, first, the invitation: "A Sacred Celebration", one line, and one maroon
+ * button, "Join the Celebration →". Tapped (once; more taps are ignored), the acceptance is sent —
+ * saved to the family's database when there is one — and only when that has succeeded does the
+ * invitation give way to the scene (if it fails, the button stays, with the reason). Nothing is
+ * remembered on the phone: every visit, a reload too, starts with the button.
+ *
+ * The scene: a temple arch in thin antique-gold lines, Mahadev and Maa Parvati within it
  * (the Save the Date painting's own figures), the pillars and the figures melting into the sky at
  * their foot, faint temples at the corners. Beneath: "A Sacred Celebration", the blessing and "Har
  * Har Mahadev"; then one maroon button, "Add to calendar" (Google Calendar or an .ics file of the
  * wedding as configured — and it says exactly what happened, never that the date is saved), and a
- * plain "Return to invitation" link back to the top. Nothing here claims an RSVP was recorded.
+ * plain "Return to invitation" link back to the top; and an honest note — the family has it (with a
+ * database) or the guest should tell them too (without one).
  *
- * Seen the first time (about 3.6s): the trishul and the bells; the arch draws itself (both pillars
- * rising, the upper arch from each side to its peak, a kalash, one gleam along it); Mahadev and Maa
- * Parvati appear from 97%; the heading, blessing and closing rise in; the button last. The page stays
- * usable throughout, and then all is still. Reduced motion: everything simply fades in.
+ * Seen the first time: the trishul and the bells, the heading and its line, the button last. Opened
+ * (about 3s): the arch draws itself (both pillars rising, the upper arch from each side to its peak, a
+ * kalash, one gleam along it); Mahadev and Maa Parvati appear from 97%; the heading, blessing and
+ * closing rise in; the calendar button last. Then all is still. Reduced motion: plain fades.
  */
 
-/** When each part comes in (ms from the section being seen). */
-const AT = { trishul: 0, rule: 320, pillars: 600, arch: 1000, kalash: 1450, gleam: 1500, figures: 1700, heading: 2400, blessing: 2600, closing: 2800, button: 3150, link: 3300 };
+/** When each part comes in (ms): the invitation from the section being seen, the scene from its opening. */
+const AT = {
+  trishul: 0,
+  rule: 320,
+  title: 520,
+  message: 660,
+  join: 820,
+  pillars: 200,
+  arch: 600,
+  kalash: 1050,
+  gleam: 1100,
+  figures: 1300,
+  heading: 2000,
+  blessing: 2200,
+  closing: 2400,
+  button: 2750,
+  link: 2900,
+};
+/** The invitation fades away this long (ms) before the scene opens in its place. */
+const LEAVE = 320;
+const pause = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const at = (ms: number) => ({ "--at": `${ms}ms` }) as CSSProperties;
 
 type CalendarItem = NonNullable<ReturnType<typeof weddingCalendarItem>>;
 
+type Phase = "idle" | "sending" | "leaving" | "open";
+
 export function Rsvp() {
   const { rsvp } = wedding;
+  const { guestName, isPersonalized } = useGuest();
   const ref = useRef<HTMLElement>(null);
   const seen = useInView(ref, { threshold: 0.15 });
   const reduced = usePrefersReducedMotion();
   const calendar = useMemo(() => weddingCalendarItem(), []);
+  const [phase, setPhase] = useState<Phase>("idle");
+  const [acceptance, setAcceptance] = useState<Acceptance | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const busy = useRef(false);
+
+  const accept = async () => {
+    if (busy.current || phase !== "idle") return;
+    busy.current = true;
+    setPhase("sending");
+    setError(null);
+    try {
+      const a = await acceptInvitation(guestName, isPersonalized ? guestName : null);
+      // saved: only now the invitation fades and the scene opens in its place
+      setAcceptance(a);
+      setPhase("leaving");
+      if (!reduced) await pause(LEAVE);
+      setPhase("open");
+    } catch (e) {
+      setError(e instanceof BackendError ? e.message : "Something went wrong. Please try again.");
+      setPhase("idle");
+    } finally {
+      busy.current = false;
+    }
+  };
+  const open = phase === "open";
 
   return (
     <section
@@ -46,6 +102,7 @@ export function Rsvp() {
       data-shown={seen || undefined}
       data-still={reduced || undefined}
       data-bells={seen ? (reduced ? "still" : "in") : "hidden"}
+      data-open={open || undefined}
     >
       <TempleBells />
       <TempleSilhouette className="rs-temple rs-temple-left" />
@@ -59,43 +116,103 @@ export function Rsvp() {
           <Rule />
         </div>
 
-        {/* the temple arch, and Mahadev and Maa Parvati within it */}
-        <div className="rs-art">
-          <span aria-hidden className="rs-glow" style={at(AT.figures)} />
-          <img
-            className="rs-figures"
-            style={at(AT.figures)}
-            src={wedding.assets.saveTheDateLayers.figures}
-            alt="Mahadev and Maa Parvati: he gently touches her forehead as she bows her head, garlanded"
-            width={572}
-            height={1024}
-            loading="lazy"
-            decoding="async"
-            draggable={false}
-          />
-          <Arch />
-        </div>
-
-        <h2 id="rsvp-heading" className="rs-heading rs-in" style={at(AT.heading)}>
-          {rsvp.title}
-        </h2>
-        <p className="rs-blessing rs-in" style={at(AT.blessing)}>
-          {rsvp.blessing}
-        </p>
-        <p className="rs-closing rs-in" style={at(AT.closing)}>
-          {rsvp.closing}
-        </p>
-
-        {calendar && (
-          <div className="rs-in mt-8 flex flex-col items-center" style={at(AT.button)}>
-            <AddToCalendar calendar={calendar} label={rsvp.calendarButton} />
+        {!open ? (
+          /* the invitation */
+          <div className="rs-invite flex flex-col items-center" data-leaving={phase === "leaving" || undefined}>
+            <h2 id="rsvp-heading" className="rs-title rs-in" style={at(AT.title)}>
+              {rsvp.title}
+            </h2>
+            <p className="rs-message rs-in" style={at(AT.message)}>
+              {rsvp.message}
+            </p>
+            <div className="rs-in mt-7" style={at(AT.join)}>
+              <button
+                type="button"
+                className="rs-btn"
+                onClick={accept}
+                aria-disabled={phase !== "idle" || undefined}
+                data-phase={phase}
+              >
+                {phase === "sending" ? "Sending your joy…" : error ? "Try again" : rsvp.button}
+                <svg
+                  aria-hidden
+                  viewBox="0 0 20 10"
+                  className="rs-btn-arrow"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M1 5h17M14 1.5 18 5l-4 3.5" />
+                </svg>
+              </button>
+            </div>
+            {error && (
+              <p role="alert" className="mt-3 max-w-[18rem] text-[13.5px] leading-snug text-[#9a3b2e]">
+                We couldn't send your acceptance. {error}
+              </p>
+            )}
           </div>
+        ) : (
+          <Scene
+            calendar={calendar}
+            note={
+              acceptance?.savedTo === "remote"
+                ? "Your acceptance has reached the family."
+                : "Please also let the family know you're coming."
+            }
+          />
         )}
-        <a href="#invitation" className="rs-return rs-in" style={at(AT.link)}>
-          {rsvp.returnLink}
-        </a>
       </div>
     </section>
+  );
+}
+
+/** The scene that opens once the acceptance is saved (its parts timed from the moment it opens). */
+function Scene({ calendar, note }: { calendar: CalendarItem | null; note: string }) {
+  const { rsvp } = wedding;
+  return (
+    <div className="rs-scene flex flex-col items-center" aria-live="polite">
+      {/* the temple arch, and Mahadev and Maa Parvati within it */}
+      <div className="rs-art">
+        <span aria-hidden className="rs-glow" style={at(AT.figures)} />
+        <img
+          className="rs-figures"
+          style={at(AT.figures)}
+          src={wedding.assets.saveTheDateLayers.figures}
+          alt="Mahadev and Maa Parvati: he gently touches her forehead as she bows her head, garlanded"
+          width={572}
+          height={1024}
+          loading="lazy"
+          decoding="async"
+          draggable={false}
+        />
+        <Arch />
+      </div>
+
+      <h2 id="rsvp-heading" className="rs-heading rs-in" style={at(AT.heading)}>
+        {rsvp.title}
+      </h2>
+      <p className="rs-blessing rs-in" style={at(AT.blessing)}>
+        {rsvp.blessing}
+      </p>
+      <p className="rs-closing rs-in" style={at(AT.closing)}>
+        {rsvp.closing}
+      </p>
+
+      {calendar && (
+        <div className="rs-in mt-8 flex flex-col items-center" style={at(AT.button)}>
+          <AddToCalendar calendar={calendar} label={rsvp.calendarButton} />
+        </div>
+      )}
+      <p className="rs-note rs-in" style={at(AT.link)}>
+        {note}
+      </p>
+      <a href="#invitation" className="rs-return rs-in" style={at(AT.link)}>
+        {rsvp.returnLink}
+      </a>
+    </div>
   );
 }
 
@@ -113,7 +230,13 @@ function AddToCalendar({ calendar, label }: { calendar: CalendarItem; label: str
   };
   return (
     <>
-      <button type="button" className="rs-btn" aria-expanded={open} aria-controls="rs-calendar" onClick={() => setOpen((o) => !o)}>
+      <button
+        type="button"
+        className="rs-btn"
+        aria-expanded={open}
+        aria-controls="rs-calendar"
+        onClick={() => setOpen((o) => !o)}
+      >
         <Icon name="calendar" className="h-4 w-4" strokeWidth={1.5} />
         {label}
       </button>
@@ -143,7 +266,8 @@ function Arch() {
   const draw = (start: number, dur: number) => ({ "--at": `${start}ms`, "--dur": `${dur}ms` }) as CSSProperties;
   const half = "M36 166C36 122 86 100 116 78 134 64 144 48 150 28";
   const halfIn = "M48 172C48 132 94 112 121 92 137 80 146 66 150 50";
-  const mirror = (d: string) => d.replace(/(\d+(?:\.\d+)?) (\d+(?:\.\d+)?)/g, (_, x: string, y: string) => `${300 - Number(x)} ${y}`);
+  const mirror = (d: string) =>
+    d.replace(/(\d+(?:\.\d+)?) (\d+(?:\.\d+)?)/g, (_, x: string, y: string) => `${300 - Number(x)} ${y}`);
   return (
     <svg aria-hidden className="rs-arch" viewBox="0 0 300 400" fill="none" strokeLinecap="round" strokeLinejoin="round">
       {[0, 1].map((side) => {
@@ -153,10 +277,20 @@ function Arch() {
             {/* the pillar: two lines rising (from below, where they melt into the blue) to the capital */}
             <path className="rs-stroke" pathLength={1} d={`M${x(28)} 400V172`} style={draw(AT.pillars, 520)} />
             <path className="rs-stroke rs-fine" pathLength={1} d={`M${x(44)} 400V176`} style={draw(AT.pillars + 50, 500)} />
-            <path className="rs-stroke" pathLength={1} d={`M${x(22)} 172H${x(50)}M${x(25)} 178H${x(47)}`} style={draw(AT.arch - 70, 200)} />
+            <path
+              className="rs-stroke"
+              pathLength={1}
+              d={`M${x(22)} 172H${x(50)}M${x(25)} 178H${x(47)}`}
+              style={draw(AT.arch - 70, 200)}
+            />
             {/* the arch, from the pillar's top to the peak */}
             <path className="rs-stroke" pathLength={1} d={side ? mirror(half) : half} style={draw(AT.arch, 480)} />
-            <path className="rs-stroke rs-fine" pathLength={1} d={side ? mirror(halfIn) : halfIn} style={draw(AT.arch + 60, 440)} />
+            <path
+              className="rs-stroke rs-fine"
+              pathLength={1}
+              d={side ? mirror(halfIn) : halfIn}
+              style={draw(AT.arch + 60, 440)}
+            />
           </g>
         );
       })}
@@ -166,7 +300,12 @@ function Arch() {
         <circle cx="150" cy="14" r="3.2" stroke="#a8741f" strokeWidth="1.2" fill="#c9a45c" fillOpacity="0.45" />
       </g>
       {/* one gleam running along the arch, left to right */}
-      <path className="rs-gleam" pathLength={1} style={{ "--at": `${AT.gleam}ms` } as CSSProperties} d={`${half}C156 48 166 64 184 78 214 100 264 122 264 166`} />
+      <path
+        className="rs-gleam"
+        pathLength={1}
+        style={{ "--at": `${AT.gleam}ms` } as CSSProperties}
+        d={`${half}C156 48 166 64 184 78 214 100 264 122 264 166`}
+      />
     </svg>
   );
 }
@@ -174,7 +313,16 @@ function Arch() {
 /** Mahadev's trishul, in fine gold line. */
 function Trishul() {
   return (
-    <svg aria-hidden viewBox="0 0 32 46" className="mx-auto h-[52px] w-9" fill="none" stroke="#a8741f" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      aria-hidden
+      viewBox="0 0 32 46"
+      className="mx-auto h-[52px] w-9"
+      fill="none"
+      stroke="#a8741f"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       {/* the middle blade, the two curving side prongs, the shaft */}
       <path d="M16 2.5 13.6 9 16 15l2.4-6Z" fill="#c9a45c" fillOpacity="0.45" />
       <path d="M16 15v29" />
