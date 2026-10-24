@@ -24,7 +24,7 @@ import { TempleBells, TempleSilhouette } from "@/components/art/Temple";
  * their foot, faint temples at the corners. Beneath: "A Sacred Celebration", the blessing and "Har
  * Har Mahadev"; then one maroon button, "Add to calendar" (Google Calendar or an .ics file of the
  * wedding as configured — and it says exactly what happened, never that the date is saved), and a
- * plain "Return to invitation" link back to the top; and an honest note — the family has it (with a
+ * an honest note — the family has it (with a
  * database) or the guest should tell them too (without one).
  *
  * Seen the first time: the trishul and the bells, the heading and its line, the button last. Opened
@@ -209,9 +209,6 @@ function Scene({ calendar, note }: { calendar: CalendarItem | null; note: string
       <p className="rs-note rs-in" style={at(AT.link)}>
         {note}
       </p>
-      <a href="#invitation" className="rs-return rs-in" style={at(AT.link)}>
-        {rsvp.returnLink}
-      </a>
     </div>
   );
 }

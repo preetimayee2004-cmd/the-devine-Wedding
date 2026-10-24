@@ -15,7 +15,7 @@ const TOAST_MS = 1500;
 
 /**
  * Section 02 — one screen, in the style of the couple's chosen painting, on
- * the site's own sky: a carved arch in Mahadev's blue with gently swaying temple bells
+ * the site's own sky: a carved navy arch hung with white flowers, with gently swaying temple bells
  * and jasmine strings across the top, right where the Save the Date ends; on the sky
  * below the bells, the guest's welcome — their name from the link, the
  * couple's names, the hashtag (a tap copies it), the date and the venue (a

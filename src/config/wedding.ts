@@ -293,7 +293,6 @@ export const wedding = {
     blessing: "With the blessings of Mahadev and Maa Parvati, we look forward to celebrating this special occasion with you.",
     closing: "Har Har Mahadev",
     calendarButton: "Add to calendar",
-    returnLink: "Return to invitation",
   },
 
   /** Section 09 — the blessing wall. Sample wishes show until real ones arrive. */
@@ -462,8 +461,8 @@ export const wedding = {
     omSeal: "/art/om-seal.webp",
     /**
      * Section 02, made from one painting (its text and sky taken out, so the site's sky shows
-     * through): the carved arch — recoloured to Mahadev's own blue in the Save the Date painting
-     * (his skin's tones, shadow to highlight, so the carving keeps its depth) — with bells and jasmine strings across the top (1220 × 600), and
+     * through): the carved arch — its carving in deep navy (the Blessing Wall button's, toned shadow
+     * to highlight so the carving keeps its depth), white flowers hanging where its leaves were — with bells and jasmine strings across the top (1220 × 600), and
      * the scene at the foot (1220 × 1448) — palms, petals, hills, a temple by the river, a diya,
      * lotuses, and the couple offering water to the Shivling.
      */

@@ -1030,7 +1030,8 @@
     text-transform: uppercase;
     color: rgb(var(--gold-ink));
   }
-  /* "Add to calendar": solid deep maroon, warm ivory words, a thin antique-gold edge, 10px corners */
+  /* the buttons ("Join the Celebration", "Add to calendar"), as the Blessing Wall's: deep navy, warm
+     ivory words, a thin antique-gold edge, 10px corners */
   .rs-btn {
     display: inline-flex;
     align-items: center;
@@ -1040,11 +1041,11 @@
     padding: 0 28px;
     border: 1px solid #b89554;
     border-radius: 10px;
-    background-color: #702d35;
+    background-color: rgb(var(--navy));
     color: #fff9ef;
     box-shadow:
-      inset 0 1px 0 rgb(255 249 239 / 0.14),
-      0 12px 24px -12px rgb(112 45 53 / 0.6);
+      inset 0 1px 0 rgb(255 249 239 / 0.12),
+      0 12px 24px -14px rgb(18 41 74 / 0.8);
     font-family: var(--font-body);
     font-size: 12.5px;
     font-weight: 600;
@@ -1060,24 +1061,23 @@
   }
   @media (hover: hover) {
     .rs-btn:hover {
-      background-color: #7e3640;
+      background-color: #1b3a63;
       border-color: #d0b06f;
       box-shadow:
-        inset 0 1px 0 rgb(255 249 239 / 0.18),
-        0 14px 28px -12px rgb(0 0 0 / 0.65),
+        inset 0 1px 0 rgb(255 249 239 / 0.16),
+        0 14px 28px -14px rgb(18 41 74 / 0.85),
         0 0 0 3px rgb(184 149 84 / 0.18);
     }
   }
   .rs-btn:active {
-    background-color: #5d242b;
+    background-color: #0c1d36;
     box-shadow:
       inset 0 2px 4px rgb(0 0 0 / 0.3),
-      0 6px 14px -10px rgb(0 0 0 / 0.6);
+      0 6px 14px -10px rgb(18 41 74 / 0.7);
     transform: scale(0.98);
   }
   .rs-btn:focus-visible,
-  .rs-chip:focus-visible,
-  .rs-return:focus-visible {
+  .rs-chip:focus-visible {
     outline: 2px solid rgb(var(--gold-ink));
     outline-offset: 3px;
   }
@@ -1120,24 +1120,6 @@
   }
   .rs-feedback:not(:empty) {
     margin-top: 10px;
-  }
-  /* "Return to invitation": a plain link */
-  .rs-return {
-    margin-top: 10px;
-    padding: 6px 4px;
-    font-family: var(--font-body);
-    font-size: 13px;
-    letter-spacing: 0.04em;
-    color: rgb(var(--navy));
-    text-decoration: underline;
-    text-decoration-color: rgb(184 149 84 / 0.9);
-    text-underline-offset: 4px;
-    transition: color 200ms ease;
-  }
-  @media (hover: hover) {
-    .rs-return:hover {
-      color: rgb(var(--gold-ink));
-    }
   }
   /* reduced motion: everything simply fades in */
   .rs[data-still] .rs-stroke {
