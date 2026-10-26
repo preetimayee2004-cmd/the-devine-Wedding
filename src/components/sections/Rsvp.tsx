@@ -66,7 +66,7 @@ type Phase = "idle" | "sending" | "leaving" | "open";
 
 export function Rsvp() {
   const { rsvp } = wedding;
-  const { guestName, isPersonalized } = useGuest();
+  const { guestName, fromLink } = useGuest();
   const personal = usePersonal();
   const ref = useRef<HTMLElement>(null);
   const seen = useInView(ref, { threshold: 0.15 });
@@ -83,7 +83,8 @@ export function Rsvp() {
     setPhase("sending");
     setError(null);
     try {
-      const a = await acceptInvitation(guestName, isPersonalized ? guestName : null);
+      // tied to the name from the link only (never the sample name)
+      const a = await acceptInvitation(guestName, fromLink ? guestName : null);
       // saved: only now the invitation fades and the scene opens in its place
       setAcceptance(a);
       setPhase("leaving");

@@ -2,10 +2,12 @@ import { createContext, useContext, useEffect, useMemo, type ReactNode } from "r
 import { wedding } from "@/config/wedding";
 
 interface GuestState {
-  /** Guest's name from the share link, or the configured fallback ("Guest"). */
+  /** Guest's name from the share link, else the sample name, else the fallback ("Guest"). */
   guestName: string;
-  /** True when the name came from the URL rather than the fallback. */
+  /** True when there is a name to greet: from the URL, or the sample name. */
   isPersonalized: boolean;
+  /** True only when the name came from the URL — the name that may be saved with a wish or an RSVP. */
+  fromLink: boolean;
 }
 
 const GuestContext = createContext<GuestState | null>(null);
@@ -28,14 +30,16 @@ export function sanitizeGuestName(raw: string | null, maxLength: number): string
 }
 
 function readGuestFromUrl(): GuestState {
-  const { queryKeys, fallbackName, maxLength } = wedding.guest;
+  const { queryKeys, fallbackName, sampleName, maxLength } = wedding.guest;
   const params = new URLSearchParams(window.location.search);
 
   for (const key of queryKeys) {
     const name = sanitizeGuestName(params.get(key), maxLength);
-    if (name) return { guestName: name, isPersonalized: true };
+    if (name) return { guestName: name, isPersonalized: true, fromLink: true };
   }
-  return { guestName: fallbackName, isPersonalized: false };
+  // no name in the link: the example name, if one is set (see `guest.sampleName`)
+  if (sampleName) return { guestName: sampleName, isPersonalized: true, fromLink: false };
+  return { guestName: fallbackName, isPersonalized: false, fromLink: false };
 }
 
 export function GuestProvider({ children }: { children: ReactNode }) {

@@ -47,7 +47,7 @@ const GLOW_MS = 650;
 
 export function BlessingWall() {
   const { wishes: copy } = wedding;
-  const { guestName, isPersonalized } = useGuest();
+  const { guestName, fromLink } = useGuest();
   const personal = usePersonal();
   const sectionRef = useRef<HTMLElement>(null);
   const hangRef = useRef<HTMLDivElement>(null);
@@ -106,7 +106,8 @@ export function BlessingWall() {
     setHint(null);
     setState({ kind: "sending" });
     pendingId.current ??= newId();
-    const wish: Wish = { id: pendingId.current, name: isPersonalized ? guestName : null, message };
+    // signed with the name from the link only (never the sample name)
+    const wish: Wish = { id: pendingId.current, name: fromLink ? guestName : null, message };
     const started = performance.now();
     try {
       await addWish(wish);
@@ -209,7 +210,7 @@ export function BlessingWall() {
                       {hint ??
                         (state.kind === "error"
                           ? `We couldn't send your blessing. ${state.message}`
-                          : isPersonalized
+                          : fromLink
                             ? `Signed with love, ${guestName}`
                             : "Signed “With love”")}
                     </span>

@@ -469,6 +469,12 @@ export const wedding = {
   guest: {
     queryKeys: ["guest", "to", "name"],
     fallbackName: "Guest",
+    /**
+     * SAMPLE: when the link names no guest, the invitation greets this example name instead, so every
+     * personal line can be seen as a guest would. It is never saved with a wish or an RSVP. Set it to
+     * null before sharing a link without a name, so such a link reads as written for anyone.
+     */
+    sampleName: "Ananya" as string | null,
     maxLength: 40,
     /** The browser tab, for a named guest: "Ananya, you're invited · …". */
     titleFor: "{guest}, you're invited",
