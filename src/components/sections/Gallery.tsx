@@ -21,8 +21,8 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
  * Fourteen photos of different sizes, the same thin antique-gold gap between all of them, together
  * make a heart inside a double gold heart line wreathed in eucalyptus (the couple's picture of it,
  * its white keyed away, the leaves recoloured a dusty Shiva blue): each tile is clipped to the inner
- * line's opening, traced from the picture, and the frame lies over the photos' edge. Seen the first time, the tiles fly
- * in from the edges (turned up to ±15°, 70ms apart, about 1.4s) and settle with a little spring;
+ * line's opening, traced from the picture; the frame lies behind them, so its leaves tuck behind the
+ * photo heart and never hide a photo. Seen the first time, the tiles fly in from the edges (turned up to ±15°, 70ms apart, about 1.4s) and settle with a little spring;
  * then the heart beats now and then, barely (a soft double beat, 1 → 1.012, every 3.2s).
  *
  * In 3D: the heart sits in 900px of perspective, each tile lifted off it by its size (the largest
@@ -474,7 +474,7 @@ export function Gallery() {
                 </defs>
                 <path d={HEART_PATH} />
               </svg>
-              {/* the gold heart line and its eucalyptus, over the photos' edge (lifted above every tile) */}
+              {/* the gold heart line and its eucalyptus, behind the photos (the leaves tuck behind the heart) */}
               <img aria-hidden className="hc-frame" src={gallery.heartFrame} alt="" draggable={false} style={FRAME} />
               {TILES.map((_, i) => {
                 const g = GEOMETRY[i];

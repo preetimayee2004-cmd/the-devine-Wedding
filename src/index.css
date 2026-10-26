@@ -3659,17 +3659,19 @@
   .hc-mount path {
     fill: url(#hc-gold);
     stroke: url(#hc-gold);
-    stroke-width: 1.8;
+    /* a thin gold rim just past the opening: the heart's edge reads even where leaves hid the frame's
+       line in the picture */
+    stroke-width: 1.1;
     stroke-linejoin: round;
   }
-  /* the heart frame: lifted just above the highest tile (and scaled back to its place), so the
-     photos always pass under its band */
+  /* the heart frame: behind the mount and the photos (and scaled back to its place), so its leaves
+     tuck behind the photo heart and never hide a photo; its gold line and the leaves outside show */
   .hc-frame {
     position: absolute;
     max-width: none;
     pointer-events: none;
     user-select: none;
-    transform: translateZ(42px) scale(0.9533);
+    transform: translateZ(-2px) scale(1.0022);
     filter: drop-shadow(0 4px 8px rgb(18 41 74 / 0.12));
     transition: opacity 700ms ease-out;
   }
