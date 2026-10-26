@@ -421,6 +421,8 @@ export const wedding = {
       { role: "Guest Coordinator", name: "Rohan", phone: null },
       { role: "Wedding Coordinator", name: "Neha Verma", phone: null },
     ]),
+    /** The closing line at the foot of the section. */
+    closing: "We're just a call away.",
   },
 
   /** Section 11 — thank you. */
