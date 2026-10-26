@@ -1051,7 +1051,8 @@
     height: 50px;
     padding: 0 28px;
     border: 1px solid #b89554;
-    border-radius: 10px;
+    /* a pill, as the Blessing Wall's button */
+    border-radius: 9999px;
     background-color: rgb(var(--navy));
     color: #fff9ef;
     box-shadow:
@@ -1948,7 +1949,8 @@
     min-height: 50px;
     margin-top: 18px;
     border: 1px solid #b89554;
-    border-radius: 10px;
+    /* a pill, as the Blessing Wall's button */
+    border-radius: 9999px;
     background-color: rgb(var(--navy));
     color: #fff9ef;
     box-shadow:
@@ -2248,7 +2250,8 @@
     min-height: 44px;
     margin-top: 10px;
     padding: 0 18px;
-    border-radius: 10px;
+    /* a pill, as the Blessing Wall's button */
+    border-radius: 9999px;
     font-family: var(--font-body);
     font-size: 11.5px;
     font-weight: 600;
