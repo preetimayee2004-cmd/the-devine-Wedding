@@ -3077,6 +3077,8 @@
      at the very edges): it may tuck up beside the words, but always leaves 40px of sky above them. */
   /* Family: on a phone the two families one above the other (a lotus rule between); from 520px
      side by side */
+  /* the two families one above the other at every width (side by side, the names' frames would
+     stand upright instead of lying on their side) */
   .fam-pair {
     display: grid;
     grid-template-columns: 1fr;
@@ -3119,6 +3121,52 @@
     display: flex;
     justify-content: center;
   }
+  /* each family's names in one gold frame on its side: a fine gold line inset 10px (the corners'
+     flowers and curls reach past it), a faint ivory ground within */
+  .fam-names {
+    position: relative;
+    isolation: isolate;
+    width: min(100%, 340px);
+    margin-top: 18px;
+    padding: 30px 26px 28px;
+  }
+  .fam-names-frame {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+  .fam-names-line {
+    position: absolute;
+    inset: 10px;
+    border: 1.2px solid;
+    border-image: linear-gradient(135deg, #9c6b1e, #d9b25e 45%, #e6c77e 55%, #a8741f) 1;
+    background: rgb(255 252 245 / 0.55);
+  }
+  .fam-corner {
+    position: absolute;
+    width: 48px;
+    height: 48px;
+  }
+  .fam-corner-tl {
+    left: 0.4px;
+    top: 0.4px;
+  }
+  .fam-corner-tr {
+    right: 0.4px;
+    top: 0.4px;
+    transform: scaleX(-1);
+  }
+  .fam-corner-bl {
+    left: 0.4px;
+    bottom: 0.4px;
+    transform: scaleY(-1);
+  }
+  .fam-corner-br {
+    right: 0.4px;
+    bottom: 0.4px;
+    transform: scale(-1);
+  }
   .fam-temple {
     position: absolute;
     right: 10px;
@@ -3126,18 +3174,6 @@
     width: 86px;
     color: rgb(18 41 74 / 0.08);
     pointer-events: none;
-  }
-  @media (min-width: 520px) {
-    .fam-pair {
-      grid-template-columns: 1fr 1fr;
-      column-gap: 20px;
-    }
-    .fam-frame {
-      width: min(100%, 400px);
-    }
-    .fam-between {
-      display: none;
-    }
   }
   /* "Welcome": a deep sapphire — Mahadev's blue, festive, and clear on the pale sky */
   .couple-welcome-word {
