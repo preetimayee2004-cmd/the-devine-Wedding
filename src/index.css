@@ -3596,11 +3596,13 @@
   .hc-wrap {
     margin: 26px calc(8px - var(--gutter)) 0;
   }
-  /* the opening; the frame reaches past it (113% wide), so it fits the screen with 8px to spare */
+  /* the opening; the frame reaches past it (116% wide: its leaves 11% out to the left, 25% up), so the
+     opening is nudged right to centre the whole, with room above for the leaves */
   .hc {
     position: relative;
-    width: min(calc(100% / 1.13), 400px);
-    margin: 26px auto 36px;
+    width: min(calc(100% / 1.17), 400px);
+    margin: calc(18% + 8px) auto 30px;
+    translate: 3.16% 0;
     container-type: inline-size;
     perspective: 900px;
     touch-action: pan-y;
@@ -3610,7 +3612,7 @@
   }
   .hc-beat {
     position: relative;
-    aspect-ratio: 1000 / 758.2;
+    aspect-ratio: 1000 / 845.6;
     transform-style: preserve-3d;
   }
   /* the heartbeat, once the tiles are home — barely there: a soft double beat (1 → 1.012), then a
@@ -3660,7 +3662,7 @@
     stroke-width: 1.8;
     stroke-linejoin: round;
   }
-  /* the gold heart frame: lifted just above the highest tile (and scaled back to its place), so the
+  /* the heart frame: lifted just above the highest tile (and scaled back to its place), so the
      photos always pass under its band */
   .hc-frame {
     position: absolute;
@@ -3668,7 +3670,7 @@
     pointer-events: none;
     user-select: none;
     transform: translateZ(42px) scale(0.9533);
-    filter: drop-shadow(0 6px 10px rgb(84 60 24 / 0.22));
+    filter: drop-shadow(0 4px 8px rgb(18 41 74 / 0.12));
     transition: opacity 700ms ease-out;
   }
   .hc[data-phase="before"] .hc-frame {

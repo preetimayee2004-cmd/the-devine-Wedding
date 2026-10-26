@@ -231,8 +231,11 @@ export const wedding = {
     title: "Our Gallery",
     intro: "Moments we hold close, like the moon in Mahadev's locks.",
     hint: "Tap a photo",
-    /** The polished gold heart frame round the photos (its white keyed away; the photos fill its opening). */
-    heartFrame: "/art/gallery-heart-frame.webp",
+    /**
+     * The frame round the photos: a double gold heart line wreathed in eucalyptus (the couple's picture,
+     * its white keyed away, the leaves recoloured a dusty Shiva blue); the photos fill its opening.
+     */
+    heartFrame: "/art/gallery-heart-leaves.webp",
     photos: list<Photo>([
       {
         src: "/photos/gallery-1.webp",
