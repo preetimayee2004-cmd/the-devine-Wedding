@@ -465,7 +465,7 @@ export function Invitation() {
         />
       )}
 
-      {/* soft temple bells, off until tapped — in the corner once the opening is over */}
+      {/* the song on or off — in the corner once the opening is over */}
       <MusicToggle visible={!locked} />
 
       {/* ── the opening: on a sunrise sky, the two hands glide in until their fingertips all but touch,

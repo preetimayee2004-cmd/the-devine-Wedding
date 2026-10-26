@@ -1,30 +1,21 @@
-import { useEffect, useRef, useState } from "react";
-import { createDhun, type Dhun } from "@/lib/templeBells";
+import { useEffect, useState } from "react";
+import { isMusicOn, onMusicChange, pauseMusic, playMusic } from "@/lib/music";
 
 /**
- * A small round sound button in the top corner (a speaker, as on the gate): soft temple bells on, or
- * off. Off until the guest taps it — never plays on its own.
+ * A small round sound button in the top corner (a speaker, as on the gate): the couple's song on, or
+ * off. It shows the song as the gate's tap left it, and pauses or resumes it.
  */
 export function MusicToggle({ visible }: { visible: boolean }) {
-  const dhun = useRef<Dhun | null | undefined>(undefined);
-  const [playing, setPlaying] = useState(false);
+  const [playing, setPlaying] = useState(isMusicOn);
 
-  useEffect(() => () => dhun.current?.pause(), []);
-
-  const toggle = () => {
-    if (dhun.current === undefined) dhun.current = createDhun();
-    if (!dhun.current) return;
-    if (playing) dhun.current.pause();
-    else dhun.current.play();
-    setPlaying(!playing);
-  };
+  useEffect(() => onMusicChange(setPlaying), []);
 
   return (
     <button
       type="button"
-      onClick={toggle}
+      onClick={() => (playing ? pauseMusic() : playMusic())}
       aria-pressed={playing}
-      aria-label={playing ? "Sound on: turn off the temple bells" : "Sound off: play soft temple bells"}
+      aria-label={playing ? "Music on: pause the song" : "Music off: play the song"}
       className={`fixed right-5 z-40 flex h-10 w-10 items-center justify-center rounded-full border border-gold/70 bg-ivory/80 text-navy shadow-[0_4px_14px_-6px_rgb(var(--navy)/0.35)] backdrop-blur-sm transition-opacity duration-500 hover:bg-ivory ${visible ? "opacity-100" : "pointer-events-none opacity-0"}`}
       style={{ top: "calc(var(--status-bar) + 22px)" }}
     >

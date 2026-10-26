@@ -527,6 +527,11 @@ export const wedding = {
      * couple's chosen painting, cut out of its Himalayan scene so they sit in the gold halo on the
      * site's own sky (her lap and skirt and his right arm, which the cut-out left faint, made solid).
      */
+    /**
+     * The couple's song: it starts from the gate's "Tap to open" (unless the guest turns the sound
+     * off there first), loops softly, and the corner's sound button pauses or resumes it.
+     */
+    music: "/audio/parvati-boli-shankar-se.mp3",
     thankYouArt: "/art/shiva-parvati-prayer.webp",
     /**
      * Section 08 (RSVP). Before accepting: the pot hanging on its chain and the Shivling beneath it (the

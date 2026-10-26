@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
-import { ringGhanti } from "@/lib/templeBells";
+import { playMusic, preloadMusic } from "@/lib/music";
 
 interface OpeningGateProps {
   /** The golden ॐ wax seal at its centre. */
@@ -56,14 +56,16 @@ const DUST = [
  * Tilting the phone moves a soft shine across the seal (where the browser
  * allows it without asking). No names or date here — only, when the link names a guest, theirs.
  *
- * A tap: a tiny buzz (and a temple ghanti, if the guest turned the sound on in
- * the corner), and the gate simply fades away as the opening's hands begin
- * beneath it. Skip goes straight to the card. Only transform and opacity move;
+ * A tap: a tiny buzz, the couple's song fading in (unless the guest turned the
+ * sound off in the corner first), and the gate simply fades away as the
+ * opening's hands begin beneath it. Skip goes straight to the card (the song
+ * starting too). Only transform and opacity move;
  * reduced motion gets a plain fade.
  */
 export function OpeningGate({ seal, sky, invited, guest, label, devanagari = false, reduced, onBegin, onSkip, onGone }: OpeningGateProps) {
   const [phase, setPhase] = useState<"waiting" | "leaving">("waiting");
-  const [sound, setSound] = useState(false);
+  // the song plays from the tap unless the guest turns it off here first
+  const [sound, setSound] = useState(true);
   const timers = useRef<number[]>([]);
   const root = useRef<HTMLDivElement>(null);
   const tilt = useRef<HTMLDivElement>(null);
@@ -71,6 +73,7 @@ export function OpeningGate({ seal, sky, invited, guest, label, devanagari = fal
 
   useEffect(() => {
     root.current?.focus({ preventScroll: true });
+    preloadMusic();
     const pending = timers.current;
     return () => pending.forEach(clearTimeout);
   }, []);
@@ -112,7 +115,7 @@ export function OpeningGate({ seal, sky, invited, guest, label, devanagari = fal
     } catch {
       // some browsers refuse vibration — no matter
     }
-    if (sound) ringGhanti();
+    if (sound) playMusic();
     setPhase("leaving");
     onBegin();
     later(reduced ? REDUCED_FADE_MS : FADE_MS, onGone);
@@ -120,6 +123,7 @@ export function OpeningGate({ seal, sky, invited, guest, label, devanagari = fal
 
   const skip = () => {
     if (phase === "leaving") return;
+    if (sound) playMusic();
     setPhase("leaving");
     onSkip();
     later(reduced ? REDUCED_FADE_MS : FADE_MS, onGone);
@@ -224,7 +228,7 @@ export function OpeningGate({ seal, sky, invited, guest, label, devanagari = fal
       </p>
       <LotusRule className="gate-words relative mt-2" />
 
-      {/* the sound of the tap: off unless the guest turns it on */}
+      {/* the song: on, unless the guest turns it off before the tap */}
       <button
         type="button"
         onClick={(e) => {
@@ -232,7 +236,7 @@ export function OpeningGate({ seal, sky, invited, guest, label, devanagari = fal
           setSound((on) => !on);
         }}
         aria-pressed={sound}
-        aria-label={sound ? "Sound on: a temple bell rings on the tap" : "Sound off"}
+        aria-label={sound ? "Music on: the song plays when you open the invitation" : "Music off"}
         className="gate-chip fixed left-4 flex h-10 w-10 items-center justify-center rounded-full"
         style={{ top: "calc(var(--status-bar) + 12px)" }}
       >
