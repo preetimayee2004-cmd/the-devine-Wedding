@@ -28,7 +28,7 @@ export function LoveNote() {
       id="love-note"
       ref={ref}
       aria-labelledby="note-heading"
-      className="ln relative overflow-x-clip px-[var(--gutter)] pb-10 pt-[calc(var(--section-gap)+12px)]"
+      className="ln relative overflow-x-clip px-[var(--gutter)] pb-12 pt-10"
       data-shown={seen || undefined}
       data-still={reduced || undefined}
     >
@@ -103,6 +103,11 @@ export function LoveNote() {
           </div>
         </div>
       </div>
+
+      {/* the very last line: the mantra */}
+      <p className="ln-in relative mt-8 text-center font-deva text-[22px] text-gold-ink" style={{ "--at": "3000ms" } as CSSProperties}>
+        <span lang="sa">{copy.mantra}</span>
+      </p>
 
       {/* a faint Himalayan range, resting below */}
       <svg aria-hidden viewBox="0 0 400 60" preserveAspectRatio="none" className="ln-himalaya">

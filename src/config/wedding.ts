@@ -192,9 +192,9 @@ export const wedding = {
   family: {
     eyebrow: "Two Families, One Celebration",
     title: "With Their Blessings",
-    intro: "With the blessings of our elders and the love of our families, two homes become one.",
+    intro: "Held in our elders' blessings and our families' love, two homes become one.",
     /** The same, for a guest named in the link. */
-    introFor: "With the blessings of our elders and the love of our families, two homes become one — and you, {guest}, are family to us.",
+    introFor: "Held in our elders' blessings and our families' love, two homes become one — and you, {guest}, are family to us.",
     sides: list<FamilySide>([
       {
         title: "The Bride's Family",
@@ -320,10 +320,12 @@ export const wedding = {
     /** Over the button, in the gold-framed label. */
     presence: "Your presence is our blessing",
     button: "Join the Celebration",
+    /** The small pill floating at the foot of the screen until the invitation is accepted. */
+    shortcut: "RSVP",
     /** Once accepted, over the scene: for a named guest, and for anyone. */
     thanksFor: "Thank you, {guest} — we can't wait to celebrate with you!",
     thanks: "Thank you — we can't wait to celebrate with you!",
-    blessing: "With the blessings of Mahadev and Maa Parvati, we look forward to celebrating this special occasion with you.",
+    blessing: "By the grace of Mahadev and Maa Parvati, we look forward to celebrating this special occasion with you.",
     closing: "Har Har Mahadev",
     calendarButton: "Add to calendar",
     /** Under the scene, once accepted: where the acceptance went (each with its twin for a named guest). */
@@ -444,7 +446,6 @@ export const wedding = {
       "Thank you for being a part of our beautiful beginning. May the blessings of Mahadev always guide our journey.",
     messageFor:
       "Thank you, {guest}, for being a part of our beautiful beginning. May the blessings of Mahadev always guide our journey.",
-    mantra: "ॐ नमः शिवाय",
   },
 
   /** Section 12 — the last page: a letter in a sacred envelope; the couple's names and the sign-off on its pocket. */
@@ -455,6 +456,8 @@ export const wedding = {
     title: "Two Souls. One Sacred Journey.",
     message: "May your love find strength in Shiva, grace in Parvati, and blessings in every step of your journey together.",
     closing: "Jai Mahadev",
+    /** The very last line of the invitation, under the envelope. */
+    mantra: "ॐ नमः शिवाय",
   },
 
   /**
@@ -550,14 +553,14 @@ export const wedding = {
     music: "/audio/parvati-boli-shankar-se.mp3",
     thankYouArt: "/art/shiva-parvati-prayer.webp",
     /**
-     * Section 08 (RSVP). Before accepting: the pot hanging on its chain and the Shivling beneath it (the
-     * couple's Shivling-theme picture, its page keyed away). Nandi below the panel: from the couple's RSVP design,
+     * Section 08 (RSVP). Before accepting: the kalash hanging on its chain and the Shivling beneath it,
+     * drawn for the site (SVG) in the same fine gold line on warm ivory as Nandi. Nandi below the panel: from the couple's RSVP design,
      * in fine gold line with his jewels and drape, on a base of curls, flowers and a lotus (its page keyed away). Once accepted:
      * the gold trishul from the couple's design (keyed off its page, 2x).
      */
     rsvpTrishul: "/art/rsvp-trishul.webp",
-    rsvpPot: "/art/rsvp-pot.webp",
-    rsvpShivling: "/art/rsvp-shivling.webp",
+    rsvpPot: "/art/rsvp-kalash.svg",
+    rsvpShivling: "/art/rsvp-shivling.svg",
     rsvpNandi: "/art/rsvp-nandi.webp",
     /**
      * Section 08 (RSVP): Mahadev holding Maa Parvati close, eyes closed — the couple's chosen painting,

@@ -19,7 +19,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
  * serif, its address, the date and time in gold capitals, and "Find your way" (navy, a gold edge, a
  * small compass; a soft ripple where it is pressed) to the directions.
  *
- * A Sacred Journey: by air, by rail, by road — editorial rows, each with a small line icon in a fine
+ * All Roads Lead Here: by air, by rail, by road — editorial rows, each with a small line icon in a fine
  * gold ring, its gold label, the place, and its distance and time on one line; a fine gold line
  * between rows; a tap (or Enter) opens a row's detail, the chevron turning. A curved gold route runs
  * behind the icons from the first to the last, never under the words.
@@ -103,7 +103,7 @@ export function Venue() {
         <div ref={travelRef} className="fw-journey" data-shown={travelSeen || undefined} data-still={reduced || undefined}>
           <Reveal show={travelSeen} delay={t(0)}>
             <p className="fw-label">How to Reach</p>
-            <h3 className="fw-journey-title">A Sacred Journey</h3>
+            <h3 className="fw-journey-title">All Roads Lead Here</h3>
           </Reveal>
           <Journey points={travel.points} show={travelSeen} reduced={reduced} />
         </div>

@@ -1,13 +1,10 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { wedding } from "@/config/wedding";
 import { useGuest } from "@/context/GuestContext";
 import { useInView } from "@/hooks/useInView";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
 import { useLang } from "@/lib/lang";
-import { directionsUrl } from "@/lib/maps";
 import { EASE } from "@/lib/motion";
-import { formatVenueDate, parseVenueDateTime } from "@/lib/venueTime";
-import { Icon } from "@/components/art/Icons";
 
 // a deeper gold for the hashtag, so it reads on the sky (every line also carries a soft white glow — index.css)
 const HASHTAG = "#8a5a10";
@@ -18,8 +15,8 @@ const TOAST_MS = 1500;
  * the site's own sky: a carved navy arch hung with white flowers, with gently swaying temple bells
  * and jasmine strings across the top, right where the Save the Date ends; on the sky
  * below the bells, the guest's welcome — their name from the link, the
- * couple's names, the hashtag (a tap copies it), the date and the venue (a
- * map link); and at the foot the couple offering water to the Shivling, by
+ * couple's names and the hashtag (a tap copies it) — the date and the venue are left to
+ * the Save the Date, the countdown and the venue, so they aren't said again here; and at the foot the couple offering water to the Shivling, by
  * the river with a temple, a diya and blue lotuses (she in lavender, he in cool white) — always with clear sky above
  * their heads. The words rise in one by one as the section comes into view
  * (in Hindi too, when the Save the Date's EN / हिं switch is on हिं). It keeps
@@ -38,17 +35,12 @@ export function Couple() {
   const arrived = useInView(ref, { threshold: 0.3 });
   const hindi = useLang() === "hi";
   const { guestName } = useGuest();
-  const { coupleWelcome: copy, couple, venue, assets } = wedding;
+  const { coupleWelcome: copy, couple, assets } = wedding;
   const { coupleArch, coupleArchSize, coupleBells, coupleGarlands, coupleScene, coupleSceneSize } = assets;
 
   // "Dear {guest}," — the guest's name from their link, set in bold (without one, the fallback name)
   const [dearBefore, dearAfter = ""] = copy.dear.split("{guest}");
   const guest = guestName.slice(0, 40);
-
-  const date = useMemo(() => {
-    const parts = parseVenueDateTime(wedding.wedding.dateTime);
-    return parts ? formatVenueDate(parts) : null;
-  }, []);
 
   // a tap on the hashtag copies it, and "Copied" shows for a moment
   const [copied, setCopied] = useState(false);
@@ -181,38 +173,6 @@ export function Couple() {
             {copied ? copy.copied : ""}
           </span>
         </div>
-
-        {/* the date on one line: day | month | year */}
-        {date && (
-          <p
-            className="mt-[22px] flex items-center justify-center gap-3 font-display font-semibold text-navy"
-            style={appear(5)}
-          >
-            <span className="text-[30px] leading-none">{date.day}</span>
-            <span aria-hidden className="h-6 w-px bg-gold-ink" />
-            <span className="text-[14px] uppercase tracking-[0.2em]">{date.month}</span>
-            <span aria-hidden className="h-6 w-px bg-gold-ink" />
-            <span className="text-[14px] tracking-[0.2em]">{date.year}</span>
-          </p>
-        )}
-
-        <span aria-hidden className="couple-rule mt-[14px]" style={appear(6)} />
-
-        {/* the full location — the pin above, then the venue, then the address; tap for directions */}
-        <a
-          href={directionsUrl(venue)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-[14px] flex min-h-[44px] max-w-full flex-col items-center px-2 font-display text-navy"
-          style={appear(6)}
-        >
-          <Icon name="pin" className="h-[22px] w-[22px] text-gold-ink" strokeWidth={1.6} />
-          <span className="mt-1 inline-flex max-w-full items-center gap-1.5 text-[18px] font-bold leading-snug [overflow-wrap:anywhere]">
-            {venue.name}
-            <Icon name="external" className="h-3.5 w-3.5 shrink-0 text-gold-ink" />
-          </span>
-          <span className="text-[15px] font-medium leading-snug text-slate [overflow-wrap:anywhere]">{venue.address}</span>
-        </a>
       </div>
 
       {/* whatever height is left goes here, as sky above the couple */}

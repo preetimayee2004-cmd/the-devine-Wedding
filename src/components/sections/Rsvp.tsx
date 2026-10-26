@@ -5,6 +5,7 @@ import { useElementSize } from "@/hooks/useElementSize";
 import { useInView } from "@/hooks/useInView";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
 import { acceptInvitation, BackendError, type Acceptance } from "@/lib/backend";
+import { RSVP_ACCEPTED } from "@/lib/rsvpEvents";
 import { downloadIcs, googleCalendarUrl, weddingCalendarItem } from "@/lib/calendar";
 import { Icon } from "@/components/art/Icons";
 import { TempleBells, TempleSilhouette } from "@/components/art/Temple";
@@ -90,6 +91,7 @@ export function Rsvp() {
       setPhase("leaving");
       if (!reduced) await pause(LEAVE);
       setPhase("open");
+      window.dispatchEvent(new Event(RSVP_ACCEPTED));
     } catch (e) {
       setError(e instanceof BackendError ? e.message : "Something went wrong. Please try again.");
       setPhase("idle");
@@ -130,7 +132,7 @@ export function Rsvp() {
         ) : (
           /* the pot on its chain, hung from the garland's flower, a drop falling now and then onto the Shivling */
           <div className="rs-in rs-pot-wrap" style={at(AT.trishul)} data-leaving={phase === "leaving" || undefined}>
-            <img className="rs-pot" src={wedding.assets.rsvpPot} alt="" aria-hidden draggable={false} width={180} height={299} />
+            <img className="rs-pot" src={wedding.assets.rsvpPot} alt="" aria-hidden draggable={false} width={80} height={140} />
             <span aria-hidden className="rs-drop" />
           </div>
         )}
@@ -142,10 +144,10 @@ export function Rsvp() {
               className="rs-shivling rs-in"
               style={at(AT.shivling)}
               src={wedding.assets.rsvpShivling}
-              alt="A Shivling with a bel leaf on top and the tripundra, water flowing from its spout"
+              alt="A Shivling with a bel leaf on top, the tripundra and a saffron tilak, water flowing from its spout"
               draggable={false}
-              width={310}
-              height={345}
+              width={160}
+              height={150}
             />
             <h2 id="rsvp-heading" className="rs-title rs-in" style={at(AT.title)}>
               {rsvp.title}

@@ -11,8 +11,8 @@ import { Reveal } from "@/components/ui/Reveal";
  *
  * The venue's route runs into a circular gold halo that draws itself slowly.
  * Within it, Shiv and Parvati, seated side by side with hands folded in prayer,
- * paint in through the watercolour bloom; the thank-you and a closing mantra
- * follow.
+ * paint in through the watercolour bloom; then the thank-you, which flows straight on into the
+ * love note (one finale: no separator between them, the mantra at its very end).
  */
 const HALO_DOTS = Array.from({ length: 12 }, (_, i) => {
   const a = (i / 12) * Math.PI * 2;
@@ -135,9 +135,6 @@ export function ThankYou() {
         className="mx-auto mt-3 max-w-[20rem] text-balance font-display text-[20px] font-medium italic leading-snug text-slate"
       >
         {personal(copy.messageFor, copy.message)}
-      </Reveal>
-      <Reveal show={seen} delay={at(1900)} as="p" className="mt-5 font-deva text-[21px] text-gold-ink">
-        <span lang="sa">{copy.mantra}</span>
       </Reveal>
     </section>
   );
