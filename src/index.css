@@ -1147,168 +1147,235 @@
     animation: rs-appear 400ms ease-out both;
   }
 
-  /* Blessing Wall — "Blessings of the Divine Union": one blessing on a keepsake scroll laid across
-     the page, two more as editorial blocks joined by a thin gold curve through a lotus; then "Leave a
-     Blessing" on the page itself. */
-  .bw-wall {
-    margin-top: 28px;
-  }
-  /* the scroll: paper between two slim rolled edges (gold-capped); it unrolls from its middle */
-  .bw-scroll {
+  /* Blessing Wall — on a hanging scroll: a roller at its head and at its foot (ivory paper rolled on
+     a gold rod, gold knobs past it), hung on a fine gold cord, warm-ivory paper between. It opens by
+     itself, once: the foot roller rolls down as the paper unrolls behind it. */
+  .bw-hang {
+    /* as wide as the screen allows (a little into the side margins), up to 372px */
+    --w: min(calc(100% + 2 * var(--gutter) - 16px), 372px);
     position: relative;
-    margin: 0 2px;
-    padding: 10px 0;
-    container-type: inline-size;
+    width: var(--w);
+    margin: 64px 0 16px calc((100% - var(--w)) / 2);
   }
-  .bw-paper {
-    position: relative;
-    margin: 0 9px;
-    padding: 30px 24px 26px;
-    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.55 0 0 0 0 0.42 0 0 0 0 0.22 0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"), linear-gradient(180deg, #fffbf3, #faf1df);
-    box-shadow:
-      inset 0 10px 14px -12px rgb(120 86 30 / 0.25),
-      inset 0 -10px 14px -12px rgb(120 86 30 / 0.25),
-      0 18px 30px -24px rgb(84 60 24 / 0.5);
-    text-align: center;
-  }
-  .bw-roll {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    z-index: 1;
-    width: 14px;
-    border-radius: 7px;
-    background: linear-gradient(90deg, #d9c49a, #fbf3df 38%, #fffaf0 50%, #e7d6b0 75%, #c2a874);
-    box-shadow: 0 4px 8px -4px rgb(84 60 24 / 0.45);
-  }
-  .bw-roll::before,
-  .bw-roll::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    width: 8px;
-    height: 7px;
-    margin-left: -4px;
-    border-radius: 3px;
-    background: linear-gradient(90deg, #9c7a3e, #e3c27e 50%, #9c7a3e);
-  }
-  .bw-roll::before {
-    top: -5px;
-  }
-  .bw-roll::after {
-    bottom: -5px;
-  }
-  .bw-roll-left {
-    left: 0;
-  }
-  .bw-roll-right {
-    right: 0;
-  }
-  .bw-seal {
-    display: block;
-    width: 38px;
-    height: 38px;
-    margin: 0 auto 6px;
-  }
-  /* the unrolling (once): the paper opens from its middle as the rolled edges travel out; then the
-     seal and the blessing fade in on it */
-  .bw-wall:not([data-shown]) .bw-scroll {
+  .bw-hang:not([data-shown]) {
     opacity: 0;
   }
-  .bw-wall[data-shown] .bw-scroll {
-    animation: bw-fade 300ms ease-out 450ms both;
+  .bw-hang[data-shown] {
+    animation: bw-fade 700ms ease-out 450ms both;
   }
-  .bw-wall[data-shown] .bw-paper {
-    animation: bw-unroll 900ms cubic-bezier(0.45, 0, 0.2, 1) 500ms both;
+  /* the cord: from the head roller up to a small gold ring */
+  .bw-cord {
+    position: absolute;
+    left: 6px;
+    right: 6px;
+    bottom: 100%;
+    height: 40px;
+    pointer-events: none;
   }
-  .bw-wall[data-shown] .bw-roll-left {
-    animation: bw-roll-left 900ms cubic-bezier(0.45, 0, 0.2, 1) 500ms both;
+  .bw-cord svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
   }
-  .bw-wall[data-shown] .bw-roll-right {
-    animation: bw-roll-right 900ms cubic-bezier(0.45, 0, 0.2, 1) 500ms both;
+  .bw-cord path {
+    fill: none;
+    stroke: #b89554;
+    stroke-width: 1.1;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
   }
-  .bw-wall[data-shown] .bw-seal,
-  .bw-wall[data-shown] .bw-paper-words,
-  .bw-wall[data-shown] .bw-quote-mark {
-    animation: bw-words 700ms ease-out 1250ms both;
+  .bw-cord-ring {
+    position: absolute;
+    left: 50%;
+    top: -11px;
+    width: 13px;
+    height: 13px;
+    margin-left: -6.5px;
+    border: 1.6px solid #b89554;
+    border-radius: 9999px;
+    background: rgb(255 250 240 / 0.6);
+  }
+  .bw-body {
+    position: relative;
+  }
+  .bw-roller {
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    height: 22px;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+  .bw-roller-top {
+    top: 0;
+  }
+  .bw-roller-bottom {
+    top: 100%;
+  }
+  /* the gold rod, its round knobs out past the paper */
+  .bw-rod {
+    position: absolute;
+    left: 3px;
+    right: 3px;
+    top: 50%;
+    height: 9px;
+    margin-top: -4.5px;
+    border-radius: 5px;
+    background: linear-gradient(180deg, #6e4f1c, #b48a3e 25%, #f0d896 45%, #c9a45c 65%, #7d5a22);
+  }
+  .bw-rod::before,
+  .bw-rod::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 15px;
+    height: 15px;
+    margin-top: -7.5px;
+    border-radius: 9999px;
+    background: radial-gradient(circle at 35% 30%, #fbecc0, #d4ad5f 45%, #8a6424);
+    box-shadow: 0 2px 4px -1px rgb(84 60 24 / 0.5);
+  }
+  .bw-rod::before {
+    left: -6px;
+  }
+  .bw-rod::after {
+    right: -6px;
+  }
+  /* the paper rolled on it, a fine gold band at each end */
+  .bw-roll {
+    position: absolute;
+    left: 9px;
+    right: 9px;
+    top: 0;
+    bottom: 0;
+    border-inline: 2px solid #c9a45c;
+    border-radius: 3px;
+    background: linear-gradient(180deg, #cdb789, #f5ead2 22%, #fffaf0 42%, #efe2c4 68%, #bfa676);
+    box-shadow: 0 5px 9px -5px rgb(84 60 24 / 0.5);
+  }
+  /* the paper: warm ivory, a faint grain, its edges softly shaded */
+  .bw-sheet {
+    position: relative;
+    z-index: 1;
+    margin: 0 12px;
+    padding: 42px 20px 40px;
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.55 0 0 0 0 0.42 0 0 0 0 0.22 0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+      linear-gradient(180deg, #fffbf3, #faf1df);
+    box-shadow:
+      inset 10px 0 12px -12px rgb(120 86 30 / 0.3),
+      inset -10px 0 12px -12px rgb(120 86 30 / 0.3),
+      inset 0 16px 14px -14px rgb(120 86 30 / 0.28),
+      inset 0 -16px 14px -14px rgb(120 86 30 / 0.28),
+      0 22px 34px -26px rgb(84 60 24 / 0.55);
+  }
+  /* rolled up: only a sliver of paper between the two rollers (the foot one fuller) */
+  .bw-hang[data-roll="closed"] .bw-sheet {
+    clip-path: inset(0 0 calc(100% - 20px) 0);
+  }
+  .bw-hang[data-roll="closed"] .bw-roller-bottom {
+    top: 20px;
+  }
+  .bw-hang[data-roll="closed"] .bw-roller-bottom .bw-roll {
+    transform: scaleY(1.3);
+  }
+  /* opening: the foot roller rolls down, the paper unrolling with it edge for edge */
+  .bw-hang[data-roll="opening"] .bw-sheet {
+    animation: bw-unroll 2600ms cubic-bezier(0.42, 0, 0.22, 1) both;
+  }
+  .bw-hang[data-roll="opening"] .bw-roller-bottom {
+    animation: bw-roll-down 2600ms cubic-bezier(0.42, 0, 0.22, 1) both;
+  }
+  .bw-hang[data-roll="opening"] .bw-roller-bottom .bw-roll {
+    animation: bw-roll-thin 2600ms cubic-bezier(0.42, 0, 0.22, 1) both;
   }
   @keyframes bw-unroll {
     from {
-      clip-path: inset(0 calc(50% - 2px));
+      clip-path: inset(0 0 calc(100% - 20px) 0);
     }
     to {
-      clip-path: inset(0);
+      clip-path: inset(0 0 0 0);
     }
   }
-  @keyframes bw-roll-left {
+  @keyframes bw-roll-down {
     from {
-      transform: translateX(calc(50cqw - 14px));
+      top: 20px;
+    }
+    to {
+      top: 100%;
     }
   }
-  @keyframes bw-roll-right {
+  @keyframes bw-roll-thin {
     from {
-      transform: translateX(calc(14px - 50cqw));
+      transform: scaleY(1.3);
     }
-  }
-  @keyframes bw-words {
-    from {
-      opacity: 0;
-      transform: translateY(6px);
+    to {
+      transform: none;
     }
-  }
-  /* a blessing just left takes the scroll: it simply fades in */
-  .bw-wall .bw-scroll[data-fresh] {
-    animation: bw-fade 900ms ease-out both;
-  }
-  .bw-wall .bw-scroll[data-fresh] .bw-paper,
-  .bw-wall .bw-scroll[data-fresh] .bw-roll,
-  .bw-wall .bw-scroll[data-fresh] .bw-seal,
-  .bw-wall .bw-scroll[data-fresh] .bw-paper-words,
-  .bw-wall .bw-scroll[data-fresh] .bw-quote-mark {
-    animation: none;
   }
   @keyframes bw-fade {
     from {
       opacity: 0;
     }
   }
-  /* reduced motion: no unrolling, all simply fades in */
-  .bw-wall[data-still][data-shown] .bw-paper,
-  .bw-wall[data-still][data-shown] .bw-roll,
-  .bw-wall[data-still][data-shown] .bw-seal,
-  .bw-wall[data-still][data-shown] .bw-paper-words,
-  .bw-wall[data-still][data-shown] .bw-quote-mark,
-  .bw-wall[data-still][data-shown] .bw-curve path,
-  .bw-wall[data-still][data-shown] .bw-curve-lotus {
-    animation: none;
+  @keyframes bw-rise {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
   }
-  .bw-wall[data-still][data-shown] .bw-scroll {
-    animation: bw-fade 400ms ease-out both;
+  /* a blessing on the scroll: a gold quotation mark, the words, the sender — left, right, left */
+  .bw-item {
+    text-align: left;
   }
-  .bw-quote-mark {
-    position: absolute;
-    left: 18px;
-    top: 8px;
+  .bw-item[data-side="right"] {
+    text-align: right;
+  }
+  .bw-item-text {
+    max-width: 90%;
+  }
+  .bw-item[data-side="right"] .bw-item-text {
+    margin-left: auto;
+  }
+  /* the sender on one line where it can */
+  .bw-item .bw-from {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+  }
+  .bw-item[data-fresh] {
+    animation: bw-fade 900ms ease-out both;
+  }
+  .bw-q {
+    display: block;
+    height: 24px;
     font-family: var(--font-display);
-    font-size: 96px;
+    font-size: 46px;
+    font-weight: 600;
     line-height: 1;
-    color: rgb(184 149 84 / 0.38);
-    pointer-events: none;
+    color: #b89554;
   }
-  .bw-featured-text {
-    position: relative;
+  .bw-item-text {
     display: -webkit-box;
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 9;
+    -webkit-line-clamp: 6;
     overflow: hidden;
     white-space: pre-line;
     font-family: var(--font-display);
-    font-size: 22px;
+    font-size: 20px;
     font-style: italic;
     font-weight: 500;
-    line-height: 1.42;
+    line-height: 1.38;
     color: rgb(var(--navy));
-    text-wrap: balance;
+    text-wrap: pretty;
+  }
+  .bw-divider {
+    display: block;
+    width: min(100%, 280px);
+    height: 22px;
+    margin: 20px auto;
   }
   /* the sender: small antique-gold capitals, after a short rule */
   .bw-from {
@@ -1326,89 +1393,6 @@
     margin: 0 8px 3px 0;
     vertical-align: middle;
     background: rgb(184 149 84 / 0.8);
-  }
-  /* the two beneath: editorial blocks — one set left, one right — a thin gold curve drawn between
-     them through a small lotus */
-  .bw-pair {
-    margin-top: 30px;
-  }
-  .bw-block {
-    width: 78%;
-  }
-  .bw-block-left {
-    text-align: left;
-  }
-  .bw-block-right {
-    margin-left: auto;
-    text-align: right;
-  }
-  .bw-link-curve {
-    position: relative;
-    height: 64px;
-    margin: 6px 0;
-  }
-  .bw-curve {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    overflow: visible;
-  }
-  .bw-curve path {
-    fill: none;
-    stroke: #b89554;
-    stroke-width: 1;
-    stroke-linecap: butt;
-    stroke-dasharray: 1 1;
-    stroke-dashoffset: 1;
-  }
-  .bw-wall[data-shown] .bw-curve path {
-    animation: bw-draw 550ms cubic-bezier(0.45, 0, 0.55, 1) 1650ms both;
-  }
-  .bw-wall[data-shown] .bw-curve path + path {
-    animation-delay: 2200ms;
-  }
-  .bw-wall[data-still] .bw-curve path {
-    stroke-dashoffset: 0;
-  }
-  .bw-curve-lotus {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 34px;
-    height: 23px;
-    margin: -14px 0 0 -17px;
-  }
-  .bw-wall[data-shown] .bw-curve-lotus {
-    animation: bw-words 500ms ease-out 2050ms both;
-  }
-  .bw-wall:not([data-shown]) .bw-curve-lotus {
-    opacity: 0;
-  }
-  .bw-secondary {
-    text-align: inherit;
-  }
-  .bw-quote-small {
-    display: block;
-    height: 22px;
-    font-family: var(--font-display);
-    font-size: 40px;
-    line-height: 1;
-    color: rgb(184 149 84 / 0.6);
-  }
-  .bw-secondary-text {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 7;
-    overflow: hidden;
-    white-space: pre-line;
-    font-family: var(--font-display);
-    font-size: 17px;
-    font-style: italic;
-    font-weight: 500;
-    line-height: 1.4;
-    color: rgb(var(--slate));
-    text-wrap: balance;
   }
   /* "View all wishes →": a fine gold underline that fills on hover, the arrow stepping on */
   .bw-link {
@@ -1487,18 +1471,66 @@
     border-color: #9a3b2e;
     box-shadow: 0 0 0 3px rgb(154 59 46 / 0.14);
   }
-  /* "Offer your blessing": deep navy (as the RSVP's buttons), warm ivory words, a thin antique-gold
-     edge, 10px corners */
-  .bw-send {
+  /* the box folds away once the blessing is saved (and opens again for another) */
+  .bw-fields {
+    display: grid;
+    grid-template-rows: 1fr;
+    transition:
+      grid-template-rows 700ms cubic-bezier(0.45, 0, 0.25, 1),
+      opacity 350ms ease-out;
+  }
+  .bw-fields > div {
+    min-height: 0;
+    margin: -4px;
+    padding: 4px;
+    overflow: hidden;
+  }
+  .bw-fields[data-gone] {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+  /* the button: a deep-navy pill (as the RSVP's buttons), a little gold lotus, a gold bead and line
+     either side */
+  .bw-send-row {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    width: 100%;
-    height: 50px;
+    gap: 8px;
     margin-top: 18px;
+  }
+  .bw-send-orn {
+    position: relative;
+    flex: 0 1 34px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #b89554);
+  }
+  .bw-send-orn::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 6px;
+    height: 6px;
+    margin-top: -3px;
     border: 1px solid #b89554;
-    border-radius: 10px;
+    background: #fffaf0;
+    transform: rotate(45deg);
+  }
+  .bw-send-orn-r {
+    transform: scaleX(-1);
+  }
+  .bw-send {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    height: 48px;
+    padding: 0 26px;
+    border: 1px solid #b89554;
+    border-radius: 9999px;
     background-color: rgb(var(--navy));
     color: #fff9ef;
     box-shadow:
@@ -1517,11 +1549,20 @@
       box-shadow 200ms ease,
       transform 150ms ease;
   }
-  .bw-send-arrow {
-    width: 16px;
-    height: 8px;
-    color: #d4b26e;
-    transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  /* the gold it turns into */
+  .bw-send::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    background: radial-gradient(circle at 50% 38%, #f6e2a6, #d8b25e 58%, #a8741f);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .bw-send-lotus {
+    width: 20px;
+    height: 14px;
+    color: #d9b25e;
   }
   @media (hover: hover) {
     .bw-send:not(:disabled):hover {
@@ -1532,15 +1573,9 @@
         0 14px 28px -14px rgb(18 41 74 / 0.85),
         0 0 0 3px rgb(184 149 84 / 0.18);
     }
-    .bw-send:not(:disabled):hover .bw-send-arrow {
-      transform: translateX(3px);
-    }
   }
   .bw-send:not(:disabled):active {
     background-color: #0c1d36;
-    box-shadow:
-      inset 0 2px 4px rgb(0 0 0 / 0.3),
-      0 6px 14px -10px rgb(18 41 74 / 0.7);
     transform: scale(0.98);
   }
   .bw-send:focus-visible {
@@ -1549,81 +1584,226 @@
   }
   .bw-send:disabled {
     cursor: progress;
-    opacity: 0.85;
   }
-  /* saved: the lotus draws itself, a fine rule opens, then the words */
-  .bw-done {
-    padding: 6px 0 4px;
+  /* tapped: it glows softly while the blessing is saved */
+  .bw-send-row[data-phase="sending"] .bw-send {
+    animation: bw-glow 1100ms ease-in-out infinite alternate;
   }
-  .bw-done-lotus path {
-    stroke-dasharray: 1;
-    stroke-dashoffset: 1;
-    animation: bw-draw 900ms cubic-bezier(0.45, 0, 0.25, 1) both;
-  }
-  .bw-done-lotus path:nth-child(2),
-  .bw-done-lotus path:nth-child(3) {
-    animation-delay: 120ms;
-  }
-  .bw-done-lotus path:nth-child(4),
-  .bw-done-lotus path:nth-child(5) {
-    animation-delay: 240ms;
-  }
-  .bw-done-lotus path:nth-child(6) {
-    animation-delay: 420ms;
-  }
-  @keyframes bw-draw {
-    to {
-      stroke-dashoffset: 0;
-    }
-  }
-  .bw-done-rule {
-    display: block;
-    width: 90px;
-    height: 1px;
-    margin: 10px auto 0;
-    background: linear-gradient(90deg, transparent, rgb(184 149 84 / 0.85), transparent);
-    animation: bw-rule 600ms cubic-bezier(0.22, 1, 0.36, 1) 500ms both;
-  }
-  @keyframes bw-rule {
+  @keyframes bw-glow {
     from {
-      transform: scaleX(0);
+      border-color: #b89554;
+      box-shadow:
+        inset 0 1px 0 rgb(255 249 239 / 0.12),
+        0 0 0 0 rgb(233 200 120 / 0),
+        0 12px 24px -14px rgb(18 41 74 / 0.8);
     }
+    to {
+      border-color: #ecd08a;
+      box-shadow:
+        inset 0 1px 0 rgb(255 249 239 / 0.22),
+        0 0 24px 5px rgb(233 200 120 / 0.55),
+        0 12px 24px -14px rgb(18 41 74 / 0.8);
+    }
+  }
+  /* saved: the pill draws in to a small golden circle and gives way to the lotus */
+  .bw-send-row[data-phase="sent"] .bw-send {
+    animation: bw-morph 760ms cubic-bezier(0.45, 0, 0.25, 1) both;
+  }
+  .bw-send-row[data-phase="sent"] .bw-send::after {
+    animation: bw-gild 760ms ease-out both;
+  }
+  .bw-send-row[data-phase="sent"] .bw-send-label,
+  .bw-send-row[data-phase="sent"] .bw-send-lotus,
+  .bw-send-row[data-phase="sent"] .bw-send-orn {
+    animation: bw-out 260ms ease-out both;
+  }
+  @keyframes bw-morph {
+    0% {
+      clip-path: inset(0 0 round 24px);
+    }
+    55% {
+      clip-path: inset(0 calc(50% - 24px) round 24px);
+      opacity: 1;
+      transform: none;
+    }
+    100% {
+      clip-path: inset(0 calc(50% - 24px) round 24px);
+      opacity: 0;
+      transform: scale(0.55);
+    }
+  }
+  /* gilded early, so the pill is gold (not a muddy mix) by the time it is a circle */
+  @keyframes bw-gild {
+    0%,
+    6% {
+      opacity: 0;
+    }
+    38%,
+    100% {
+      opacity: 1;
+    }
+  }
+  @keyframes bw-out {
+    to {
+      opacity: 0;
+    }
+  }
+  /* the golden lotus: a bud that slowly blooms over a soft glow, releasing a few golden motes */
+  .bw-bloom {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 80px;
+    height: 64px;
+    margin: -38px 0 0 -40px;
+    pointer-events: none;
+  }
+  .bw-bloom-glow {
+    position: absolute;
+    left: 50%;
+    top: 58%;
+    width: 130px;
+    height: 130px;
+    margin: -65px 0 0 -65px;
+    border-radius: 9999px;
+    background: radial-gradient(circle, rgb(246 226 166 / 0.75), rgb(246 226 166 / 0) 65%);
+    animation: bw-halo 2800ms ease-out 450ms both;
+  }
+  @keyframes bw-halo {
+    0% {
+      opacity: 0;
+      transform: scale(0.5);
+    }
+    40% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0.45;
+      transform: none;
+    }
+  }
+  .bw-bloom-lotus {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    transform-origin: 50% 78%;
+    filter: drop-shadow(0 3px 5px rgb(120 86 30 / 0.3));
+    animation: bw-bud 560ms cubic-bezier(0.22, 1, 0.36, 1) 420ms both;
+  }
+  @keyframes bw-bud {
+    from {
+      opacity: 0;
+      transform: scale(0.45);
+    }
+  }
+  .bw-petal {
+    transform-box: view-box;
+    transform-origin: 40px 50px;
+    animation: bw-open 1600ms cubic-bezier(0.22, 1, 0.36, 1) 820ms both;
+  }
+  .bw-petal-ol {
+    --r: 54deg;
+    --k: 0.7;
+  }
+  .bw-petal-or {
+    --r: -54deg;
+    --k: 0.7;
+  }
+  .bw-petal-sl {
+    --r: 22deg;
+    --k: 0.85;
+  }
+  .bw-petal-sr {
+    --r: -22deg;
+    --k: 0.85;
+  }
+  .bw-petal-c {
+    --r: 0deg;
+    --k: 0.84;
+  }
+  @keyframes bw-open {
+    from {
+      transform: rotate(var(--r)) scale(var(--k));
+    }
+  }
+  .bw-mote {
+    position: absolute;
+    left: 50%;
+    top: 55%;
+    width: var(--s);
+    height: var(--s);
+    margin: calc(var(--s) / -2) 0 0 calc(var(--s) / -2);
+    border-radius: 9999px;
+    background: radial-gradient(circle, #fff6d6, #e2bd62 60%, rgb(226 189 98 / 0));
+    box-shadow: 0 0 6px 1px rgb(240 210 130 / 0.7);
+    opacity: 0;
+    animation: bw-mote 2100ms cubic-bezier(0.2, 0.7, 0.3, 1) calc(1150ms + var(--d)) both;
+  }
+  @keyframes bw-mote {
+    0% {
+      opacity: 0;
+      transform: translate(0, 0) scale(0.4);
+    }
+    18% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translate(var(--x), var(--y)) scale(1);
+    }
+  }
+  /* then the thanks, where it was kept, and "Leave another blessing" */
+  .bw-done {
+    margin-top: 30px;
+    text-align: center;
   }
   .bw-done-thanks {
-    margin-top: 14px;
     font-family: var(--font-display);
-    font-size: 22px;
+    font-size: 21px;
     font-style: italic;
     font-weight: 500;
     line-height: 1.35;
     color: rgb(var(--navy));
-    animation: bw-rise 600ms cubic-bezier(0.22, 1, 0.36, 1) 700ms both;
+    text-wrap: balance;
+    animation: bw-rise 700ms cubic-bezier(0.22, 1, 0.36, 1) 2100ms both;
   }
   .bw-done-where {
     margin-top: 6px;
     font-family: var(--font-body);
     font-size: 12.5px;
     color: rgb(var(--slate) / 0.9);
-    animation: bw-rise 600ms cubic-bezier(0.22, 1, 0.36, 1) 850ms both;
+    animation: bw-rise 700ms cubic-bezier(0.22, 1, 0.36, 1) 2300ms both;
   }
   .bw-done-again {
-    margin-top: 14px;
-    animation: bw-rise 600ms cubic-bezier(0.22, 1, 0.36, 1) 1000ms both;
+    margin-top: 12px;
+    animation: bw-rise 700ms cubic-bezier(0.22, 1, 0.36, 1) 2500ms both;
   }
-  @keyframes bw-rise {
-    from {
-      opacity: 0;
-      transform: translateY(8px);
-    }
+  /* reduced motion: the scroll is simply open; a steady glow; the lotus simply there, open */
+  .bw-hang[data-still] .bw-fields {
+    transition: none;
   }
-  .bw-done[data-still] .bw-done-lotus path {
-    stroke-dashoffset: 0;
+  .bw-hang[data-still] .bw-send-row[data-phase="sending"] .bw-send {
+    animation: none;
+    box-shadow: 0 0 20px 4px rgb(233 200 120 / 0.5);
+  }
+  .bw-hang[data-still] .bw-send-row[data-phase="sent"] .bw-send,
+  .bw-hang[data-still] .bw-send-row[data-phase="sent"] .bw-send-orn {
+    animation: none;
+    opacity: 0;
+  }
+  .bw-hang[data-still] .bw-bloom-lotus {
+    animation: bw-fade 300ms ease-out both;
+  }
+  .bw-hang[data-still] .bw-petal {
     animation: none;
   }
-  .bw-done[data-still] .bw-done-rule,
-  .bw-done[data-still] .bw-done-thanks,
-  .bw-done[data-still] .bw-done-where,
-  .bw-done[data-still] .bw-done-again {
+  .bw-hang[data-still] .bw-mote,
+  .bw-hang[data-still] .bw-bloom-glow {
+    display: none;
+  }
+  .bw-hang[data-still] .bw-done > * {
     animation: bw-fade 300ms ease-out both;
   }
   /* all the blessings, in the sheet: each a short entry, a fine gold line between */
