@@ -391,10 +391,6 @@ export const wedding = {
         detail: "Ola, Uber, autos and e-rickshaws run all over the city. Show the driver the venue on the map.",
       },
     ]),
-    /** The little tip under the stops. */
-    pickupTip: "Guest pickup details will be shared on WhatsApp",
-    /** For a named guest, in two lines (the box hugs them). */
-    pickupTipFor: "{guest}, your pickup details\nwill be shared on WhatsApp",
   },
 
   /**
@@ -452,7 +448,7 @@ export const wedding = {
    * Personalised links: ?guest=Ananya (also ?to= or ?name=). The name greets the guest on the gate
    * (above "You're invited"), in the couple section, the countdown's line on and after the day, the
    * family's intro, the events' quote, the RSVP (its line, and the thanks once accepted), the
-   * blessing wall (the box, the signature and the thanks), the pickup tip, the contact intro, the
+   * blessing wall (the box, the signature and the thanks), the contact intro, the
    * thank-you, the love note and the browser tab; without one, those lines read as written for
    * anyone (each "…For" line has its plain twin beside it).
    */

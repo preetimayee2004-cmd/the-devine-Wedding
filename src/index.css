@@ -2139,21 +2139,6 @@
       transition: none;
     }
   }
-  .fw-tip {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 9px 16px;
-    border: 1px solid rgb(184 149 84 / 0.55);
-    border-radius: 20px;
-    background: rgb(255 251 242 / 0.8);
-    font-family: var(--font-body);
-    font-size: 12.5px;
-    line-height: 1.35;
-    /* a named guest's tip comes in two lines of its own */
-    white-space: pre-line;
-    color: rgb(var(--slate));
-  }
   /* Contact & Assistance — a small wedding directory, sized to fit one screen: the two families side
      by side under small gold arches on a soft cream ground, then two compact coordinator rows. */
   .ct-family {

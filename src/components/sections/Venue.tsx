@@ -1,6 +1,5 @@
 import { useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { wedding } from "@/config/wedding";
-import { usePersonal } from "@/context/GuestContext";
 import type { TravelPoint } from "@/config/types";
 import { useInView } from "@/hooks/useInView";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
@@ -23,15 +22,13 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
  * A Sacred Journey: by air, by rail, by road — editorial rows, each with a small line icon in a fine
  * gold ring, its gold label, the place, and its distance and time on one line; a fine gold line
  * between rows; a tap (or Enter) opens a row's detail, the chevron turning. A curved gold route runs
- * behind the icons from the first to the last, never under the words. Then a small tip: pickup
- * details come on WhatsApp.
+ * behind the icons from the first to the last, never under the words.
  *
  * As it is reached: the map fades in, the route draws itself, the icons follow a beat apart, the rows
  * rise in. Buttons are at least 48px tall. Reduced motion: plain fades, no ripple.
  */
 export function Venue() {
   const { venue, travel } = wedding;
-  const personal = usePersonal();
   const sectionRef = useRef<HTMLElement>(null);
   const travelRef = useRef<HTMLDivElement>(null);
   const seen = useInView(sectionRef, { threshold: 0.06 });
@@ -109,12 +106,6 @@ export function Venue() {
             <h3 className="fw-journey-title">A Sacred Journey</h3>
           </Reveal>
           <Journey points={travel.points} show={travelSeen} reduced={reduced} />
-          <Reveal show={travelSeen} delay={t(1200)} className="mt-5 flex justify-center">
-            <p className="fw-tip">
-              <Icon name="chat" className="h-4 w-4 shrink-0 text-gold-ink" strokeWidth={1.5} />
-              {personal(travel.pickupTipFor, travel.pickupTip)}
-            </p>
-          </Reveal>
         </div>
 
       </div>
