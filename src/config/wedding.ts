@@ -542,10 +542,17 @@ export const wedding = {
      * site's own sky (her lap and skirt and his right arm, which the cut-out left faint, made solid).
      */
     /**
-     * The couple's song: it starts from the gate's "Tap to open" (unless the guest turns the sound
-     * off there first), loops softly, and the corner's sound button pauses or resumes it.
+     * The couple's song — only its opening tune (the file keeps just its first 14s). It starts from
+     * the gate's "Tap to open" (unless the guest turns the sound off there first), and the corner's
+     * sound button pauses or resumes it.
      */
-    music: "/audio/parvati-boli-shankar-se.mp3",
+    music: "/audio/parvati-boli-shankar-se-intro.mp3",
+    /**
+     * Where the tune loops (seconds): it plays from the top once, then repeats between two of its own
+     * downbeats — the triple beat that comes every 2.909s — four phrases a time, so the join falls on
+     * the beat. To loop a longer or shorter stretch, keep both on a downbeat (1.032 + n × 2.909).
+     */
+    musicLoop: { start: 1.032, end: 12.67 },
     thankYouArt: "/art/shiva-parvati-prayer.webp",
     /**
      * Section 08 (RSVP). Before accepting: the kalash hanging on its chain and the Shivling beneath it,

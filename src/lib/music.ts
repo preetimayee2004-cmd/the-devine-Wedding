@@ -1,85 +1,139 @@
 import { wedding } from "@/config/wedding";
 
 /**
- * The couple's song (`assets.music`): one audio element for the whole page. It starts only from a
- * tap — the gate's "Tap to open" (or Skip), or the sound button — fading in, and loops; it fades out
- * when turned off, and rests while the page is hidden (resuming when it's back, if it was on). The
- * gate's own sound button decides, before the tap, whether the tap starts it.
+ * The couple's song — only its opening tune, looped for the whole visit (`assets.music`, trimmed to
+ * the opening, and `assets.musicLoop`). It plays from the top once, then loops seamlessly between two
+ * of the tune's own downbeats, so the join falls on the beat. Web Audio does the looping, sample-exact.
+ *
+ * It starts only from a tap — the gate's "Tap to open" (or Skip), or the sound button — fading in; it
+ * fades out when turned off, and rests while the page is hidden (resuming when it's back, if it was
+ * on). The file is fetched ahead at the gate, so a tap starts it at once.
  */
 type Listener = (playing: boolean) => void;
 
 const VOLUME = 0.6;
-const FADE_IN_MS = 1800;
-const FADE_OUT_MS = 500;
+const FADE_IN_S = 1.8;
+const FADE_OUT_S = 0.5;
 
-let audio: HTMLAudioElement | null = null;
+type AudioCtor = typeof AudioContext;
+
+let ctx: AudioContext | null = null;
+let gain: GainNode | null = null;
+let source: AudioBufferSourceNode | null = null;
+let bytes: Promise<ArrayBuffer | null> | null = null;
+let decoded: Promise<AudioBuffer | null> | null = null;
 /** The guest wants it on (the page being hidden doesn't change that). */
 let wanted = false;
-let frame = 0;
+let resting = 0;
 const listeners = new Set<Listener>();
 
 const tell = () => listeners.forEach((l) => l(wanted));
 
-function element(): HTMLAudioElement {
-  if (audio) return audio;
-  audio = new Audio(wedding.assets.music);
-  audio.loop = true;
-  audio.preload = "auto";
-  audio.volume = 0;
+/** The audio context and its volume — made on the first tap (a browser allows sound only then). */
+function context(): AudioContext | null {
+  if (ctx) return ctx;
+  const Ctor: AudioCtor | undefined =
+    window.AudioContext ?? (window as unknown as { webkitAudioContext?: AudioCtor }).webkitAudioContext;
+  if (!Ctor) return null;
+  // on an iPhone, play as music even with the ringer switched to silent (where the browser allows it)
+  const session = (navigator as Navigator & { audioSession?: { type: string } }).audioSession;
+  if (session) session.type = "playback";
+  ctx = new Ctor();
+  gain = ctx.createGain();
+  gain.gain.value = 0;
+  gain.connect(ctx.destination);
   document.addEventListener("visibilitychange", () => {
-    if (!audio || !wanted) return;
-    if (document.hidden) audio.pause();
-    else start();
+    if (!ctx || !wanted) return;
+    if (document.hidden) void ctx.suspend();
+    else void ctx.resume();
   });
-  return audio;
+  return ctx;
 }
 
-/** Glide the volume to `to` (on iOS the volume is fixed, so this simply waits). */
-function glide(to: number, ms: number, then?: () => void) {
-  const a = element();
-  cancelAnimationFrame(frame);
-  const from = a.volume;
-  const t0 = performance.now();
-  const step = (now: number) => {
-    const k = Math.min(1, (now - t0) / ms);
-    try {
-      a.volume = from + (to - from) * k;
-    } catch {
-      // a fixed volume — no matter
+/** Glide the volume to `to` over `seconds`. */
+function ramp(to: number, seconds: number) {
+  if (!ctx || !gain) return;
+  const now = ctx.currentTime;
+  gain.gain.cancelScheduledValues(now);
+  gain.gain.setValueAtTime(gain.gain.value, now);
+  gain.gain.linearRampToValueAtTime(to, now + seconds);
+}
+
+/**
+ * Smooth the loop's join: the last few milliseconds before its end are blended into the ones before
+ * its start, so when it jumps back the sound runs on without a click.
+ */
+function smoothJoin(buffer: AudioBuffer, from: number, to: number) {
+  const fade = Math.round(buffer.sampleRate * 0.03);
+  const a = Math.round(from * buffer.sampleRate);
+  const b = Math.round(to * buffer.sampleRate);
+  if (a - fade < 0 || b > buffer.length) return;
+  for (let c = 0; c < buffer.numberOfChannels; c++) {
+    const data = buffer.getChannelData(c);
+    for (let i = 0; i < fade; i++) {
+      const w = i / fade;
+      data[b - fade + i] = data[b - fade + i] * (1 - w) + data[a - fade + i] * w;
     }
-    if (k < 1) frame = requestAnimationFrame(step);
-    else then?.();
-  };
-  frame = requestAnimationFrame(step);
+  }
 }
 
-function start() {
-  const a = element();
-  const played = a.play();
-  glide(VOLUME, FADE_IN_MS);
-  // a browser that won't play (no tap yet, or no audio): it is simply off
-  played?.catch(() => {
-    wanted = false;
-    tell();
-  });
+/** It can't play here (no Web Audio, or the file failed): simply off. */
+function fail() {
+  wanted = false;
+  tell();
 }
 
-/** Load it ahead, so a tap starts it at once. */
+async function start() {
+  const ac = context();
+  if (!ac) return fail();
+  // resumed within the tap itself, as browsers require
+  void ac.resume();
+  if (!source) {
+    preloadMusic();
+    decoded ??= (bytes as Promise<ArrayBuffer | null>).then((data) =>
+      data ? new Promise<AudioBuffer>((done, failed) => ac.decodeAudioData(data, done, failed)).catch(() => null) : null,
+    );
+    const buffer = await decoded;
+    if (!buffer) return fail();
+    if (!source && gain) {
+      const { start: from } = wedding.assets.musicLoop;
+      const to = Math.min(wedding.assets.musicLoop.end, buffer.duration);
+      smoothJoin(buffer, from, to);
+      source = ac.createBufferSource();
+      source.buffer = buffer;
+      source.loop = true;
+      source.loopStart = from;
+      source.loopEnd = to;
+      source.connect(gain);
+      source.start();
+    }
+  }
+  if (wanted) ramp(VOLUME, FADE_IN_S);
+}
+
+/** Fetch the file ahead (no sound yet), so a tap starts it at once. */
 export function preloadMusic() {
-  element();
+  bytes ??= fetch(wedding.assets.music)
+    .then((r) => (r.ok ? r.arrayBuffer() : null))
+    .catch(() => null);
 }
 
 /** Start (or resume) the song — call it from a tap. */
 export function playMusic() {
   wanted = true;
+  clearTimeout(resting);
   tell();
-  start();
+  void start();
 }
 
 export function pauseMusic() {
   wanted = false;
   tell();
-  glide(0, FADE_OUT_MS, () => element().pause());
+  ramp(0, FADE_OUT_S);
+  clearTimeout(resting);
+  resting = window.setTimeout(() => {
+    if (!wanted) void ctx?.suspend();
+  }, FADE_OUT_S * 1000 + 60);
 }
 
 export const isMusicOn = () => wanted;
