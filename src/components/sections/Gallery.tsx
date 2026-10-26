@@ -18,9 +18,10 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 /**
  * Section 07 — "Our Gallery": the couple's photos as a heart.
  *
- * Fourteen photos of different sizes, the same thin antique-gold gap between all of them (and round
- * the heart's edge), together make a heart: its outline is the classic heart curve, each tile clipped
- * to it, so the edge is smooth; a faint, soft shadow under it. Seen the first time, the tiles fly
+ * Fourteen photos of different sizes, the same thin antique-gold gap between all of them, together
+ * make a heart inside a polished gold heart frame (the couple's picture of it, its white keyed away):
+ * each tile is clipped to the frame's inner outline, traced from the picture, and the frame lies over
+ * the photos' edge; a faint, soft shadow under it. Seen the first time, the tiles fly
  * in from the edges (turned up to ±15°, 70ms apart, about 1.4s) and settle with a little spring;
  * then the heart beats now and then, barely (a soft double beat, 1 → 1.012, every 3.2s).
  *
@@ -48,8 +49,8 @@ type Crop = readonly [x: number, y: number, w: number];
 type Shot = { photo: number; crop?: Crop };
 type Card = { faces: [Shot, Shot | null]; turns: number };
 
-/** The heart's height to its width. */
-const RATIO = 0.904;
+/** The heart's height to its width (the gold frame's opening). */
+const RATIO = 0.7582;
 /** The perspective, and the smallest tile's lift (px). */
 const PERSPECTIVE = 900;
 const LIFT = 40;
@@ -66,33 +67,73 @@ const FLIP_MS = 3000;
  * height), its photo (by `src`) and the crop of it. Five photos show twice, once as a close-up.
  */
 const TILES: readonly { box: readonly [number, number, number, number]; photo: string; crop: Crop }[] = [
-  { box: [0, 0.03, 0.25, 0.3], photo: "/photos/gallery-1.webp", crop: [0, 0.02, 1] },
+  { box: [0, 0, 0.25, 0.3], photo: "/photos/gallery-1.webp", crop: [0, 0.02, 1] },
   { box: [0.25, 0, 0.5, 0.3], photo: "/photos/gallery-4.webp", crop: [0, 0, 1] },
   { box: [0.5, 0, 0.75, 0.14], photo: "/photos/gallery-1.webp", crop: [0.075, 0.075, 0.7] },
   { box: [0.5, 0.14, 0.75, 0.3], photo: "/photos/gallery-2.webp", crop: [0, 0.08, 1] },
-  { box: [0.75, 0.03, 1, 0.3], photo: "/photos/gallery-6.webp", crop: [0, 0.05, 1] },
+  { box: [0.75, 0, 1, 0.3], photo: "/photos/gallery-6.webp", crop: [0, 0.05, 1] },
   { box: [0, 0.3, 0.3, 0.46], photo: "/photos/gallery-9.webp", crop: [0.05, 0.12, 0.9] },
   { box: [0, 0.46, 0.3, 0.62], photo: "/photos/gallery-5.webp", crop: [0.02, 0.07, 0.8] },
   { box: [0.3, 0.3, 0.7, 0.62], photo: "/photos/gallery-3.webp", crop: [0, 0.03, 1] },
   { box: [0.7, 0.3, 1, 0.46], photo: "/photos/gallery-8.webp", crop: [0.08, 0.25, 0.85] },
   { box: [0.7, 0.46, 1, 0.62], photo: "/photos/gallery-6.webp", crop: [0, 0.1, 1] },
-  { box: [0.19, 0.62, 0.4, 0.78], photo: "/photos/gallery-7.webp", crop: [0, 0.12, 1] },
-  { box: [0.4, 0.62, 0.6, 0.78], photo: "/photos/gallery-5.webp", crop: [0, 0.02, 1] },
-  { box: [0.6, 0.62, 0.81, 0.78], photo: "/photos/gallery-7.webp", crop: [0.3, 0.15, 0.65] },
-  { box: [0.358, 0.78, 0.642, 1], photo: "/photos/gallery-4.webp", crop: [0.12, 0.06, 0.75] },
+  { box: [0.08, 0.62, 0.36, 0.78], photo: "/photos/gallery-7.webp", crop: [0, 0.12, 1] },
+  { box: [0.36, 0.62, 0.64, 0.78], photo: "/photos/gallery-5.webp", crop: [0, 0.02, 1] },
+  { box: [0.64, 0.62, 0.93, 0.78], photo: "/photos/gallery-7.webp", crop: [0.3, 0.15, 0.65] },
+  { box: [0.26, 0.78, 0.77, 1], photo: "/photos/gallery-4.webp", crop: [0.2, 0.14, 0.75] },
 ];
 
-/** The classic heart curve, in the heart's box (0–1 each way), 240 points round. */
-const HEART = (() => {
-  const pts = Array.from({ length: 240 }, (_, i) => {
-    const t = (i / 240) * 2 * Math.PI;
-    return [16 * Math.sin(t) ** 3, 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)];
-  });
-  const ys = pts.map((p) => p[1]);
-  const [lo, hi] = [Math.min(...ys), Math.max(...ys)];
-  return pts.map(([x, y]) => [(x + 16) / 32, (hi - y) / (hi - lo)]);
-})();
-/** The heart as an SVG path in a 100 × 90.4 box, for the cream mount behind the tiles. */
+/**
+ * The gold frame's opening, in the heart's box (0–1 each way), 240 points round: traced from the
+ * frame picture (rays out from the opening's middle, 2px under the gold band, lightly smoothed).
+ */
+const HEART = (
+  "0.5057 0.2338,0.5097 0.2268,0.5140 0.2190,0.5190 0.2071,0.5245 0.1951,0.5305 0.1830," +
+  "0.5369 0.1708,0.5439 0.1574,0.5514 0.1460,0.5596 0.1339,0.5680 0.1234,0.5772 0.1114," +
+  "0.5870 0.0994,0.5969 0.0896,0.6073 0.0805,0.6182 0.0712,0.6294 0.0629,0.6413 0.0544," +
+  "0.6536 0.0466,0.6665 0.0387,0.6794 0.0324,0.6934 0.0253,0.7074 0.0197,0.7220 0.0143," +
+  "0.7366 0.0102,0.7524 0.0054,0.7676 0.0027,0.7832 0.0007,0.7987 0.0000,0.8144 0.0001," +
+  "0.8293 0.0022,0.8444 0.0051,0.8589 0.0095,0.8731 0.0150,0.8864 0.0222,0.8994 0.0303," +
+  "0.9110 0.0403,0.9221 0.0512,0.9324 0.0630,0.9418 0.0760,0.9505 0.0898,0.9587 0.1041," +
+  "0.9658 0.1192,0.9723 0.1349,0.9782 0.1510,0.9831 0.1676,0.9874 0.1845,0.9912 0.2016," +
+  "0.9939 0.2192,0.9961 0.2368,0.9978 0.2545,0.9988 0.2722,0.9994 0.2900,1.0000 0.3076," +
+  "0.9996 0.3252,0.9985 0.3428,0.9975 0.3602,0.9959 0.3775,0.9938 0.3947,0.9911 0.4117," +
+  "0.9884 0.4284,0.9846 0.4449,0.9824 0.4615,0.9808 0.4780,0.9784 0.4942,0.9756 0.5102," +
+  "0.9729 0.5261,0.9675 0.5413,0.9604 0.5559,0.9537 0.5702,0.9462 0.5841,0.9380 0.5973," +
+  "0.9299 0.6103,0.9219 0.6228,0.9131 0.6347,0.9044 0.6463,0.8952 0.6572,0.8860 0.6677," +
+  "0.8769 0.6780,0.8675 0.6876,0.8585 0.6972,0.8498 0.7068,0.8411 0.7160,0.8319 0.7244," +
+  "0.8233 0.7330,0.8143 0.7410,0.8053 0.7488,0.7963 0.7562,0.7877 0.7637,0.7790 0.7709," +
+  "0.7705 0.7782,0.7621 0.7853,0.7537 0.7923,0.7455 0.7994,0.7373 0.8064,0.7291 0.8131," +
+  "0.7209 0.8199,0.7127 0.8265,0.7045 0.8331,0.6964 0.8398,0.6882 0.8464,0.6802 0.8534," +
+  "0.6720 0.8602,0.6638 0.8669,0.6557 0.8742,0.6475 0.8816,0.6391 0.8886,0.6307 0.8961," +
+  "0.6223 0.9036,0.6135 0.9107,0.6048 0.9188,0.5958 0.9267,0.5868 0.9354,0.5776 0.9454," +
+  "0.5683 0.9556,0.5586 0.9655,0.5486 0.9768,0.5383 0.9889,0.5276 0.9975,0.5166 1.0000," +
+  "0.5056 0.9979,0.4947 0.9915,0.4840 0.9785,0.4737 0.9658,0.4637 0.9551,0.4542 0.9445," +
+  "0.4449 0.9345,0.4356 0.9269,0.4266 0.9184,0.4178 0.9107,0.4091 0.9034,0.4007 0.8956," +
+  "0.3925 0.8876,0.3844 0.8797,0.3765 0.8717,0.3685 0.8648,0.3606 0.8577,0.3526 0.8512," +
+  "0.3446 0.8449,0.3367 0.8384,0.3291 0.8314,0.3213 0.8249,0.3134 0.8185,0.3056 0.8120," +
+  "0.2977 0.8055,0.2891 0.8002,0.2807 0.7943,0.2727 0.7878,0.2645 0.7812,0.2562 0.7747," +
+  "0.2483 0.7675,0.2404 0.7601,0.2322 0.7528,0.2237 0.7457,0.2157 0.7378,0.2072 0.7301," +
+  "0.1985 0.7224,0.1897 0.7145,0.1805 0.7065,0.1709 0.6986,0.1617 0.6899,0.1522 0.6812," +
+  "0.1430 0.6718,0.1343 0.6617,0.1250 0.6517,0.1157 0.6411,0.1068 0.6300,0.0980 0.6185," +
+  "0.0893 0.6066,0.0809 0.5941,0.0744 0.5807,0.0663 0.5673,0.0587 0.5535,0.0517 0.5392," +
+  "0.0453 0.5244,0.0377 0.5096,0.0324 0.4939,0.0270 0.4780,0.0221 0.4618,0.0178 0.4452," +
+  "0.0141 0.4284,0.0102 0.4113,0.0077 0.3940,0.0049 0.3765,0.0028 0.3587,0.0011 0.3409," +
+  "0.0006 0.3230,0.0000 0.3049,0.0001 0.2868,0.0008 0.2687,0.0019 0.2505,0.0036 0.2325," +
+  "0.0063 0.2147,0.0095 0.1970,0.0137 0.1797,0.0186 0.1627,0.0244 0.1463,0.0308 0.1303," +
+  "0.0385 0.1150,0.0471 0.1007,0.0553 0.0861,0.0644 0.0724,0.0747 0.0601,0.0851 0.0479," +
+  "0.0957 0.0365,0.1082 0.0271,0.1215 0.0192,0.1349 0.0121,0.1495 0.0069,0.1647 0.0033," +
+  "0.1804 0.0010,0.1964 0.0003,0.2121 0.0002,0.2280 0.0015,0.2440 0.0043,0.2596 0.0076," +
+  "0.2749 0.0116,0.2902 0.0173,0.3051 0.0235,0.3193 0.0297,0.3334 0.0374,0.3468 0.0451," +
+  "0.3598 0.0535,0.3721 0.0619,0.3843 0.0718,0.3956 0.0810,0.4066 0.0916,0.4169 0.1015," +
+  "0.4276 0.1156,0.4371 0.1277,0.4463 0.1412,0.4548 0.1540,0.4632 0.1709,0.4702 0.1837," +
+  "0.4769 0.1964,0.4830 0.2099,0.4886 0.2233,0.4932 0.2311,0.4975 0.2360,0.5016 0.2381"
+)
+  .split(",")
+  .map((p) => p.split(" ").map(Number));
+/** The frame picture round the opening: its place and size, as % of the heart's box. */
+const FRAME = { left: "-6.35%", top: "-7.98%", width: "112.98%", height: "121.70%" };
+/** The heart as an SVG path in a 100 × 75.82 box, for the gold mount behind the tiles. */
 const HEART_PATH = `M${HEART.map(([x, y]) => `${(x * 100).toFixed(2)} ${(y * 100 * RATIO).toFixed(2)}`).join("L")}Z`;
 
 const area = (p: number[][]) =>
@@ -421,7 +462,7 @@ export function Gallery() {
           <div className="hc-beat">
             <div ref={tiltRef} className="hc-tilt">
               {/* the gilded mount: the gaps between the tiles, and a rim round the heart as thin as they are */}
-              <svg className="hc-mount" viewBox="0 0 100 90.4" preserveAspectRatio="none" aria-hidden>
+              <svg className="hc-mount" viewBox={`0 0 100 ${(100 * RATIO).toFixed(2)}`} preserveAspectRatio="none" aria-hidden>
                 <defs>
                   <linearGradient id="hc-gold" x1="0" y1="0" x2="1" y2="1">
                     <stop offset="0" stopColor="#d9bd82" />
@@ -432,6 +473,8 @@ export function Gallery() {
                 </defs>
                 <path d={HEART_PATH} />
               </svg>
+              {/* the polished gold heart frame, over the photos' edge (lifted above every tile) */}
+              <img aria-hidden className="hc-frame" src={gallery.heartFrame} alt="" draggable={false} style={FRAME} />
               {TILES.map((_, i) => {
                 const g = GEOMETRY[i];
                 const card = cards[i];

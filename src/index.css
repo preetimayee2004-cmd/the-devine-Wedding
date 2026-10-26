@@ -3553,17 +3553,19 @@
   }
 
   /* ── Section 07: Gallery — the photos as a heart ──
-     Fourteen tiles clipped to the heart curve, the same thin cream gap between all of them, in 900px of
+     Fourteen tiles clipped to the gold heart frame's opening, the same thin gold gap between all of them,
+     the polished frame over their edge, in 900px of
      perspective: each lifted off the heart by its size and drawn back to its place at rest, so a
      tilt shows the depth. Sized to the screen (20px from each edge, up to 440px) and in its own
      width units (cqw), so a real phone and the desktop's phone match. Transform and opacity. */
   .hc-wrap {
-    margin: 26px calc(20px - var(--gutter)) 0;
+    margin: 26px calc(8px - var(--gutter)) 0;
   }
+  /* the opening; the frame reaches past it (113% wide), so it fits the screen with 8px to spare */
   .hc {
     position: relative;
-    width: min(100%, 440px);
-    margin-inline: auto;
+    width: min(calc(100% / 1.13), 400px);
+    margin: 26px auto 36px;
     container-type: inline-size;
     perspective: 900px;
     touch-action: pan-y;
@@ -3573,7 +3575,7 @@
   }
   .hc-beat {
     position: relative;
-    aspect-ratio: 1000 / 904;
+    aspect-ratio: 1000 / 758.2;
     transform-style: preserve-3d;
   }
   /* the heartbeat, once the tiles are home — barely there: a soft double beat (1 → 1.012), then a
@@ -3622,6 +3624,20 @@
     stroke: url(#hc-gold);
     stroke-width: 1.8;
     stroke-linejoin: round;
+  }
+  /* the gold heart frame: lifted just above the highest tile (and scaled back to its place), so the
+     photos always pass under its band */
+  .hc-frame {
+    position: absolute;
+    max-width: none;
+    pointer-events: none;
+    user-select: none;
+    transform: translateZ(42px) scale(0.9533);
+    filter: drop-shadow(0 6px 10px rgb(84 60 24 / 0.22));
+    transition: opacity 700ms ease-out;
+  }
+  .hc[data-phase="before"] .hc-frame {
+    opacity: 0;
   }
   /* a tile: lifted by its size (--z) and drawn back to its place (--dx, --dy, --s) */
   .hc-tile {
