@@ -448,16 +448,11 @@ export const wedding = {
       "Thank you, {guest}, for being a part of our beautiful beginning. May the blessings of Mahadev always guide our journey.",
   },
 
-  /** Section 12 — the last page: a letter in a sacred envelope; the couple's names and the sign-off on its pocket. */
-  loveNote: {
-    eyebrow: "With love, blessed by Mahadev",
-    /** Above the letter's heading, for a guest named in the link only. */
-    greetingFor: "Dear {guest},",
-    title: "Two Souls. One Sacred Journey.",
-    message: "May your love find strength in Shiva, grace in Parvati, and blessings in every step of your journey together.",
-    closing: "Jai Mahadev",
-    /** The very last line of the invitation, under the envelope. */
-    mantra: "ॐ नमः शिवाय",
+  /** The footer — the last page, small and quiet: a blessing, the mantra, an emblem, the couple's initials. */
+  footer: {
+    blessing: "May the blessings of Mahadev and Maa Parvati guide your journey with love, harmony, and eternal happiness.",
+    mantra: "॥ हर हर महादेव ॥",
+    backToTop: "Back to Top",
   },
 
   /**
@@ -466,7 +461,7 @@ export const wedding = {
    * family's intro, the events' quote, the RSVP (its line, and the thanks and note once accepted),
    * the countdown's line over the numbers, the blessing wall (the box, the signature and the thanks),
    * the contact intro and closing line, the
-   * thank-you, the love note and the browser tab; without one, those lines read as written for
+   * thank-you and the browser tab; without one, those lines read as written for
    * anyone (each "…For" line has its plain twin beside it).
    */
   guest: {

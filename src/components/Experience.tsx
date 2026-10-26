@@ -10,14 +10,14 @@ import { BlessingWall } from "@/components/sections/BlessingWall";
 import { Venue } from "@/components/sections/Venue";
 import { Contact } from "@/components/sections/Contact";
 import { ThankYou } from "@/components/sections/ThankYou";
-import { LoveNote } from "@/components/sections/LoveNote";
+import { Footer } from "@/components/sections/Footer";
 import { SectionSeparator } from "@/components/ui/SectionSeparator";
 import { RsvpShortcut } from "@/components/ui/RsvpShortcut";
 
 /**
  * The whole guest journey, in order. The invitation plays the opening itself. Between the sections, a
  * ripple of the Ganga with a lotus, a diya or a shankh by turn (none between the Save the Date and the
- * couple section, which flow into each other, nor between the thank-you and the love note — one finale).
+ * couple section, which flow into each other,).
  */
 export function Experience() {
   return (
@@ -43,9 +43,9 @@ export function Experience() {
       <SectionSeparator ornament="diya" />
       <Contact />
       <SectionSeparator ornament="shankh" />
-      {/* the thank-you flows straight on into the love note: one finale */}
       <ThankYou />
-      <LoveNote />
+      <SectionSeparator ornament="lotus" />
+      <Footer />
       {/* the RSVP, a tap away from anywhere until it is accepted */}
       <RsvpShortcut />
     </>

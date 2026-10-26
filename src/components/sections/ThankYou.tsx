@@ -11,8 +11,7 @@ import { Reveal } from "@/components/ui/Reveal";
  *
  * The venue's route runs into a circular gold halo that draws itself slowly.
  * Within it, Shiv and Parvati, seated side by side with hands folded in prayer,
- * paint in through the watercolour bloom; then the thank-you, which flows straight on into the
- * love note (one finale: no separator between them, the mantra at its very end).
+ * paint in through the watercolour bloom; then the thank-you. The small footer follows.
  */
 const HALO_DOTS = Array.from({ length: 12 }, (_, i) => {
   const a = (i / 12) * Math.PI * 2;
