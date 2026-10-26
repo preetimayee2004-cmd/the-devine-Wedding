@@ -210,7 +210,7 @@ export function Rsvp() {
 
         {/* Nandi, just beneath the panel, facing straight forward */}
         <div className="rs-in" style={at(open ? AT.link + 300 : AT.nandi)}>
-          <img className="rs-nandi" src={wedding.assets.rsvpNandi} alt="Nandi seated facing forward, garlanded in marigolds, on a plinth over a small gold lotus" draggable={false} width={200} height={196} />
+          <img className="rs-nandi" src={wedding.assets.rsvpNandi} alt="Nandi seated facing forward in fine gold line, adorned with jewels and a drape, on a base of gold curls, flowers and a lotus" draggable={false} width={780} height={504} />
         </div>
       </div>
     </section>

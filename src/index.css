@@ -959,12 +959,13 @@
       width: 18px;
     }
   }
-  /* Nandi, in fine gold line, just beneath the panel (its plinth and lotus are its base) */
+  /* Nandi, in fine gold line, just beneath the panel, his horns close under it (his base of curls,
+     flowers and a lotus is the section's foot ornament) */
   .rs-nandi {
     display: block;
-    width: 132px;
+    width: min(52%, 196px);
     height: auto;
-    margin: 12px auto 0;
+    margin: 6px auto 0;
   }
   /* the garland across the top, between the bells */
   .rs-garland {
