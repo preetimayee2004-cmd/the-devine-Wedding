@@ -776,7 +776,7 @@
      comes in once at its --at; reduced motion ([data-still]) simply fades it all in. */
   /* before the scene opens, room below the button for the temples at the corners */
   .rs:not([data-open]) {
-    padding-bottom: 104px;
+    padding-bottom: 40px;
   }
   .rs-temple {
     position: absolute;
@@ -791,6 +791,173 @@
   .rs-temple-left {
     left: 6px;
     transform: scaleX(-1);
+  }
+  /* the invitation, after the couple's design: the gold trishul, the joined hands over a lotus, the
+     heading and its line, a lotus rule, then a gold-framed label round "Your presence is our blessing"
+     and the button; Nandi a little below; bel leaves faint at the edges, a garland across the top */
+  .rs {
+    isolation: isolate;
+  }
+  .rs-trishul {
+    display: block;
+    width: 40px;
+    height: auto;
+    margin: 0 auto;
+  }
+  .rs-hands {
+    display: block;
+    width: min(82%, 300px);
+    height: auto;
+    margin-top: 10px;
+  }
+  .rs-divider {
+    display: block;
+    width: 190px;
+    height: 19px;
+    margin-top: 16px;
+  }
+  .rs-label {
+    position: relative;
+    width: 100%;
+    max-width: 22rem;
+    margin: 22px auto 0;
+    padding: 26px 8px 24px;
+  }
+  .rs-label-art {
+    position: absolute;
+    inset: 0;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .rs-label-ground {
+    fill: rgb(255 251 242 / 0.6);
+  }
+  .rs-label-line {
+    stroke: #b89554;
+    stroke-width: 1;
+  }
+  .rs-label-art .rs-label-fine {
+    stroke: #c9a45c;
+    stroke-width: 0.7;
+    opacity: 0.85;
+  }
+  .rs-label-gap {
+    fill: #fbf6ec;
+  }
+  .rs-presence {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: var(--font-display);
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: rgb(var(--gold-ink));
+  }
+  .rs-spark {
+    flex: none;
+    width: 16px;
+    height: 10px;
+  }
+  .rs-join {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    margin-top: 16px;
+  }
+  .rs-sprig {
+    flex: none;
+    width: 22px;
+    height: 24px;
+  }
+  .rs-sprig-flip {
+    transform: scaleX(-1);
+  }
+  /* one line always, the sprigs beside it even on a narrow phone */
+  .rs-join .rs-btn {
+    padding: 0 18px;
+    letter-spacing: 0.13em;
+    white-space: nowrap;
+  }
+  @media (max-width: 374px) {
+    .rs-join .rs-btn {
+      padding: 0 14px;
+      letter-spacing: 0.1em;
+    }
+    .rs-sprig {
+      width: 18px;
+    }
+  }
+  /* Nandi, a little below the button, a soft shadow at its base */
+  .rs-nandi {
+    display: block;
+    width: 72px;
+    height: auto;
+    margin: 34px auto 0;
+    filter: drop-shadow(0 6px 6px rgb(18 41 74 / 0.16));
+  }
+  .rs-foot {
+    display: block;
+    width: 220px;
+    height: 25px;
+    margin: 14px auto 0;
+  }
+  /* the garland across the top, between the bells */
+  .rs-garland {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    width: 100%;
+    height: 34px;
+    pointer-events: none;
+  }
+  .rs-garland-flower {
+    position: absolute;
+    left: 50%;
+    top: 9px;
+    width: 22px;
+    height: 22px;
+    margin-left: -11px;
+    pointer-events: none;
+  }
+  /* bel leaves: faint, near the edges, swaying just a little */
+  .rs-bel-field {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .rs-bel {
+    position: absolute;
+    fill: #a9c4a4;
+    fill-opacity: 0.6;
+    stroke: #8fb08c;
+    stroke-width: 0.6;
+    stroke-opacity: 0.6;
+    rotate: var(--turn);
+    opacity: 0;
+  }
+  .rs[data-shown] .rs-bel {
+    animation:
+      rs-appear 1200ms ease-out var(--at) forwards,
+      rs-sway 7s ease-in-out var(--d) infinite alternate;
+  }
+  @keyframes rs-sway {
+    from {
+      transform: rotate(-4deg);
+    }
+    to {
+      transform: rotate(4deg);
+    }
+  }
+  .rs[data-still] .rs-bel {
+    animation: rs-appear 400ms ease-out forwards;
   }
   /* the arch and the couple: 3:4, the pillars' feet melting into the sky */
   .rs-art {

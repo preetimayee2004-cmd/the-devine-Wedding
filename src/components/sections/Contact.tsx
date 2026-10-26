@@ -1,7 +1,8 @@
-import { useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import { useRef, useState, type CSSProperties } from "react";
 import { wedding } from "@/config/wedding";
 import { usePersonal } from "@/context/GuestContext";
 import type { Coordinator, FamilyContact } from "@/config/types";
+import { useElementSize } from "@/hooks/useElementSize";
 import { useInView } from "@/hooks/useInView";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
 import { Icon } from "@/components/art/Icons";
@@ -141,32 +142,12 @@ function windowPath(w: number, h: number, i: number, open = false) {
   return `M${f(x0)} ${f(y1)}L${f(x0)} ${f(spring)}${left}${right}L${f(x1)} ${f(y1)}${open ? "" : "Z"}`;
 }
 
-/** The size of an element, kept up to date. */
-function useBox<T extends HTMLElement>() {
-  const ref = useRef<T>(null);
-  const [box, setBox] = useState<{ w: number; h: number } | null>(null);
-  useLayoutEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const measure = () => {
-      const { width: w, height: h } = el.getBoundingClientRect();
-      setBox((b) => (b && Math.abs(b.w - w) < 0.5 && Math.abs(b.h - h) < 0.5 ? b : { w, h }));
-    };
-    measure();
-    if (!("ResizeObserver" in window)) return;
-    const ro = new ResizeObserver(measure);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
-  return [ref, box] as const;
-}
-
 /**
  * One family's contact in a miniature palace window: the outline drawn to the window's own size (so
  * the arch never stretches), a parchment ground, a tiny lotus on the peak; the words and the button.
  */
 function FamilyWindow({ person, show, at, reduced }: { person: FamilyContact; show: boolean; at: number; reduced: boolean }) {
-  const [ref, box] = useBox<HTMLElement>();
+  const [ref, box] = useElementSize<HTMLElement>();
   const words = (ms: number) => at + (reduced ? 0 : ms);
   return (
     <article ref={ref} className="ct-window" aria-label={person.side} style={{ "--at": `${at}ms` } as CSSProperties}>

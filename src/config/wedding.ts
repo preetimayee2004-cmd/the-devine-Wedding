@@ -314,6 +314,8 @@ export const wedding = {
     message: "Your presence would make our celebration even more special.",
     /** The same, for a guest named in the link ({guest} is their name). */
     messageFor: "{guest}, your presence would make our celebration even more special.",
+    /** Over the button, in the gold-framed label. */
+    presence: "Your presence is our blessing",
     button: "Join the Celebration",
     /** Once accepted, over the scene: for a named guest, and for anyone. */
     thanksFor: "Thank you, {guest} — we can't wait to celebrate with you!",
@@ -526,6 +528,13 @@ export const wedding = {
      * site's own sky (her lap and skirt and his right arm, which the cut-out left faint, made solid).
      */
     thankYouArt: "/art/shiva-parvati-prayer.webp",
+    /**
+     * Section 08 (RSVP), from the couple's design: the gold trishul, and the joined hands over a lotus
+     * with vines (keyed off its page, 2x); and Nandi, seated in marigolds, below the button.
+     */
+    rsvpTrishul: "/art/rsvp-trishul.webp",
+    rsvpHands: "/art/rsvp-hands.webp",
+    rsvpNandi: "/art/rsvp-nandi.webp",
     /**
      * Section 08 (RSVP): Mahadev holding Maa Parvati close, eyes closed — the couple's chosen painting,
      * cut out of its red ground (the halo's arc and the corner flowers left behind) so it stands in the

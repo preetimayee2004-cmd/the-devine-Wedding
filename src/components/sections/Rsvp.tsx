@@ -1,6 +1,7 @@
-import { useMemo, useRef, useState, type CSSProperties } from "react";
+import { useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { wedding } from "@/config/wedding";
 import { useGuest, usePersonal } from "@/context/GuestContext";
+import { useElementSize } from "@/hooks/useElementSize";
 import { useInView } from "@/hooks/useInView";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
 import { acceptInvitation, BackendError, type Acceptance } from "@/lib/backend";
@@ -37,9 +38,12 @@ import { TempleBells, TempleSilhouette } from "@/components/art/Temple";
 const AT = {
   trishul: 0,
   rule: 320,
-  title: 520,
-  message: 660,
-  join: 820,
+  hands: 260,
+  title: 620,
+  message: 760,
+  divider: 900,
+  label: 1040,
+  nandi: 1400,
   pillars: 200,
   arch: 600,
   kalash: 1050,
@@ -106,54 +110,85 @@ export function Rsvp() {
       data-open={open || undefined}
     >
       <TempleBells />
+      <Garland />
+      <GarlandFlower />
+      <BelLeaves />
       <TempleSilhouette className="rs-temple rs-temple-left" />
       <TempleSilhouette className="rs-temple rs-temple-right" />
 
       <div className="relative mx-auto flex max-w-[22.5rem] flex-col items-center">
         <div className="rs-in" style={at(AT.trishul)}>
-          <Trishul />
+          <img className="rs-trishul" src={wedding.assets.rsvpTrishul} alt="" aria-hidden draggable={false} width={188} height={328} />
         </div>
-        <div className="rs-in" style={at(AT.rule)}>
-          <Rule />
-        </div>
+        {open && (
+          <div className="rs-in" style={at(AT.rule)}>
+            <Rule />
+          </div>
+        )}
 
         {!open ? (
           /* the invitation */
           <div className="rs-invite flex flex-col items-center" data-leaving={phase === "leaving" || undefined}>
+            <img
+              className="rs-hands rs-in"
+              style={at(AT.hands)}
+              src={wedding.assets.rsvpHands}
+              alt=""
+              aria-hidden
+              draggable={false}
+              width={788}
+              height={388}
+            />
             <h2 id="rsvp-heading" className="rs-title rs-in" style={at(AT.title)}>
               {rsvp.title}
             </h2>
             <p className="rs-message rs-in" style={at(AT.message)}>
               {personal(rsvp.messageFor, rsvp.message)}
             </p>
-            <div className="rs-in mt-7" style={at(AT.join)}>
-              <button
-                type="button"
-                className="rs-btn"
-                onClick={accept}
-                aria-disabled={phase !== "idle" || undefined}
-                data-phase={phase}
-              >
-                {phase === "sending" ? "Sending your joy…" : error ? "Try again" : rsvp.button}
-                <svg
-                  aria-hidden
-                  viewBox="0 0 20 10"
-                  className="rs-btn-arrow"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M1 5h17M14 1.5 18 5l-4 3.5" />
-                </svg>
-              </button>
+            <div className="rs-in" style={at(AT.divider)}>
+              <LotusDivider />
             </div>
-            {error && (
-              <p role="alert" className="mt-3 max-w-[18rem] text-[13.5px] leading-snug text-[#9a3b2e]">
-                We couldn't send your acceptance. {error}
-              </p>
-            )}
+
+            {/* the label: "Your presence is our blessing" and the button, in a fine gold frame */}
+            <div className="rs-in w-full" style={at(AT.label)}>
+              <Label>
+                <p className="rs-presence">
+                  <Spark />
+                  {rsvp.presence}
+                  <Spark />
+                </p>
+                <div className="rs-join">
+                  <Sprig />
+                  <button
+                    type="button"
+                    className="rs-btn"
+                    onClick={accept}
+                    aria-disabled={phase !== "idle" || undefined}
+                    data-phase={phase}
+                  >
+                    {phase === "sending" ? "Sending your joy…" : error ? "Try again" : rsvp.button}
+                    <svg
+                      aria-hidden
+                      viewBox="0 0 20 10"
+                      className="rs-btn-arrow"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M1 5h17M14 1.5 18 5l-4 3.5" />
+                    </svg>
+                  </button>
+                  <Sprig flip />
+                </div>
+                {error && (
+                  <p role="alert" className="mx-auto mt-3 max-w-[18rem] text-[13.5px] leading-snug text-[#9a3b2e]">
+                    We couldn't send your acceptance. {error}
+                  </p>
+                )}
+              </Label>
+            </div>
           </div>
         ) : (
           <Scene
@@ -165,6 +200,14 @@ export function Rsvp() {
             }
           />
         )}
+
+        {/* Nandi, a little below the button, gazing up toward Mahadev and Maa Parvati */}
+        <div className="rs-in" style={at(open ? AT.link + 300 : AT.nandi)}>
+          <img className="rs-nandi" src={wedding.assets.rsvpNandi} alt="Nandi, seated, garlanded in marigolds" draggable={false} width={174} height={242} />
+        </div>
+        <div className="rs-in" style={at(open ? AT.link + 450 : AT.nandi + 200)}>
+          <FootFlourish />
+        </div>
       </div>
     </section>
   );
@@ -312,31 +355,6 @@ function Arch() {
   );
 }
 
-/** Mahadev's trishul, in fine gold line. */
-function Trishul() {
-  return (
-    <svg
-      aria-hidden
-      viewBox="0 0 32 46"
-      className="mx-auto h-[52px] w-9"
-      fill="none"
-      stroke="#a8741f"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      {/* the middle blade, the two curving side prongs, the shaft */}
-      <path d="M16 2.5 13.6 9 16 15l2.4-6Z" fill="#c9a45c" fillOpacity="0.45" />
-      <path d="M16 15v29" />
-      <path d="M16 17.5c-6.2 0-9-4.2-8.6-11.5M16 17.5c6.2 0 9-4.2 8.6-11.5" />
-      <path d="M7.4 6 6 2.5 5.2 7.4M24.6 6 26 2.5l.8 4.9" />
-      {/* the binding where the prongs meet the shaft */}
-      <path d="M13.2 21h5.6M13.6 23.4h4.8" strokeWidth="1.1" />
-      <circle cx="16" cy="44" r="1" fill="#a8741f" stroke="none" />
-    </svg>
-  );
-}
-
 /** The fine gold rule under the trishul, a small ornament in its middle. */
 function Rule() {
   return (
@@ -352,6 +370,174 @@ function Rule() {
       <circle cx="72" cy="5" r="1.1" fill="#b89554" />
       <circle cx="88" cy="5" r="1.1" fill="#b89554" />
       <path d="M80 1.2 83.8 5 80 8.8 76.2 5Z" fill="#c9a45c" fillOpacity="0.45" stroke="#a8741f" strokeWidth="0.8" />
+    </svg>
+  );
+}
+
+/** A fine gold rule with a lotus in its middle and a bead either side. */
+function LotusDivider() {
+  return (
+    <svg aria-hidden viewBox="0 0 220 22" className="rs-divider" fill="none">
+      <path d="M8 13h82M130 13h82" stroke="#b89554" strokeOpacity="0.8" strokeWidth="0.8" />
+      <circle cx="96" cy="13" r="1.3" fill="#b89554" />
+      <circle cx="124" cy="13" r="1.3" fill="#b89554" />
+      <g fill="#e9d29a" fillOpacity="0.55" stroke="#a8741f" strokeWidth="0.8" strokeLinejoin="round">
+        <path d="M110 19C105.4 18.4 101.8 15.4 100.8 11 105.2 11.4 108.4 14.4 110 19Z" />
+        <path d="M110 19C114.6 18.4 118.2 15.4 119.2 11 114.8 11.4 111.6 14.4 110 19Z" />
+        <path d="M110 19C107.6 15.8 106.6 11.6 107.4 7.2 109.4 10.4 110.2 14.6 110 19Z" />
+        <path d="M110 19C112.4 15.8 113.4 11.6 112.6 7.2 110.6 10.4 109.8 14.6 110 19Z" />
+        <path d="M110 19C108.4 14.4 108.6 8.6 110 3 111.4 8.6 111.6 14.4 110 19Z" />
+      </g>
+      <path d="M104 20.6h12" stroke="#a8741f" strokeWidth="0.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/**
+ * The label round "Your presence is our blessing" and the button: a fine double gold line with
+ * notched corners (each a quarter circle cut in), a small gold flower breaking the top line in its
+ * middle, a faint cream ground — drawn to the label's own size, so its corners never stretch.
+ */
+function Label({ children }: { children: ReactNode }) {
+  const [ref, box] = useElementSize<HTMLDivElement>();
+  const frame = (w: number, h: number, i: number, r: number) => {
+    const f = (n: number) => n.toFixed(2);
+    const [x0, y0, x1, y1] = [i, i, w - i, h - i];
+    return (
+      `M${f(x0 + r)} ${f(y0)}H${f(x1 - r)}A${r} ${r} 0 0 0 ${f(x1)} ${f(y0 + r)}` +
+      `V${f(y1 - r)}A${r} ${r} 0 0 0 ${f(x1 - r)} ${f(y1)}H${f(x0 + r)}A${r} ${r} 0 0 0 ${f(x0)} ${f(y1 - r)}` +
+      `V${f(y0 + r)}A${r} ${r} 0 0 0 ${f(x0 + r)} ${f(y0)}Z`
+    );
+  };
+  return (
+    <div ref={ref} className="rs-label">
+      {box && (
+        <svg aria-hidden className="rs-label-art" width={box.w} height={box.h} viewBox={`0 0 ${box.w} ${box.h}`} fill="none">
+          <path d={frame(box.w, box.h, 0.75, 16)} className="rs-label-ground" />
+          <path d={frame(box.w, box.h, 0.75, 16)} className="rs-label-line" />
+          <path d={frame(box.w, box.h, 6.5, 13)} className="rs-label-line rs-label-fine" />
+          {/* the flower breaking the top line */}
+          <g transform={`translate(${box.w / 2} 0.75)`}>
+            <rect x="-17" y="-3" width="34" height="6" className="rs-label-gap" />
+            <path d="M-26 0H-14M14 0H26" stroke="#b89554" strokeWidth="0.8" />
+            <circle cx="-12" cy="0" r="1.1" fill="#b89554" />
+            <circle cx="12" cy="0" r="1.1" fill="#b89554" />
+            {[0, 60, 120, 180, 240, 300].map((a) => (
+              <ellipse key={a} cx="0" cy="-3.6" rx="1.7" ry="3.2" fill="#e2c27a" stroke="#a8741f" strokeWidth="0.6" transform={`rotate(${a})`} />
+            ))}
+            <circle r="1.6" fill="#a8741f" />
+          </g>
+        </svg>
+      )}
+      <div className="relative">{children}</div>
+    </div>
+  );
+}
+
+/** A small four-pointed gold spark, beside "Your presence is our blessing". */
+function Spark() {
+  return (
+    <svg aria-hidden viewBox="0 0 16 10" className="rs-spark" fill="#b08a46">
+      <path d="M8 1.2 9 4 11.8 5 9 6 8 8.8 7 6 4.2 5 7 4Z" />
+      <path d="M0.5 5H3.6M12.4 5H15.5" stroke="#b08a46" strokeWidth="0.7" />
+    </svg>
+  );
+}
+
+/** A small gold sprig beside the button: three petals on a curl, reaching away from it. */
+function Sprig({ flip = false }: { flip?: boolean }) {
+  return (
+    <svg aria-hidden viewBox="0 0 26 28" className={`rs-sprig${flip ? " rs-sprig-flip" : ""}`} fill="none">
+      <path d="M26 14C21 14 18 12 16 9" stroke="#b08a46" strokeWidth="0.8" strokeLinecap="round" />
+      <g fill="#e9d29a" fillOpacity="0.6" stroke="#a8741f" strokeWidth="0.7" strokeLinejoin="round">
+        <path d="M10 15C6.6 14.6 4 12.4 3.4 9.2 6.6 9.6 8.8 11.8 10 15Z" />
+        <path d="M10 15C10.2 11.6 12.4 9 15.6 8.4 15.2 11.6 13 13.8 10 15Z" />
+        <path d="M10 15C7.4 13.2 6.4 9.8 7.6 6.8 9.6 8.8 10.4 12 10 15Z" />
+        <path d="M10 15C6.6 15.4 4 17.6 3.4 20.8 6.6 20.4 8.8 18.2 10 15Z" />
+        <path d="M10 15C10.2 18.4 12.4 21 15.6 21.6 15.2 18.4 13 16.2 10 15Z" />
+      </g>
+      <circle cx="10" cy="15" r="1.2" fill="#a8741f" />
+    </svg>
+  );
+}
+
+/** A fine gold garland across the top, dipping gently to a small flower in the middle. */
+function Garland() {
+  return (
+    <svg aria-hidden viewBox="0 0 400 40" preserveAspectRatio="none" className="rs-garland" fill="none">
+      <path d="M40 2Q120 22 200 23Q280 22 360 2" stroke="#b89554" strokeOpacity="0.75" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+    </svg>
+  );
+}
+
+/** The small gold flower at the garland's middle. */
+function GarlandFlower() {
+  return (
+    <svg aria-hidden viewBox="-12 -12 24 24" className="rs-garland-flower">
+      {[0, 60, 120, 180, 240, 300].map((a) => (
+        <ellipse key={a} cx="0" cy="-5.6" rx="2.6" ry="4.8" fill="#e2c27a" stroke="#a8741f" strokeWidth="0.7" transform={`rotate(${a})`} />
+      ))}
+      <circle r="2.4" fill="#a8741f" />
+    </svg>
+  );
+}
+
+/**
+ * Bel leaves — Mahadev's own — scattered faintly near the edges: each a trifoliate leaf in soft sage,
+ * swaying just a little. Where each sits (% of the section), its size (px), its turn (deg).
+ */
+const BEL = [
+  [17, 6, 34, -20],
+  [74, 5, 28, 30],
+  [7, 15, 30, 40],
+  [87, 13, 36, -10],
+  [3, 31, 26, 10],
+  [90, 30, 30, 60],
+  [8, 46, 34, -30],
+  [89, 44, 26, 20],
+  [2, 62, 26, 50],
+  [92, 64, 30, -40],
+  [9, 76, 32, 15],
+  [86, 77, 28, -25],
+  [24, 87, 26, 35],
+  [74, 88, 30, -15],
+] as const;
+
+function BelLeaves() {
+  return (
+    <div aria-hidden className="rs-bel-field">
+      {BEL.map(([x, y, size, turn], i) => (
+        <svg
+          key={i}
+          viewBox="0 0 40 40"
+          className="rs-bel"
+          style={{ left: `${x}%`, top: `${y}%`, width: size, height: size, "--turn": `${turn}deg`, "--d": `${(i % 5) * -1.4}s`, "--at": `${300 + i * 60}ms` } as CSSProperties}
+        >
+          <path d="M20 22V38" stroke="#8aa88a" strokeWidth="0.9" strokeLinecap="round" />
+          <path d="M20 22C11.5 18 11 7 20 1 29 7 28.5 18 20 22Z" />
+          <path d="M20 22C14 28.5 3 27.5 0.8 19 7 12 17 13.5 20 22Z" />
+          <path d="M20 22C26 28.5 37 27.5 39.2 19 33 12 23 13.5 20 22Z" />
+          <path d="M20 21V5M19 22 5 19.5M21 22 35 19.5" stroke="#f2f6ef" strokeWidth="0.6" fill="none" />
+        </svg>
+      ))}
+    </div>
+  );
+}
+
+/** At the foot: fine gold curls sweeping out from a small lotus, a bead along each. */
+function FootFlourish() {
+  return (
+    <svg aria-hidden viewBox="0 0 260 30" className="rs-foot" fill="none">
+      <path d="M114 22C92 24 70 14 48 18 30 21 18 28 4 24M146 22C168 24 190 14 212 18 230 21 242 28 256 24" stroke="#b89554" strokeOpacity="0.85" strokeWidth="0.9" strokeLinecap="round" />
+      <path d="M4 24C8 20 13 21 13 25M256 24C252 20 247 21 247 25" stroke="#b89554" strokeOpacity="0.85" strokeWidth="0.9" strokeLinecap="round" />
+      <path d="M100 22.5 103 19.5 106 22.5 103 25.5ZM160 22.5 157 19.5 154 22.5 157 25.5Z" fill="#c9a45c" />
+      <g fill="#e9d29a" fillOpacity="0.55" stroke="#a8741f" strokeWidth="0.8" strokeLinejoin="round">
+        <path d="M130 27C124.6 26.4 120.4 22.8 119.2 17.6 124.4 18 128.2 21.6 130 27Z" />
+        <path d="M130 27C135.4 26.4 139.6 22.8 140.8 17.6 135.6 18 131.8 21.6 130 27Z" />
+        <path d="M130 27C127.2 23.2 126 18.2 127 13 129.4 16.8 130.2 21.8 130 27Z" />
+        <path d="M130 27C132.8 23.2 134 18.2 133 13 130.6 16.8 129.8 21.8 130 27Z" />
+        <path d="M130 27C128 21.6 128.2 14.8 130 8.2 131.8 14.8 132 21.6 130 27Z" />
+      </g>
     </svg>
   );
 }
