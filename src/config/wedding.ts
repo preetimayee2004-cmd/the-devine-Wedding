@@ -195,7 +195,7 @@ export const wedding = {
     sides: list<FamilySide>([
       {
         title: "The Bride's Family",
-        photo: { src: "/photos/family-bride.webp", alt: "The bride in red with her father and mother, walking arm in arm" },
+        photo: { src: "/photos/family-bride.webp", alt: "The bride in her bridal jewels, her mother kissing her cheek" },
         members: [
           { relation: "Parents", name: "Smt. Sunita & Shri Rakesh Kumar" },
           { relation: "Grandparents", name: "Smt. Kamla Devi & Shri Harinarayan" },
