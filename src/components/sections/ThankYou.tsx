@@ -10,8 +10,8 @@ import { Reveal } from "@/components/ui/Reveal";
  * Section 11 — blessed beginnings (PRD §4).
  *
  * The venue's route runs into a circular gold halo that draws itself slowly.
- * Within it, little Mahadev on Nandi paints in through the watercolour bloom —
- * his trishul rising past the ring — and the thank-you and a closing mantra
+ * Within it, Shiv and Parvati, seated side by side with hands folded in prayer,
+ * paint in through the watercolour bloom; the thank-you and a closing mantra
  * follow.
  */
 const HALO_DOTS = Array.from({ length: 12 }, (_, i) => {
@@ -103,7 +103,7 @@ export function ThankYou() {
             ))}
           </g>
         </svg>
-        {/* little Mahadev on Nandi, fading softly into the halo at the base; the trishul rises past the ring */}
+        {/* Shiv and Parvati in prayer, fading softly into the halo at the base; his crescent at the ring */}
         <div className="absolute inset-x-[7%] bottom-[7%] top-[4%] [mask-image:linear-gradient(#000_80%,transparent_99%)] [-webkit-mask-image:linear-gradient(#000_80%,transparent_99%)]">
           <div
             className="watercolor-reveal flex h-full items-end justify-center"
@@ -111,7 +111,7 @@ export function ThankYou() {
           >
             <img
               src={assets.thankYouArt}
-              alt="Little Mahadev riding Nandi, holding his trishul and damru"
+              alt="Shiva and Parvati seated side by side, hands folded in prayer"
               loading="lazy"
               decoding="async"
               className="block h-full w-full object-contain object-bottom"

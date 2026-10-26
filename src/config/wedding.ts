@@ -519,11 +519,11 @@ export const wedding = {
      */
     saveTheDateLayers: { back: "/art/painting-back.webp", figures: "/art/painting-figures.webp" },
     /**
-     * Section 11 (Thank You): little Mahadev riding Nandi, trishul and damru in hand — the couple's
-     * chosen picture, cut out of its Himalayan scene (the bun's top and Nandi's back, cropped by the
-     * picture, fade softly) so it stands in the gold halo on the site's own sky.
+     * Section 11 (Thank You): Shiv and Parvati seated side by side, hands folded in prayer — the
+     * couple's chosen painting, cut out of its Himalayan scene so they sit in the gold halo on the
+     * site's own sky (her lap and skirt and his right arm, which the cut-out left faint, made solid).
      */
-    thankYouArt: "/art/baby-shiva-nandi.webp",
+    thankYouArt: "/art/shiva-parvati-prayer.webp",
     /**
      * Section 08 (RSVP): Mahadev holding Maa Parvati close, eyes closed — the couple's chosen painting,
      * cut out of its red ground (the halo's arc and the corner flowers left behind) so it stands in the
