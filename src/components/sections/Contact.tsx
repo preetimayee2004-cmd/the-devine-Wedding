@@ -111,7 +111,7 @@ export function Contact() {
       {/* the closing line */}
       <div ref={closingRef} className="mt-10 text-center">
         <Reveal show={closingSeen} delay={t(100)} as="p" className="ct-closing">
-          {contact.closing}
+          {personal(contact.closingFor, contact.closing)}
         </Reveal>
         <Reveal show={closingSeen} delay={t(260)} className="mt-2 flex justify-center">
           <Lotus className="h-5 w-[30px]" />

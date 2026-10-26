@@ -236,6 +236,8 @@
     font-size: 18px;
     font-weight: 500;
     line-height: 1.3;
+    /* a long name in it wraps evenly */
+    text-wrap: balance;
     background: linear-gradient(90deg, #3d5576, #9a7432);
     -webkit-background-clip: text;
     background-clip: text;

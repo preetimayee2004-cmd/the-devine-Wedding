@@ -107,6 +107,8 @@ export const wedding = {
     labels: { days: "Days", hours: "Hours", minutes: "Minutes", seconds: "Seconds" },
     /** The line above the numbers. */
     lead: "Hamare vivah mein baaki hain",
+    /** The same, for a guest named in the link. */
+    leadFor: "{guest}, hamare vivah mein baaki hain",
     /** Read out for the wedding's date in the little calendar. */
     weddingDay: "wedding day",
     /** With the EN / हिं switch on हिं (the date and the calendar's month and days come from the date). */
@@ -115,6 +117,7 @@ export const wedding = {
       labels: { days: "दिन", hours: "घंटे", minutes: "मिनट", seconds: "सेकंड" },
       weddingDay: "विवाह का दिन",
       lead: "हमारे विवाह में बाकी हैं",
+      leadFor: "{guest}, हमारे विवाह में बाकी हैं",
       today: {
         title: "आज हमारा विवाह है",
         line: "महादेव के आशीर्वाद से, आज दो दिल एक हो रहे हैं।",
@@ -323,6 +326,11 @@ export const wedding = {
     blessing: "With the blessings of Mahadev and Maa Parvati, we look forward to celebrating this special occasion with you.",
     closing: "Har Har Mahadev",
     calendarButton: "Add to calendar",
+    /** Under the scene, once accepted: where the acceptance went (each with its twin for a named guest). */
+    reached: "Your acceptance has reached the family.",
+    reachedFor: "Your acceptance has reached the family, {guest}.",
+    tellFamily: "Please also let the family know you're coming.",
+    tellFamilyFor: "{guest}, please also let the family know you're coming.",
   },
 
   /** Section 09 — the blessing wall. Sample wishes show until real ones arrive. */
@@ -425,6 +433,7 @@ export const wedding = {
     ]),
     /** The closing line at the foot of the section. */
     closing: "We're just a call away.",
+    closingFor: "We're just a call away, {guest}.",
   },
 
   /** Section 11 — thank you. */
@@ -451,8 +460,9 @@ export const wedding = {
   /**
    * Personalised links: ?guest=Ananya (also ?to= or ?name=). The name greets the guest on the gate
    * (above "You're invited"), in the couple section, the countdown's line on and after the day, the
-   * family's intro, the events' quote, the RSVP (its line, and the thanks once accepted), the
-   * blessing wall (the box, the signature and the thanks), the contact intro, the
+   * family's intro, the events' quote, the RSVP (its line, and the thanks and note once accepted),
+   * the countdown's line over the numbers, the blessing wall (the box, the signature and the thanks),
+   * the contact intro and closing line, the
    * thank-you, the love note and the browser tab; without one, those lines read as written for
    * anyone (each "…For" line has its plain twin beside it).
    */

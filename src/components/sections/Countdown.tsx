@@ -150,7 +150,7 @@ export function Countdown() {
         ) : (
           state.phase === "counting" && (
             <Reveal show={seen} delay={at(1400)}>
-              <p className={`cd-lead ${hindi ? "font-deva" : "font-display italic"}`}>{words.lead}</p>
+              <p className={`cd-lead ${hindi ? "font-deva" : "font-display italic"}`}>{personal(words.leadFor, words.lead)}</p>
               <CountdownRow state={state} start={seen} reduced={reduced} after={at(1400)} />
             </Reveal>
           )

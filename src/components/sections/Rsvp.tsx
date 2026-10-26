@@ -202,8 +202,8 @@ export function Rsvp() {
             calendar={calendar}
             note={
               acceptance?.savedTo === "remote"
-                ? "Your acceptance has reached the family."
-                : "Please also let the family know you're coming."
+                ? personal(rsvp.reachedFor, rsvp.reached)
+                : personal(rsvp.tellFamilyFor, rsvp.tellFamily)
             }
           />
         )}
