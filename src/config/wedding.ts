@@ -54,8 +54,8 @@ export const wedding = {
     title: "Save the Date",
     blessing: "With the blessings of Mahadev and Maa Parvati, two hearts begin their sacred journey together.",
     request: "request the honour of your presence as they celebrate their union",
-    /** The date waits under a strip of gold foil to scratch away: its words, and the tap alternative beneath. */
-    scratchHint: "Scratch to reveal",
+    /** The date waits under an ornate label of gold foil to scratch away: its words, and the tap alternative beneath. */
+    scratchHint: "Gently scratch to reveal",
     tapToReveal: "or tap to reveal",
     /** The link at the foot of the card, under the blessing: it scrolls on to the next section. */
     viewInvitation: "View the Invitation",
@@ -75,7 +75,7 @@ export const wedding = {
       blessing: "महादेव और माँ पार्वती के आशीर्वाद से, दो हृदय अपनी पवित्र यात्रा आरंभ कर रहे हैं।",
       names: { bride: "प्रीति", groom: "शिवाशीष" },
       request: "अपने विवाह के शुभ अवसर पर आपकी गरिमामयी उपस्थिति की कामना करते हैं",
-      scratchHint: "खुरचें और देखें",
+      scratchHint: "हल्के से खुरचें और देखें",
       tapToReveal: "या स्पर्श करके देखें",
       venue: "कैलाश वाटिका, वाराणसी",
       viewInvitation: "निमंत्रण देखें",

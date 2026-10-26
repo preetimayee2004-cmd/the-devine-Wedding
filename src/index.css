@@ -2433,8 +2433,9 @@
     font-size: 17px;
   }
 
-  /* The Save the Date's date under a "Golden Veil" (ScratchReveal): a compact strip of antique-gold
-     foil to scratch away, "or tap to reveal" beneath. One box throughout, so nothing around it moves. */
+  /* The Save the Date's date under a "Golden Veil" (ScratchReveal): an ornate label of champagne-gold
+     foil (a cartouche with ogee ends) to scratch away, a gold hand pointing at it, "or tap to reveal"
+     and a small lotus rule beneath. One box throughout, so nothing around it moves. */
   .veil {
     display: flex;
     flex-direction: column;
@@ -2444,8 +2445,8 @@
     position: relative;
     display: grid;
     place-items: center;
-    width: 258px;
-    height: 44px;
+    width: 300px;
+    height: 46px;
   }
   .veil-stage > * {
     grid-area: 1 / 1;
@@ -2455,11 +2456,11 @@
     inset: 0;
     width: 100%;
     height: 100%;
-    border-radius: 4px;
     cursor: grab;
     /* scratching never scrolls the page */
     touch-action: none;
-    box-shadow: 0 3px 8px -5px rgb(110 76 24 / 0.5);
+    /* the shadow follows the label's shape */
+    filter: drop-shadow(0 3px 4px rgb(110 76 24 / 0.28));
   }
   .veil-foil:active {
     cursor: grabbing;
@@ -2476,43 +2477,70 @@
       opacity: 0;
     }
   }
-  /* a fingertip glides across, a few times, once the card shows; it rests at the first touch */
-  .veil-finger {
+  /* the gold hand at the right end: once the card shows, it rubs at the label a few times (its
+     sparkles twinkling), then rests; it leaves at the first touch */
+  .veil-hand {
     position: absolute;
-    left: 50%;
-    top: 58%;
+    right: -24px;
+    top: 50%;
     z-index: 1;
-    width: 20px;
-    height: 20px;
-    margin-left: -10px;
-    color: rgb(var(--navy));
-    opacity: 0;
+    width: 28px;
+    height: 28px;
+    margin-top: -6px;
+    color: #b38c4e;
     pointer-events: none;
-    filter: drop-shadow(0 1px 1px rgb(255 248 228 / 0.8));
+    filter: drop-shadow(0 1px 1px rgb(255 248 228 / 0.9));
+    transition: opacity 300ms ease;
   }
-  .veil-finger svg {
+  .veil-hand svg {
     width: 100%;
     height: 100%;
+    overflow: visible;
   }
-  .veil[data-shown] .veil-finger {
-    animation: veil-swipe 1700ms ease-in-out calc(var(--veil-at) + 900ms) 3 both;
+  .veil:not([data-shown]) .veil-hand {
+    opacity: 0;
   }
-  .veil[data-touched] .veil-finger {
-    display: none;
+  .veil[data-shown] .veil-hand {
+    animation: veil-rub 1500ms ease-in-out var(--veil-at) 3 both;
   }
-  @keyframes veil-swipe {
+  .veil[data-shown] .veil-sparks {
+    animation: veil-spark 750ms ease-in-out var(--veil-at) 6 both;
+  }
+  .veil[data-touched] .veil-hand,
+  .veil[data-lifting] .veil-hand {
+    opacity: 0;
+  }
+  @keyframes veil-rub {
     0% {
       opacity: 0;
-      transform: translateX(-62px) rotate(-8deg);
+      transform: none;
     }
-    18%,
-    72% {
-      opacity: 0.7;
+    15%,
+    55% {
+      opacity: 1;
+      transform: none;
+    }
+    35%,
+    75% {
+      transform: translate(-5px, -1.5px) rotate(-4deg);
     }
     100% {
-      opacity: 0;
-      transform: translateX(62px) rotate(6deg);
+      opacity: 1;
+      transform: none;
     }
+  }
+  @keyframes veil-spark {
+    0%,
+    100% {
+      opacity: 0.35;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+  .veil[data-still] .veil-hand,
+  .veil[data-still] .veil-sparks {
+    animation: none;
   }
   /* revealed: one faint gleam of gold across the date */
   .veil-gleam {
@@ -2532,6 +2560,12 @@
       transform: translateX(420%) skewX(-14deg);
     }
   }
+  .veil-rule {
+    display: block;
+    width: 110px;
+    height: 11px;
+    margin-top: 1px;
+  }
   /* the alternative for anyone who can't scratch */
   .veil-tap {
     min-height: 24px;
@@ -2539,9 +2573,10 @@
     padding: 2px 8px;
     border-radius: 6px;
     font-family: var(--font-display);
-    font-size: 13px;
+    font-size: 14px;
     font-style: italic;
-    color: rgb(var(--slate) / 0.9);
+    font-weight: 500;
+    color: rgb(var(--navy) / 0.85);
     text-decoration: underline dotted rgb(184 149 84 / 0.8);
     text-underline-offset: 3px;
     -webkit-tap-highlight-color: transparent;
