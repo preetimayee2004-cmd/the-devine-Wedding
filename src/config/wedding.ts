@@ -529,11 +529,13 @@ export const wedding = {
      */
     thankYouArt: "/art/shiva-parvati-prayer.webp",
     /**
-     * Section 08 (RSVP), from the couple's design: the gold trishul, and the joined hands over a lotus
-     * with vines (keyed off its page, 2x); and Nandi, seated in marigolds, below the button.
+     * Section 08 (RSVP). Before accepting: the pot hanging on its chain, the Shivling beneath it, and
+     * Nandi below the button (the couple's Shivling-theme picture, its page keyed away). Once
+     * accepted: the gold trishul from the couple's design (keyed off its page, 2x).
      */
     rsvpTrishul: "/art/rsvp-trishul.webp",
-    rsvpHands: "/art/rsvp-hands.webp",
+    rsvpPot: "/art/rsvp-pot.webp",
+    rsvpShivling: "/art/rsvp-shivling.webp",
     rsvpNandi: "/art/rsvp-nandi.webp",
     /**
      * Section 08 (RSVP): Mahadev holding Maa Parvati close, eyes closed — the couple's chosen painting,

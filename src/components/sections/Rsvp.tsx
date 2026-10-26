@@ -38,7 +38,7 @@ import { TempleBells, TempleSilhouette } from "@/components/art/Temple";
 const AT = {
   trishul: 0,
   rule: 320,
-  hands: 260,
+  shivling: 260,
   title: 620,
   message: 760,
   divider: 900,
@@ -117,27 +117,34 @@ export function Rsvp() {
       <TempleSilhouette className="rs-temple rs-temple-right" />
 
       <div className="relative mx-auto flex max-w-[22.5rem] flex-col items-center">
-        <div className="rs-in" style={at(AT.trishul)}>
-          <img className="rs-trishul" src={wedding.assets.rsvpTrishul} alt="" aria-hidden draggable={false} width={188} height={328} />
-        </div>
-        {open && (
-          <div className="rs-in" style={at(AT.rule)}>
-            <Rule />
+        {open ? (
+          <>
+            <div className="rs-in" style={at(AT.trishul)}>
+              <img className="rs-trishul" src={wedding.assets.rsvpTrishul} alt="" aria-hidden draggable={false} width={188} height={328} />
+            </div>
+            <div className="rs-in" style={at(AT.rule)}>
+              <Rule />
+            </div>
+          </>
+        ) : (
+          /* the pot on its chain, hung from the garland's flower, a drop falling now and then onto the Shivling */
+          <div className="rs-in rs-pot-wrap" style={at(AT.trishul)} data-leaving={phase === "leaving" || undefined}>
+            <img className="rs-pot" src={wedding.assets.rsvpPot} alt="" aria-hidden draggable={false} width={180} height={299} />
+            <span aria-hidden className="rs-drop" />
           </div>
         )}
 
         {!open ? (
           /* the invitation */
-          <div className="rs-invite flex flex-col items-center" data-leaving={phase === "leaving" || undefined}>
+          <div className="rs-invite flex w-full flex-col items-center" data-leaving={phase === "leaving" || undefined}>
             <img
-              className="rs-hands rs-in"
-              style={at(AT.hands)}
-              src={wedding.assets.rsvpHands}
-              alt=""
-              aria-hidden
+              className="rs-shivling rs-in"
+              style={at(AT.shivling)}
+              src={wedding.assets.rsvpShivling}
+              alt="A Shivling with a bel leaf on top and the tripundra, water flowing from its spout"
               draggable={false}
-              width={788}
-              height={388}
+              width={310}
+              height={345}
             />
             <h2 id="rsvp-heading" className="rs-title rs-in" style={at(AT.title)}>
               {rsvp.title}
@@ -203,7 +210,7 @@ export function Rsvp() {
 
         {/* Nandi, a little below the button, gazing up toward Mahadev and Maa Parvati */}
         <div className="rs-in" style={at(open ? AT.link + 300 : AT.nandi)}>
-          <img className="rs-nandi" src={wedding.assets.rsvpNandi} alt="Nandi, seated, garlanded in marigolds" draggable={false} width={174} height={242} />
+          <img className="rs-nandi" src={wedding.assets.rsvpNandi} alt="Nandi, seated, garlanded in marigolds" draggable={false} width={306} height={386} />
         </div>
         <div className="rs-in" style={at(open ? AT.link + 450 : AT.nandi + 200)}>
           <FootFlourish />

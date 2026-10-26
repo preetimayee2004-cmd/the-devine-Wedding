@@ -804,11 +804,76 @@
     height: auto;
     margin: 0 auto;
   }
-  .rs-hands {
+  /* the pot hangs from the garland's flower (its chain's top under the flower), swaying just a little */
+  .rs-pot-wrap {
+    position: relative;
+    margin-top: -44px;
+  }
+  .rs-pot {
     display: block;
-    width: min(82%, 300px);
+    width: 70px;
     height: auto;
-    margin-top: 10px;
+    transform-origin: 50% 0;
+  }
+  .rs[data-shown]:not([data-still]) .rs-pot {
+    animation: rs-pot-sway 5.5s ease-in-out infinite alternate;
+  }
+  @keyframes rs-pot-sway {
+    from {
+      transform: rotate(-1.4deg);
+    }
+    to {
+      transform: rotate(1.4deg);
+    }
+  }
+  .rs-pot-wrap[data-leaving] {
+    animation: rs-leave 320ms ease-in both;
+  }
+  /* a drop of water, now and then, from the pot's tip onto the Shivling */
+  .rs-drop {
+    position: absolute;
+    left: 50%;
+    top: 111px;
+    width: 5px;
+    height: 7px;
+    margin-left: -2.5px;
+    border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+    background: radial-gradient(circle at 40% 62%, #ffffff, #cfe3f2 55%, #93b6d3);
+    box-shadow: 0 0 2px rgb(18 41 74 / 0.25);
+    opacity: 0;
+  }
+  .rs[data-shown]:not([data-still]) .rs-drop {
+    animation: rs-drip 3.6s cubic-bezier(0.55, 0, 0.9, 0.45) 1.6s infinite;
+  }
+  @keyframes rs-drip {
+    0%,
+    30% {
+      opacity: 0;
+      transform: translateY(-3px) scale(0.4);
+    }
+    42% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    56% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    74% {
+      opacity: 0.9;
+      transform: translateY(26px) scale(1, 1.15);
+    }
+    78%,
+    100% {
+      opacity: 0;
+      transform: translateY(30px) scale(1.2, 0.6);
+    }
+  }
+  .rs-shivling {
+    display: block;
+    width: min(42%, 150px);
+    height: auto;
+    margin-top: 14px;
   }
   .rs-divider {
     display: block;
@@ -895,7 +960,7 @@
   /* Nandi, a little below the button, a soft shadow at its base */
   .rs-nandi {
     display: block;
-    width: 72px;
+    width: 84px;
     height: auto;
     margin: 34px auto 0;
     filter: drop-shadow(0 6px 6px rgb(18 41 74 / 0.16));
@@ -918,6 +983,7 @@
   }
   .rs-garland-flower {
     position: absolute;
+    z-index: 1;
     left: 50%;
     top: 9px;
     width: 22px;
