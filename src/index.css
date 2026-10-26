@@ -776,7 +776,7 @@
      comes in once at its --at; reduced motion ([data-still]) simply fades it all in. */
   /* before the scene opens, room below the button for the temples at the corners */
   .rs:not([data-open]) {
-    padding-bottom: 40px;
+    padding-bottom: 76px;
   }
   .rs-temple {
     position: absolute;
@@ -811,7 +811,7 @@
   }
   .rs-pot {
     display: block;
-    width: 70px;
+    width: 58px;
     height: auto;
     transform-origin: 50% 0;
   }
@@ -820,10 +820,10 @@
   }
   @keyframes rs-pot-sway {
     from {
-      transform: rotate(-1.4deg);
+      transform: rotate(-1deg);
     }
     to {
-      transform: rotate(1.4deg);
+      transform: rotate(1deg);
     }
   }
   .rs-pot-wrap[data-leaving] {
@@ -833,7 +833,7 @@
   .rs-drop {
     position: absolute;
     left: 50%;
-    top: 111px;
+    top: 91px;
     width: 5px;
     height: 7px;
     margin-left: -2.5px;
@@ -861,19 +861,20 @@
     }
     74% {
       opacity: 0.9;
-      transform: translateY(26px) scale(1, 1.15);
+      transform: translateY(19px) scale(1, 1.15);
     }
     78%,
     100% {
       opacity: 0;
-      transform: translateY(30px) scale(1.2, 0.6);
+      transform: translateY(22px) scale(1.2, 0.6);
     }
   }
+  /* the Shivling, the focal point: right beneath the pot's tip, static */
   .rs-shivling {
     display: block;
-    width: min(42%, 150px);
+    width: min(44%, 156px);
     height: auto;
-    margin-top: 14px;
+    margin-top: 16px;
   }
   .rs-divider {
     display: block;
@@ -903,8 +904,8 @@
   }
   .rs-label-art .rs-label-fine {
     stroke: #c9a45c;
-    stroke-width: 0.7;
-    opacity: 0.85;
+    stroke-width: 0.55;
+    opacity: 0.4;
   }
   .rs-label-gap {
     fill: #fbf6ec;
@@ -938,6 +939,7 @@
     flex: none;
     width: 22px;
     height: 24px;
+    opacity: 0.75;
   }
   .rs-sprig-flip {
     transform: scaleX(-1);
@@ -957,19 +959,12 @@
       width: 18px;
     }
   }
-  /* Nandi, a little below the button, a soft shadow at its base */
+  /* Nandi, in fine gold line, just beneath the panel (its plinth and lotus are its base) */
   .rs-nandi {
     display: block;
-    width: 84px;
+    width: 132px;
     height: auto;
-    margin: 34px auto 0;
-    filter: drop-shadow(0 6px 6px rgb(18 41 74 / 0.16));
-  }
-  .rs-foot {
-    display: block;
-    width: 220px;
-    height: 25px;
-    margin: 14px auto 0;
+    margin: 12px auto 0;
   }
   /* the garland across the top, between the bells */
   .rs-garland {
@@ -991,7 +986,7 @@
     margin-left: -11px;
     pointer-events: none;
   }
-  /* bel leaves: faint, near the edges, swaying just a little */
+  /* bel leaves: faint (15–25%), near the edges and corners, still */
   .rs-bel-field {
     position: absolute;
     inset: 0;
@@ -1001,29 +996,22 @@
   }
   .rs-bel {
     position: absolute;
-    fill: #a9c4a4;
-    fill-opacity: 0.6;
-    stroke: #8fb08c;
+    fill: #8fb48a;
+    stroke: #6f966b;
     stroke-width: 0.6;
-    stroke-opacity: 0.6;
     rotate: var(--turn);
     opacity: 0;
   }
   .rs[data-shown] .rs-bel {
-    animation:
-      rs-appear 1200ms ease-out var(--at) forwards,
-      rs-sway 7s ease-in-out var(--d) infinite alternate;
-  }
-  @keyframes rs-sway {
-    from {
-      transform: rotate(-4deg);
-    }
-    to {
-      transform: rotate(4deg);
-    }
+    animation: rs-bel-in 1200ms ease-out var(--at) forwards;
   }
   .rs[data-still] .rs-bel {
-    animation: rs-appear 400ms ease-out forwards;
+    animation: rs-bel-in 400ms ease-out forwards;
+  }
+  @keyframes rs-bel-in {
+    to {
+      opacity: var(--o);
+    }
   }
   /* the arch and the couple: 3:4, the pillars' feet melting into the sky */
   .rs-art {
@@ -1164,7 +1152,7 @@
   }
   /* the invitation: the heading, its line, the button; it fades away once the acceptance is saved */
   .rs-title {
-    margin-top: 18px;
+    margin-top: 8px;
     font-family: var(--font-display);
     font-size: 31px;
     font-weight: 500;

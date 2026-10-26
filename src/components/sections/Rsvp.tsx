@@ -208,12 +208,9 @@ export function Rsvp() {
           />
         )}
 
-        {/* Nandi, a little below the button, gazing up toward Mahadev and Maa Parvati */}
+        {/* Nandi, just beneath the panel, facing straight forward */}
         <div className="rs-in" style={at(open ? AT.link + 300 : AT.nandi)}>
-          <img className="rs-nandi" src={wedding.assets.rsvpNandi} alt="Nandi, seated, garlanded in marigolds" draggable={false} width={306} height={386} />
-        </div>
-        <div className="rs-in" style={at(open ? AT.link + 450 : AT.nandi + 200)}>
-          <FootFlourish />
+          <img className="rs-nandi" src={wedding.assets.rsvpNandi} alt="Nandi seated facing forward, garlanded in marigolds, on a plinth over a small gold lotus" draggable={false} width={200} height={196} />
         </div>
       </div>
     </section>
@@ -420,19 +417,18 @@ function Label({ children }: { children: ReactNode }) {
     <div ref={ref} className="rs-label">
       {box && (
         <svg aria-hidden className="rs-label-art" width={box.w} height={box.h} viewBox={`0 0 ${box.w} ${box.h}`} fill="none">
-          <path d={frame(box.w, box.h, 0.75, 16)} className="rs-label-ground" />
-          <path d={frame(box.w, box.h, 0.75, 16)} className="rs-label-line" />
-          <path d={frame(box.w, box.h, 6.5, 13)} className="rs-label-line rs-label-fine" />
+          <path d={frame(box.w, box.h, 0.75, 12)} className="rs-label-ground" />
+          <path d={frame(box.w, box.h, 0.75, 12)} className="rs-label-line" />
+          <path d={frame(box.w, box.h, 6, 9.5)} className="rs-label-line rs-label-fine" />
           {/* the flower breaking the top line */}
           <g transform={`translate(${box.w / 2} 0.75)`}>
-            <rect x="-17" y="-3" width="34" height="6" className="rs-label-gap" />
-            <path d="M-26 0H-14M14 0H26" stroke="#b89554" strokeWidth="0.8" />
-            <circle cx="-12" cy="0" r="1.1" fill="#b89554" />
-            <circle cx="12" cy="0" r="1.1" fill="#b89554" />
-            {[0, 60, 120, 180, 240, 300].map((a) => (
-              <ellipse key={a} cx="0" cy="-3.6" rx="1.7" ry="3.2" fill="#e2c27a" stroke="#a8741f" strokeWidth="0.6" transform={`rotate(${a})`} />
+            <rect x="-12" y="-3" width="24" height="6" className="rs-label-gap" />
+            <circle cx="-9" cy="0" r="0.8" fill="#b89554" />
+            <circle cx="9" cy="0" r="0.8" fill="#b89554" />
+            {[0, 72, 144, 216, 288].map((a) => (
+              <ellipse key={a} cx="0" cy="-2.7" rx="1.2" ry="2.3" fill="#ecd49c" stroke="#b08a46" strokeWidth="0.5" transform={`rotate(${a})`} />
             ))}
-            <circle r="1.6" fill="#a8741f" />
+            <circle r="1.1" fill="#b08a46" />
           </g>
         </svg>
       )}
@@ -490,35 +486,34 @@ function GarlandFlower() {
 }
 
 /**
- * Bel leaves — Mahadev's own — scattered faintly near the edges: each a trifoliate leaf in soft sage,
- * swaying just a little. Where each sits (% of the section), its size (px), its turn (deg).
+ * Bel leaves — Mahadev's own — kept near the edges and corners, clear of the words and the button:
+ * each a trifoliate leaf in soft sage, faint (15–25%). Where each sits (% of the section), its size
+ * (px), its turn (deg) and its opacity.
  */
 const BEL = [
-  [17, 6, 34, -20],
-  [74, 5, 28, 30],
-  [7, 15, 30, 40],
-  [87, 13, 36, -10],
-  [3, 31, 26, 10],
-  [90, 30, 30, 60],
-  [8, 46, 34, -30],
-  [89, 44, 26, 20],
-  [2, 62, 26, 50],
-  [92, 64, 30, -40],
-  [9, 76, 32, 15],
-  [86, 77, 28, -25],
-  [24, 87, 26, 35],
-  [74, 88, 30, -15],
+  [3, 8, 30, -20, 0.2],
+  [12, 17, 22, 40, 0.15],
+  [88, 9, 26, 30, 0.18],
+  [80, 17, 32, -10, 0.24],
+  [2, 32, 26, 10, 0.22],
+  [91, 31, 30, 60, 0.2],
+  [6, 47, 22, -30, 0.16],
+  [90, 49, 26, 20, 0.18],
+  [1, 64, 30, 50, 0.25],
+  [91, 66, 24, -40, 0.2],
+  [5, 80, 24, 15, 0.17],
+  [88, 82, 30, -25, 0.22],
 ] as const;
 
 function BelLeaves() {
   return (
     <div aria-hidden className="rs-bel-field">
-      {BEL.map(([x, y, size, turn], i) => (
+      {BEL.map(([x, y, size, turn, o], i) => (
         <svg
           key={i}
           viewBox="0 0 40 40"
           className="rs-bel"
-          style={{ left: `${x}%`, top: `${y}%`, width: size, height: size, "--turn": `${turn}deg`, "--d": `${(i % 5) * -1.4}s`, "--at": `${300 + i * 60}ms` } as CSSProperties}
+          style={{ left: `${x}%`, top: `${y}%`, width: size, height: size, "--turn": `${turn}deg`, "--o": o, "--at": `${300 + i * 60}ms` } as CSSProperties}
         >
           <path d="M20 22V38" stroke="#8aa88a" strokeWidth="0.9" strokeLinecap="round" />
           <path d="M20 22C11.5 18 11 7 20 1 29 7 28.5 18 20 22Z" />
@@ -528,23 +523,5 @@ function BelLeaves() {
         </svg>
       ))}
     </div>
-  );
-}
-
-/** At the foot: fine gold curls sweeping out from a small lotus, a bead along each. */
-function FootFlourish() {
-  return (
-    <svg aria-hidden viewBox="0 0 260 30" className="rs-foot" fill="none">
-      <path d="M114 22C92 24 70 14 48 18 30 21 18 28 4 24M146 22C168 24 190 14 212 18 230 21 242 28 256 24" stroke="#b89554" strokeOpacity="0.85" strokeWidth="0.9" strokeLinecap="round" />
-      <path d="M4 24C8 20 13 21 13 25M256 24C252 20 247 21 247 25" stroke="#b89554" strokeOpacity="0.85" strokeWidth="0.9" strokeLinecap="round" />
-      <path d="M100 22.5 103 19.5 106 22.5 103 25.5ZM160 22.5 157 19.5 154 22.5 157 25.5Z" fill="#c9a45c" />
-      <g fill="#e9d29a" fillOpacity="0.55" stroke="#a8741f" strokeWidth="0.8" strokeLinejoin="round">
-        <path d="M130 27C124.6 26.4 120.4 22.8 119.2 17.6 124.4 18 128.2 21.6 130 27Z" />
-        <path d="M130 27C135.4 26.4 139.6 22.8 140.8 17.6 135.6 18 131.8 21.6 130 27Z" />
-        <path d="M130 27C127.2 23.2 126 18.2 127 13 129.4 16.8 130.2 21.8 130 27Z" />
-        <path d="M130 27C132.8 23.2 134 18.2 133 13 130.6 16.8 129.8 21.8 130 27Z" />
-        <path d="M130 27C128 21.6 128.2 14.8 130 8.2 131.8 14.8 132 21.6 130 27Z" />
-      </g>
-    </svg>
   );
 }
