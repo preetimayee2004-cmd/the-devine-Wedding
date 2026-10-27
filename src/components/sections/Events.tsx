@@ -17,9 +17,9 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
  *
  * To the next: a tap on the arch, a swipe left, the › under it (‹ or a swipe right for the one
  * before), or a gold progress mark; after the last, the first. Untouched, they turn by themselves
- * every 4.5s while the arch is on screen (any turn starts the count again; it waits while the mouse
- * rests on the arch or the keyboard is in it, and a screen reader isn't told of these turns — only of
- * the guest's own; with reduced motion they wait for the guest). The change (0.8s; taps meanwhile
+ * every 4.5s while the arch is on screen, wherever the mouse is and with reduced motion too (any turn
+ * starts the count again; it waits only while the keyboard is in the arch or its controls, and a
+ * screen reader isn't told of these turns — only of the guest's own). The change (0.8s; taps meanwhile
  * are ignored): the ceremony shown fades out, its picture easing down a little (0.3s); a small
  * gold ornament glimmers where it stood; the next picture fades in, growing from 96% to 100%
  * (0.45s), and its words rise softly in just after. The progress marks move at once. The arch and
@@ -65,7 +65,7 @@ export function Events() {
   const swiped = useRef(0);
   const timers = useRef<number[]>([]);
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
-  // the turns wait while the mouse rests on the arch or the keyboard is in it
+  // the turns wait while the keyboard is in the arch or its controls
   const [hold, setHold] = useState(false);
   // the last turn was the guest's own (a screen reader is told of those only)
   const [byGuest, setByGuest] = useState(false);
@@ -94,7 +94,7 @@ export function Events() {
 
   // untouched, they turn by themselves while the arch is on screen; any turn starts the count again
   useEffect(() => {
-    if (!archSeen || reduced || hold || n < 2) return;
+    if (!archSeen || hold || n < 2) return;
     const id = window.setTimeout(() => {
       // mid-change (the guest's own, just now): count again
       if (busy.current) setTick((k) => k + 1);
@@ -102,7 +102,7 @@ export function Events() {
     }, AUTO_MS);
     return () => window.clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- go reads only refs and setters
-  }, [archSeen, reduced, hold, n, index, tick]);
+  }, [archSeen, hold, n, index, tick]);
 
   // a swipe on the arch: left for the next, right for the one before
   const onPointerDown = (e: PointerEvent) => (touch.current = { x: e.clientX, y: e.clientY });
@@ -151,9 +151,6 @@ export function Events() {
         onPointerDown={onPointerDown}
         onPointerUp={onPointerUp}
         onPointerCancel={() => (touch.current = null)}
-        // the mouse resting on the arch: the turns wait
-        onPointerEnter={(e) => e.pointerType === "mouse" && setHold(true)}
-        onPointerLeave={(e) => e.pointerType === "mouse" && setHold(false)}
       >
         {/* the arch with its flowers: still */}
         <img src={assets.eventsArch} alt="" width={ART.w} height={ART.h} draggable={false} className="ea-layer" />
