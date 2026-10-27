@@ -194,6 +194,12 @@ export function Rsvp() {
                   </button>
                   <Sprig flip />
                 </div>
+                {/* "Tap the button", until it is tapped (a failure says its own words instead) */}
+                {!error && (
+                  <p className="rs-hint" data-gone={phase !== "idle" || undefined} aria-hidden>
+                    {rsvp.hint}
+                  </p>
+                )}
                 {error && (
                   <p role="alert" className="mx-auto mt-3 max-w-[18rem] text-[13.5px] leading-snug text-[#9a3b2e]">
                     We couldn't send your acceptance. {error}

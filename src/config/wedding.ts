@@ -364,6 +364,8 @@ export const wedding = {
     /** Over the button, in the gold-framed label. */
     presence: "Your presence is our blessing",
     button: "Accept the Invitation",
+    /** Under the button, in the same label, until it is tapped. */
+    hint: "Tap the button",
     /** The small pill floating at the foot of the screen until the invitation is accepted. */
     shortcut: "RSVP",
     /** Once accepted, over the scene: for a named guest, and for anyone. */
