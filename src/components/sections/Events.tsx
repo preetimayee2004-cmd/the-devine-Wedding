@@ -187,7 +187,11 @@ function Card({ ceremony, role }: { ceremony: Ceremony; role: "rest" | "old" | "
   return (
     <div className="ev-card" data-role={role} aria-hidden={gone || undefined} aria-live={gone ? undefined : "polite"}>
       <div className="ev-figure">
-        <img src={ceremony.image.src} alt={gone ? "" : ceremony.image.alt} width={ceremony.image.width} height={ceremony.image.height} draggable={false} />
+        {ceremony.image ? (
+          <img src={ceremony.image.src} alt={gone ? "" : ceremony.image.alt} width={ceremony.image.width} height={ceremony.image.height} draggable={false} />
+        ) : (
+          <Jhoomar />
+        )}
       </div>
       <div className="ev-words">
         <h3 className="ev-name">{ceremony.name}</h3>
@@ -242,6 +246,51 @@ function Ornament() {
         <circle cx="16" cy="24" r="1" />
         <circle cx="104" cy="24" r="1" />
       </g>
+    </svg>
+  );
+}
+
+/**
+ * For a ceremony without its illustration yet: a small gold jhoomar — a crown, three tiers of fine
+ * gold strands hung with drops, a lotus at its foot — as festive as an evening reception.
+ */
+function Jhoomar() {
+  const drops = (y: number, xs: number[], r: number) =>
+    xs.map((x) => (
+      <g key={`${x}-${y}`}>
+        <path d={`M${x} ${y - 7}V${y - 2.2}`} stroke="#c9a45c" strokeWidth="0.6" />
+        <path
+          d={`M${x} ${y - 2.4}C${x - r} ${y + r * 0.6} ${x - r * 0.5} ${y + r * 1.6} ${x} ${y + r * 1.9} ${x + r * 0.5} ${y + r * 1.6} ${x + r} ${y + r * 0.6} ${x} ${y - 2.4}Z`}
+          fill="#f6e8c4"
+          stroke="#a8741f"
+          strokeWidth="0.7"
+        />
+      </g>
+    ));
+  return (
+    <svg aria-hidden viewBox="0 0 140 120" className="ev-jhoomar" fill="none" strokeLinecap="round" strokeLinejoin="round">
+      {/* the chain and the crown */}
+      <path d="M70 0V12" stroke="#a8741f" strokeWidth="0.9" />
+      <path d="M58 22C58 15 63 12 70 12 77 12 82 15 82 22Z" fill="#efdcae" stroke="#a8741f" strokeWidth="0.9" />
+      <circle cx="70" cy="10" r="2" fill="#e2c27a" stroke="#a8741f" strokeWidth="0.7" />
+      {/* three tiers, each a gold band with festoons and drops */}
+      <path d="M44 30C52 26 88 26 96 30" stroke="#a8741f" strokeWidth="1" />
+      <path d="M44 30Q57 40 70 30 83 40 96 30" stroke="#c9a45c" strokeWidth="0.7" />
+      <path d="M30 52C42 46 98 46 110 52" stroke="#a8741f" strokeWidth="1" />
+      <path d="M30 52Q44 64 58 53Q70 62 82 53Q96 64 110 52" stroke="#c9a45c" strokeWidth="0.7" />
+      <path d="M40 76C50 71 90 71 100 76" stroke="#a8741f" strokeWidth="1" />
+      <path d="M40 76Q55 87 70 77 85 87 100 76" stroke="#c9a45c" strokeWidth="0.7" />
+      <path d="M58 22 44 30M82 22 96 30M44 30 30 52M96 30 110 52M30 52 40 76M110 52 100 76" stroke="#c9a45c" strokeWidth="0.6" opacity="0.8" />
+      {drops(42, [50, 70, 90], 2.6)}
+      {drops(65, [36, 58, 82, 104], 2.8)}
+      {drops(89, [50, 70, 90], 3)}
+      {/* the lotus at its foot */}
+      <g fill="#ecd49c" fillOpacity="0.75" stroke="#a8741f" strokeWidth="0.75">
+        <path d="M70 115C67.6 111.6 67.6 107.6 70 103.6 72.4 107.6 72.4 111.6 70 115Z" />
+        <path d="M70 115C65.8 114.5 62.6 112 61.8 108.2 65.8 108.6 68.8 111.2 70 115Z" />
+        <path d="M70 115C74.2 114.5 77.4 112 78.2 108.2 74.2 108.6 71.2 111.2 70 115Z" />
+      </g>
+      <path d="M70 96.5V103" stroke="#a8741f" strokeWidth="0.8" />
     </svg>
   );
 }

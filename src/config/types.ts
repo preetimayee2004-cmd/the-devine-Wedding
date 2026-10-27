@@ -26,8 +26,11 @@ export interface Ceremony {
   time: string;
   venue: string;
   dressCode: string;
-  /** The couple dressed for it: a cut-out (transparent background), with its pixel size. */
-  image: { src: string; width: number; height: number; alt: string };
+  /**
+   * The couple dressed for it: a cut-out (transparent background), with its pixel size. Without one,
+   * the arch shows a small gold jhoomar in its place until the illustration comes.
+   */
+  image?: { src: string; width: number; height: number; alt: string };
   /** The illustration's artist, shown small under the arch while this card is up (optional). */
   credit?: string;
 }

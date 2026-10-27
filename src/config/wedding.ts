@@ -184,6 +184,14 @@ export const wedding = {
         dressCode: "Pastels and gold",
         image: { src: "/art/events/wedding.webp", width: 433, height: 640, alt: "The bride and groom in blush pink and gold, walking hand in hand" },
       },
+      {
+        name: "Reception",
+        date: "Saturday, 13 February 2027",
+        time: "7:30 PM",
+        venue: "The Grand Lawn, Kailash Vatika",
+        dressCode: "Evening formal",
+        // no illustration yet: a gold jhoomar shows in the arch until one is added here
+      },
     ]),
   },
 
