@@ -157,7 +157,7 @@ export const wedding = {
         time: "10:00 AM",
         venue: "Kailash Vatika, Varanasi",
         dressCode: "Reds and yellows",
-        image: { src: "/art/events/ganesh-pujan.webp", width: 345, height: 440, alt: "Lord Ganesha seated, blessing, in saffron and gold" },
+        image: { src: "/art/events/ganesh-pujan.svg", width: 200, height: 256, alt: "Lord Ganesha seated, in a gold crown and a saffron dhoti, holding two saffron buds" },
       },
       {
         name: "Haldi",
