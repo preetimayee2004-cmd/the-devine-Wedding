@@ -354,7 +354,7 @@ export function OpeningGate({ seal, sky, invited, guest, label, devanagari = fal
       {/* ── below it, a small gold diamond line, and the invitation to open it ── */}
       <div className="flex flex-col items-center self-start pt-6">
         <SealRule className="gate-words relative" />
-        <p className={`gate-hint gate-ivory relative mt-2.5 ${devanagari ? "font-deva text-[15px]" : `${words} text-[12.5px] tracking-[0.34em]`}`}>
+        <p className={`gate-hint gate-ivory relative mt-3 ${devanagari ? "font-deva text-[16px]" : `${words} !font-bold text-[14px] tracking-[0.3em]`}`}>
           <span className="gate-pulse">{label}</span>
         </p>
       </div>

@@ -4672,7 +4672,30 @@
       transform 300ms ease-out,
       opacity 600ms ease-out;
   }
-  /* "Tap to open": a gentle pulse */
+  /* "Tap to open": it sits low, on the brightest clouds, so a soft navy glow (no edge, not a button)
+     lies behind the ivory words, with a deeper shadow; and a gentle pulse that never fades it much */
+  .gate-hint {
+    isolation: isolate;
+    padding: 4px 0;
+  }
+  .gate-hint::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: 50%;
+    top: 50%;
+    width: calc(100% + 72px);
+    height: 52px;
+    border-radius: 9999px;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(closest-side, rgb(22 36 60 / 0.5), rgb(22 36 60 / 0.24) 58%, rgb(22 36 60 / 0));
+    pointer-events: none;
+  }
+  .gate-hint.gate-ivory {
+    text-shadow:
+      0 1px 2px rgb(14 24 44 / 0.85),
+      0 0 10px rgb(14 24 44 / 0.5);
+  }
   .gate-pulse {
     display: inline-block;
     animation: gate-pulse 3.2s ease-in-out infinite;
@@ -4683,7 +4706,7 @@
       opacity: 1;
     }
     50% {
-      opacity: 0.65;
+      opacity: 0.82;
     }
   }
 
