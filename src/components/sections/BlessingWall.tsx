@@ -18,14 +18,15 @@ import { Sheet } from "@/components/ui/Sheet";
  * ends), warm-ivory paper between. When it comes into view it opens by itself, once: the foot roller
  * rolls down and the paper unrolls behind it. On the paper: three blessings — a gold quotation mark,
  * the words in italic serif, the sender in small gold capitals after a short rule — set left, right,
- * left, a fine gold lotus divider between; "View all wishes →" (every blessing, in the sheet); a
+ * left, a fine gold lotus divider between; "View all wishes →", a glass pill (every blessing, in the sheet); a
  * small lotus rule; "Leave a Blessing", the wish box and a navy pill button with a little lotus.
  *
  * Tapped, with a few good words: the button glows softly while the blessing is saved. Only once it
  * is: the box folds away, the button draws in to a small golden circle and becomes a golden lotus,
- * which slowly blooms, releasing a few delicate golden motes; then the thanks and where it was kept —
+ * which slowly blooms, releasing a few delicate golden motes and a handful of golden hearts that rise
+ * softly and fade; then the thanks and where it was kept —
  * and the new blessing takes the scroll's first place. A failed send keeps the words and offers to
- * try again. "Leave another blessing" brings the box back. Reduced motion: the scroll is simply
+ * try again. "Leave another blessing" (a glass pill too) brings the box back. Reduced motion: the scroll is simply
  * open, and the lotus simply appears, open.
  */
 type SendState =
@@ -169,9 +170,9 @@ export function BlessingWall() {
             ))}
 
             <div className="mt-7 flex justify-center">
-              <button type="button" onClick={() => setViewAll(true)} className="bw-link">
-                <span className="bw-link-text">View all wishes</span>
-                <svg aria-hidden viewBox="0 0 20 10" className="bw-link-arrow" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
+              <button type="button" onClick={() => setViewAll(true)} className="bw-glass">
+                <span>View all wishes</span>
+                <svg aria-hidden viewBox="0 0 20 10" className="bw-glass-arrow" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M1 5h17M14 1.5 18 5l-4 3.5" />
                 </svg>
               </button>
@@ -239,16 +240,19 @@ export function BlessingWall() {
                 <p className="bw-done-where">
                   {backendMode === "remote" ? "It has been sent to the couple, with love." : "It is kept on this phone, with love."}
                 </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setState({ kind: "idle" });
-                    requestAnimationFrame(() => textRef.current?.focus());
-                  }}
-                  className="bw-link bw-done-again"
-                >
-                  <span className="bw-link-text">Leave another blessing</span>
-                </button>
+                <div className="bw-done-again">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setState({ kind: "idle" });
+                      requestAnimationFrame(() => textRef.current?.focus());
+                    }}
+                    className="bw-glass"
+                  >
+                    <SendLotus className="bw-glass-lotus" />
+                    <span>Leave another blessing</span>
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -325,9 +329,9 @@ function WishDivider() {
 }
 
 /** The little lotus on the button. */
-function SendLotus() {
+function SendLotus({ className = "bw-send-lotus" }: { className?: string }) {
   return (
-    <svg aria-hidden viewBox="0 0 24 16" className="bw-send-lotus" fill="none" stroke="currentColor" strokeWidth="1.1" strokeLinejoin="round" strokeLinecap="round">
+    <svg aria-hidden viewBox="0 0 24 16" className={className} fill="none" stroke="currentColor" strokeWidth="1.1" strokeLinejoin="round" strokeLinecap="round">
       <path d="M12 13.5C10 10.6 10 6.6 12 2.6 14 6.6 14 10.6 12 13.5Z" />
       <path d="M12 13.5C9 13 6.6 10.8 6 7.6 9 8 11.2 10.4 12 13.5Z" />
       <path d="M12 13.5C15 13 17.4 10.8 18 7.6 15 8 12.8 10.4 12 13.5Z" />
@@ -351,8 +355,23 @@ const MOTES = [
 ] as const;
 
 /**
+ * Golden hearts that rise from the lotus as it opens, swaying a little: where each drifts to (px), its
+ * delay (ms), its size (px), how long it rises (ms) and how far it sways (px).
+ */
+const HEARTS = [
+  [-34, -96, 0, 13, 2600, 7],
+  [6, -124, 180, 16, 2900, -8],
+  [38, -88, 340, 12, 2500, 6],
+  [-14, -146, 520, 11, 3000, 7],
+  [26, -150, 700, 13, 3100, -6],
+  [-46, -60, 820, 10, 2300, -5],
+  [48, -54, 960, 10, 2300, 5],
+] as const;
+
+/**
  * The golden lotus the button becomes: a closed bud that slowly blooms — outer petals, side petals and
- * the centre opening from its base — over a soft glow, releasing a few golden motes.
+ * the centre opening from its base — over a soft glow, releasing a few golden motes and, as it opens,
+ * a handful of golden hearts that rise softly and fade.
  */
 function Bloom() {
   const id = useId().replace(/:/g, "");
@@ -366,6 +385,12 @@ function Bloom() {
             <stop offset="0.55" stopColor="#d8b25e" />
             <stop offset="1" stopColor="#a8741f" />
           </linearGradient>
+          {/* the hearts' gold: light at the top left, deeper below */}
+          <linearGradient id={`${id}-h`} x1="0.2" y1="0" x2="0.8" y2="1">
+            <stop offset="0" stopColor="#fbecbf" />
+            <stop offset="0.5" stopColor="#e2b85a" />
+            <stop offset="1" stopColor="#b07c22" />
+          </linearGradient>
         </defs>
         <g fill={`url(#${id}-p)`} stroke="#9c6b1e" strokeWidth="0.8" strokeLinejoin="round">
           <path className="bw-petal bw-petal-ol" d="M40 50C29 50 17 44 11 33 22 31 33 37 40 50Z" />
@@ -378,6 +403,24 @@ function Bloom() {
       </svg>
       {MOTES.map(([x, y, d, s], i) => (
         <span key={i} className="bw-mote" style={{ "--x": `${x}px`, "--y": `${y}px`, "--d": `${d}ms`, "--s": `${s}px` } as CSSProperties} />
+      ))}
+      {HEARTS.map(([x, y, d, s, ms, sway], i) => (
+        <span
+          key={i}
+          className="bw-heart"
+          style={{ "--x": `${x}px`, "--y": `${y}px`, "--d": `${d}ms`, "--s": `${s}px`, "--ms": `${ms}ms`, "--sway": `${sway}px` } as CSSProperties}
+        >
+          <svg viewBox="0 0 24 22" className="bw-heart-shape">
+            <path
+              d="M12 21C11.2 20.3 2 13.6 2 7.4 2 4 4.6 1.5 7.6 1.5c2 0 3.5 1.1 4.4 2.6.9-1.5 2.4-2.6 4.4-2.6 3 0 5.6 2.5 5.6 5.9 0 6.2-9.2 12.9-10 13.6Z"
+              fill={`url(#${id}-h)`}
+              stroke="#a8741f"
+              strokeWidth="0.9"
+              strokeLinejoin="round"
+            />
+            <path d="M6.2 5.2c-1 .6-1.6 1.6-1.6 2.8" fill="none" stroke="#fff8e2" strokeOpacity="0.85" strokeWidth="1.2" strokeLinecap="round" />
+          </svg>
+        </span>
       ))}
     </span>
   );
