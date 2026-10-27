@@ -4203,6 +4203,82 @@
       opacity: 1;
     }
   }
+  /* until the first tap: a hand on the big middle photo, tapping gently (1.8s), a soft gold ring
+     rippling from its fingertip at each press; it fades in once the tiles are home, out at the first
+     tap. Its fingertip sits at (65.5%, 58.5%) of the heart: the photo's lower right corner, on the steps. */
+  .hc-hand {
+    position: absolute;
+    z-index: 5;
+    left: 65.5%;
+    top: 58.5%;
+    width: 9.5cqw;
+    height: 11.6cqw;
+    margin: -0.6cqw 0 0 -4.4cqw;
+    pointer-events: none;
+    opacity: 0;
+    filter: drop-shadow(0 3px 4px rgb(40 28 10 / 0.35));
+    transition: opacity 500ms ease;
+  }
+  .hc-hand[data-shown] {
+    opacity: 1;
+  }
+  .hc-hand[data-gone] {
+    opacity: 0;
+  }
+  .hc-hand svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    transform-origin: 46% 10%;
+    animation: hc-hand-tap 1.8s ease-in-out infinite;
+  }
+  @keyframes hc-hand-tap {
+    0%,
+    30%,
+    100% {
+      transform: none;
+    }
+    40% {
+      transform: translateY(2px) scale(0.9);
+    }
+    52% {
+      transform: none;
+    }
+  }
+  .hc-hand-ring {
+    position: absolute;
+    left: 46%;
+    top: 6%;
+    width: 7cqw;
+    height: 7cqw;
+    margin: -3.5cqw 0 0 -3.5cqw;
+    border: 1.5px solid rgb(255 244 214 / 0.95);
+    border-radius: 9999px;
+    box-shadow: 0 0 6px rgb(255 226 160 / 0.8);
+    opacity: 0;
+    animation: hc-hand-ring 1.8s ease-out infinite;
+  }
+  @keyframes hc-hand-ring {
+    0%,
+    36% {
+      transform: scale(0.4);
+      opacity: 0;
+    }
+    40% {
+      opacity: 0.95;
+    }
+    80%,
+    100% {
+      transform: scale(1.6);
+      opacity: 0;
+    }
+  }
+  /* reduced motion, or a slow phone: the hand simply rests there */
+  .hc[data-plain] .hc-hand svg,
+  .hc[data-plain] .hc-hand-ring {
+    animation: none;
+  }
   /* "Tap a photo", until the first tap */
   .hc-hint {
     margin-top: 12px;

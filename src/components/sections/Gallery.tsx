@@ -518,6 +518,15 @@ export function Gallery() {
               })}
             </div>
           </div>
+          {/* until the first tap: a hand tapping gently on the big photo in the middle (on its lower
+              corner, clear of the faces) — "tap a photo"; taps pass through it to the photo */}
+          <span aria-hidden className="hc-hand" data-shown={phase === "done" || undefined} data-gone={tapped || undefined}>
+            <span className="hc-hand-ring" />
+            <svg viewBox="0 0 44 54" fill="#fffaf0" stroke="#7d5a22" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round">
+              <path d="M17 6.5a3.5 3.5 0 0 1 7 0V21a3.2 3.2 0 0 1 6 1.4a3.2 3.2 0 0 1 5.6 2a3 3 0 0 1 4.4 2.6V36c0 7-5.6 12.6-12.6 12.6h-3c-3.6 0-7-1.7-9.2-4.6l-7.6-10.2a3.2 3.2 0 0 1 5-4L17 31Z" />
+              <path d="M24 21v7M30 22.4v6.6M35.6 24.4v6" fill="none" />
+            </svg>
+          </span>
         </div>
         <p className="hc-hint" data-shown={phase === "done" || undefined} data-gone={tapped || undefined} aria-hidden>
           {gallery.hint}
