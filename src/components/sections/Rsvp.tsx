@@ -8,7 +8,7 @@ import { acceptInvitation, BackendError, type Acceptance } from "@/lib/backend";
 import { RSVP_ACCEPTED } from "@/lib/rsvpEvents";
 import { downloadIcs, googleCalendarUrl, weddingCalendarItem } from "@/lib/calendar";
 import { Icon } from "@/components/art/Icons";
-import { TempleBells, TempleSilhouette } from "@/components/art/Temple";
+import { TempleBells, TempleGroup } from "@/components/art/Temple";
 
 /**
  * Section 08 — "The Sacred Union": a divine wedding scene, drawn straight onto the page's own sky
@@ -112,12 +112,14 @@ export function Rsvp() {
       data-bells={seen ? (reduced ? "still" : "in") : "hidden"}
       data-open={open || undefined}
     >
+      <Clouds />
+      <span aria-hidden className="rs-haze" />
       <TempleBells />
       <Garland />
       <GarlandFlower />
       <BelLeaves />
-      <TempleSilhouette className="rs-temple rs-temple-left" />
-      <TempleSilhouette className="rs-temple rs-temple-right" />
+      <TempleGroup className="rs-temple rs-temple-left" />
+      <TempleGroup className="rs-temple rs-temple-right" />
 
       <div className="relative mx-auto flex max-w-[22.5rem] flex-col items-center">
         {open ? (
@@ -144,10 +146,10 @@ export function Rsvp() {
               className="rs-shivling rs-in"
               style={at(AT.shivling)}
               src={wedding.assets.rsvpShivling}
-              alt="A Shivling with a bel leaf on top, the tripundra and a saffron tilak, water flowing from its spout"
+              alt="A Shivling with bel leaves on top, the tripundra and a saffron tilak, water flowing from its spout, on a glow of light in a ring of lotus petals, jasmine and leaves at its foot"
               draggable={false}
-              width={160}
-              height={150}
+              width={510}
+              height={520}
             />
             <h2 id="rsvp-heading" className="rs-title rs-in" style={at(AT.title)}>
               {rsvp.title}
@@ -213,7 +215,7 @@ export function Rsvp() {
 
         {/* Nandi, just beneath the panel, facing straight forward */}
         <div className="rs-in" style={at(open ? AT.link + 300 : AT.nandi)}>
-          <img className="rs-nandi" src={wedding.assets.rsvpNandi} alt="Nandi seated facing forward in fine gold line, adorned with jewels and a drape, on a base of gold curls, flowers and a lotus" draggable={false} width={780} height={504} />
+          <img className="rs-nandi" src={wedding.assets.rsvpNandi} alt="Nandi seated facing forward, white, adorned with gold jewels and a drape, among jasmine and leaves over a gold flourish" draggable={false} width={470} height={300} />
         </div>
       </div>
     </section>
@@ -459,19 +461,21 @@ function Spark() {
   );
 }
 
-/** A small gold sprig beside the button: three petals on a curl, reaching away from it. */
+/** Beside the button: a small gold flower — eight petals, eight paler ones between — on a fine line. */
 function Sprig({ flip = false }: { flip?: boolean }) {
   return (
-    <svg aria-hidden viewBox="0 0 26 28" className={`rs-sprig${flip ? " rs-sprig-flip" : ""}`} fill="none">
-      <path d="M26 14C21 14 18 12 16 9" stroke="#b08a46" strokeWidth="0.8" strokeLinecap="round" />
-      <g fill="#e9d29a" fillOpacity="0.6" stroke="#a8741f" strokeWidth="0.7" strokeLinejoin="round">
-        <path d="M10 15C6.6 14.6 4 12.4 3.4 9.2 6.6 9.6 8.8 11.8 10 15Z" />
-        <path d="M10 15C10.2 11.6 12.4 9 15.6 8.4 15.2 11.6 13 13.8 10 15Z" />
-        <path d="M10 15C7.4 13.2 6.4 9.8 7.6 6.8 9.6 8.8 10.4 12 10 15Z" />
-        <path d="M10 15C6.6 15.4 4 17.6 3.4 20.8 6.6 20.4 8.8 18.2 10 15Z" />
-        <path d="M10 15C10.2 18.4 12.4 21 15.6 21.6 15.2 18.4 13 16.2 10 15Z" />
+    <svg aria-hidden viewBox="0 0 30 24" className={`rs-sprig${flip ? " rs-sprig-flip" : ""}`} fill="none">
+      <path d="M0.5 12H3.5M20.5 12H29.5" stroke="#b08a46" strokeWidth="0.7" strokeLinecap="round" />
+      <g transform="translate(12 12)" strokeLinejoin="round">
+        {[22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 292.5, 337.5].map((a) => (
+          <ellipse key={a} cx="0" cy="-4.2" rx="1.5" ry="3" fill="#f2dca0" stroke="#b08a46" strokeWidth="0.4" transform={`rotate(${a})`} />
+        ))}
+        {[0, 45, 90, 135, 180, 225, 270, 315].map((a) => (
+          <ellipse key={a} cx="0" cy="-4.8" rx="1.9" ry="3.8" fill="#dcb45e" stroke="#a8741f" strokeWidth="0.5" transform={`rotate(${a})`} />
+        ))}
+        <circle r="2" fill="#a8741f" />
+        <circle r="0.8" fill="#f2dca0" />
       </g>
-      <circle cx="10" cy="15" r="1.2" fill="#a8741f" />
     </svg>
   );
 }
@@ -499,23 +503,36 @@ function GarlandFlower() {
 
 /**
  * Bel leaves — Mahadev's own — kept near the edges and corners, clear of the words and the button:
- * each a trifoliate leaf in soft sage, faint (15–25%). Where each sits (% of the section), its size
+ * each a trifoliate leaf in soft sage, light (28–40%), as in the couple's design. Where each sits (% of the section), its size
  * (px), its turn (deg) and its opacity.
  */
 const BEL = [
-  [3, 8, 30, -20, 0.2],
-  [12, 17, 22, 40, 0.15],
-  [88, 9, 26, 30, 0.18],
-  [80, 17, 32, -10, 0.24],
-  [2, 32, 26, 10, 0.22],
-  [91, 31, 30, 60, 0.2],
-  [6, 47, 22, -30, 0.16],
-  [90, 49, 26, 20, 0.18],
-  [1, 64, 30, 50, 0.25],
-  [91, 66, 24, -40, 0.2],
-  [5, 80, 24, 15, 0.17],
-  [88, 82, 30, -25, 0.22],
+  [3, 8, 30, -20, 0.34],
+  [12, 17, 22, 40, 0.28],
+  [88, 9, 26, 30, 0.32],
+  [80, 17, 32, -10, 0.38],
+  [2, 32, 26, 10, 0.36],
+  [91, 31, 30, 60, 0.34],
+  [6, 47, 22, -30, 0.3],
+  [90, 49, 26, 20, 0.32],
+  [1, 64, 30, 50, 0.4],
+  [91, 66, 24, -40, 0.34],
+  [5, 80, 24, 15, 0.3],
+  [88, 82, 30, -25, 0.36],
+  [14, 90, 20, 35, 0.28],
+  [82, 92, 22, -15, 0.3],
 ] as const;
+
+/** A few soft clouds drifting high on the sky, as in the couple's design (the site's own cloud). */
+function Clouds() {
+  return (
+    <div aria-hidden className="rs-clouds">
+      <img src={wedding.assets.clouds} alt="" className="rs-cloud rs-cloud-a" draggable={false} />
+      <img src={wedding.assets.clouds} alt="" className="rs-cloud rs-cloud-b" draggable={false} />
+      <img src={wedding.assets.clouds} alt="" className="rs-cloud rs-cloud-c" draggable={false} />
+    </div>
+  );
+}
 
 function BelLeaves() {
   return (

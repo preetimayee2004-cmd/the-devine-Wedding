@@ -787,19 +787,64 @@
   .rs:not([data-open]) {
     padding-bottom: 76px;
   }
+  /* faint warm-grey temples at the foot's corners, their tall spires at the outer edges */
   .rs-temple {
     position: absolute;
-    bottom: 6px;
-    width: 92px;
-    color: rgb(18 41 74 / 0.08);
+    z-index: -1;
+    bottom: 4px;
+    width: min(30%, 118px);
+    height: auto;
+    color: rgb(126 110 88);
+    opacity: 0.16;
     pointer-events: none;
   }
-  .rs-temple-right {
-    right: 6px;
-  }
   .rs-temple-left {
-    left: 6px;
+    left: 2px;
+  }
+  .rs-temple-right {
+    right: 2px;
     transform: scaleX(-1);
+  }
+  /* a few soft clouds high on the sky, and a warm golden haze rising from the foot */
+  .rs-clouds {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .rs-cloud {
+    position: absolute;
+    height: auto;
+    opacity: 0.55;
+  }
+  .rs-cloud-a {
+    top: 7%;
+    left: -24%;
+    width: 64%;
+  }
+  .rs-cloud-b {
+    top: 14%;
+    right: -26%;
+    width: 60%;
+    transform: scaleX(-1);
+    opacity: 0.45;
+  }
+  .rs-cloud-c {
+    top: 33%;
+    left: -34%;
+    width: 54%;
+    opacity: 0.32;
+  }
+  .rs-haze {
+    position: absolute;
+    z-index: -1;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 42%;
+    pointer-events: none;
+    background: radial-gradient(ellipse 75% 70% at 50% 100%, rgb(250 230 178 / 0.5), rgb(250 230 178 / 0) 72%);
   }
   /* the invitation, after the couple's design: the gold trishul, the joined hands over a lotus, the
      heading and its line, a lotus rule, then a gold-framed label round "Your presence is our blessing"
@@ -878,12 +923,12 @@
       transform: translateY(23px) scale(1.2, 0.6);
     }
   }
-  /* the Shivling, the focal point: right beneath the pot's tip, static */
+  /* the Shivling, the focal point: right beneath the pot's tip, on its glow and ring of lotus petals */
   .rs-shivling {
     display: block;
-    width: min(52%, 188px);
+    width: min(62%, 236px);
     height: auto;
-    margin-top: 6px;
+    margin-top: -6px;
   }
   .rs-divider {
     display: block;
@@ -946,35 +991,38 @@
   }
   .rs-sprig {
     flex: none;
-    width: 22px;
-    height: 24px;
-    opacity: 0.75;
+    width: 27px;
+    height: 22px;
   }
   .rs-sprig-flip {
     transform: scaleX(-1);
   }
   /* one line always, the sprigs beside it even on a narrow phone */
   .rs-join .rs-btn {
-    padding: 0 18px;
-    letter-spacing: 0.13em;
+    /* scaled with the screen, so the words and the flowers beside them always fit inside the frame */
+    padding: 0 clamp(12px, 4.2vw, 20px);
+    font-size: clamp(13px, 3.75vw, 15.5px);
+    letter-spacing: 0.1em;
     white-space: nowrap;
   }
   @media (max-width: 374px) {
-    .rs-join .rs-btn {
-      padding: 0 14px;
-      letter-spacing: 0.1em;
-    }
     .rs-sprig {
-      width: 18px;
+      width: 21px;
     }
   }
-  /* Nandi, in fine gold line, just beneath the panel, his horns close under it (his base of curls,
-     flowers and a lotus is the section's foot ornament) */
+  /* the very narrowest phones: the button alone */
+  @media (max-width: 340px) {
+    .rs-sprig {
+      display: none;
+    }
+  }
+  /* Nandi, white and gold among jasmine, just beneath the panel, his horns close under it (his gold
+     flourish is the section's foot ornament) */
   .rs-nandi {
     display: block;
-    width: min(52%, 196px);
+    width: min(60%, 228px);
     height: auto;
-    margin: 6px auto 0;
+    margin: 10px auto 0;
   }
   /* the garland across the top, between the bells */
   .rs-garland {
@@ -996,7 +1044,7 @@
     margin-left: -11px;
     pointer-events: none;
   }
-  /* bel leaves: faint (15–25%), near the edges and corners, still */
+  /* bel leaves: light (28–40%), soft sage, near the edges and corners, still */
   .rs-bel-field {
     position: absolute;
     inset: 0;
@@ -1006,8 +1054,8 @@
   }
   .rs-bel {
     position: absolute;
-    fill: #8fb48a;
-    stroke: #6f966b;
+    fill: #a3c59d;
+    stroke: #7ea779;
     stroke-width: 0.6;
     rotate: var(--turn);
     opacity: 0;
@@ -1385,8 +1433,8 @@
     text-transform: uppercase;
     color: rgb(var(--gold-ink));
   }
-  /* the buttons ("Join the Celebration", "Add to calendar"), as the Blessing Wall's: deep navy, warm
-     ivory words, a thin antique-gold edge, 10px corners */
+  /* the buttons ("Join the Celebration", "Add to calendar"), as in the couple's design: a deep navy
+     pill with a soft blue sheen across it, warm ivory words in the display serif, a thin gold edge */
   .rs-btn {
     display: inline-flex;
     align-items: center;
@@ -1394,18 +1442,19 @@
     gap: 10px;
     height: 50px;
     padding: 0 28px;
-    border: 1px solid #b89554;
+    border: 1px solid #c4a05a;
     /* a pill, as the Blessing Wall's button */
     border-radius: 9999px;
     background-color: rgb(var(--navy));
+    background-image: linear-gradient(100deg, rgb(120 160 220 / 0) 28%, rgb(120 160 220 / 0.24) 68%, rgb(120 160 220 / 0.06) 100%);
     color: #fff9ef;
     box-shadow:
-      inset 0 1px 0 rgb(255 249 239 / 0.12),
+      inset 0 1px 0 rgb(255 249 239 / 0.14),
       0 12px 24px -14px rgb(18 41 74 / 0.8);
-    font-family: var(--font-body);
-    font-size: 12.5px;
+    font-family: var(--font-display);
+    font-size: 15.5px;
     font-weight: 600;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;

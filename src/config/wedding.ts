@@ -599,14 +599,16 @@ export const wedding = {
     musicLoop: { start: 1.032, end: 12.67 },
     thankYouArt: "/art/shiva-parvati-prayer.webp",
     /**
-     * Section 08 (RSVP). Before accepting: the kalash hanging on its chain and the Shivling beneath it,
-     * drawn for the site (SVG) in the same fine gold line on warm ivory as Nandi. Nandi below the panel: from the couple's RSVP design,
-     * in fine gold line with his jewels and drape, on a base of curls, flowers and a lotus (its page keyed away). Once accepted:
-     * the gold trishul from the couple's design (keyed off its page, 2x).
+     * Section 08 (RSVP). Before accepting: the kalash hanging on its chain (drawn for the site, SVG), and
+     * beneath it the Shivling from the couple's RSVP design — ivory stone, bel leaves, the tripundra and
+     * a saffron tilak, on a glow of light in a ring of lotus petals, jasmine and leaves at its foot (lifted
+     * off the design's sky, its light kept translucent; 510 × 520). Nandi below the panel, from the same
+     * design: white, with gold jewels and a drape, among jasmine and leaves over a gold flourish (470 ×
+     * 300). Once accepted: the gold trishul from the couple's earlier design (keyed off its page, 2x).
      */
     rsvpTrishul: "/art/rsvp-trishul.webp",
     rsvpPot: "/art/rsvp-kalash.svg",
-    rsvpShivling: "/art/rsvp-shivling.svg",
+    rsvpShivling: "/art/rsvp-shivling.webp",
     rsvpNandi: "/art/rsvp-nandi.webp",
     /**
      * Section 08 (RSVP), once accepted: the couple's photograph, seen through the gold arch as through a
