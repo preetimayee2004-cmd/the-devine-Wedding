@@ -3648,6 +3648,91 @@
     color: rgb(18 41 74 / 0.08);
     pointer-events: none;
   }
+  /* the couple section's location: one button — the pin in a small gold ring beside the venue and its
+     address, a small arrow — ivory with a fine gold edge, as the events' venue chip; it lifts a little on
+     hover and presses in on a tap */
+  .couple-place {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 100%;
+    min-height: 52px;
+    margin-top: 16px;
+    padding: 7px 16px 7px 8px;
+    border: 1px solid rgb(184 149 84 / 0.75);
+    border-radius: 9999px;
+    background: rgb(255 251 242 / 0.85);
+    box-shadow: 0 6px 14px -9px rgb(18 41 74 / 0.45);
+    color: rgb(var(--navy));
+    text-align: left;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      background-color 200ms ease,
+      border-color 200ms ease,
+      box-shadow 200ms ease,
+      translate 200ms ease,
+      scale 150ms ease;
+  }
+  .couple-place-pin {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid rgb(184 149 84 / 0.7);
+    border-radius: 9999px;
+    background: #fffaf0;
+    color: rgb(var(--gold-ink));
+  }
+  .couple-place-words {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+  }
+  .couple-place-name {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+  }
+  .couple-place-address {
+    font-family: var(--font-display);
+    font-size: 13.5px;
+    font-weight: 500;
+    line-height: 1.25;
+    color: rgb(var(--slate));
+    overflow-wrap: anywhere;
+  }
+  .couple-place-out {
+    flex: none;
+    width: 14px;
+    height: 14px;
+    margin-left: 2px;
+    color: rgb(var(--gold-ink));
+    transition: translate 200ms ease;
+  }
+  @media (hover: hover) {
+    .couple-place:hover {
+      border-color: rgb(var(--gold-ink));
+      background: #fffdf8;
+      box-shadow: 0 10px 20px -10px rgb(18 41 74 / 0.5);
+      translate: 0 -1px;
+    }
+    .couple-place:hover .couple-place-out {
+      translate: 2px -2px;
+    }
+  }
+  .couple-place:active {
+    scale: 0.98;
+    background: #fbf3e2;
+  }
+  .couple-place:focus-visible {
+    outline: 2px solid rgb(var(--gold-ink));
+    outline-offset: 3px;
+  }
   /* "Welcome": a deep sapphire — Mahadev's blue, festive, and clear on the pale sky */
   .couple-welcome-word {
     color: #2a4f8f;

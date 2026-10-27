@@ -198,20 +198,24 @@ export function Couple() {
 
         <span aria-hidden className="couple-rule mt-[14px]" style={appear(6)} />
 
-        {/* the full location — the pin above, then the venue, then the address; tap for directions */}
+        {/* the full location as one button: the pin beside the venue and its address, a small arrow;
+            a tap opens the directions */}
         <a
           href={directionsUrl(venue)}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-[14px] flex min-h-[44px] max-w-full flex-col items-center px-2 font-display text-navy"
+          className="couple-place"
+          aria-label={`Directions to ${venue.name}, ${venue.address} (opens Google Maps)`}
           style={appear(6)}
         >
-          <Icon name="pin" className="h-[22px] w-[22px] text-gold-ink" strokeWidth={1.6} />
-          <span className="mt-1 inline-flex max-w-full items-center gap-1.5 text-[18px] font-bold leading-snug [overflow-wrap:anywhere]">
-            {venue.name}
-            <Icon name="external" className="h-3.5 w-3.5 shrink-0 text-gold-ink" />
+          <span aria-hidden className="couple-place-pin">
+            <Icon name="pin" className="h-[18px] w-[18px]" strokeWidth={1.6} />
           </span>
-          <span className="text-[15px] font-medium leading-snug text-slate [overflow-wrap:anywhere]">{venue.address}</span>
+          <span className="couple-place-words">
+            <span className="couple-place-name">{venue.name}</span>
+            <span className="couple-place-address">{venue.address}</span>
+          </span>
+          <Icon name="external" className="couple-place-out" />
         </a>
       </div>
 
