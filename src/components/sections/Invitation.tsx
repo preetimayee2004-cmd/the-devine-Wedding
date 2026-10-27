@@ -448,6 +448,8 @@ export function Invitation() {
 
       {/* the song on or off — in the corner once the opening is over */}
       <MusicToggle visible={!locked} />
+      {/* …and while the opening plays, in the upper left, where the gate had it (Skip is upper right) */}
+      <MusicToggle visible={locked && beat >= 0} corner="left" />
 
       {/* ── the opening: on a sunrise sky, the two hands glide in until their fingertips all but touch,
           then fade into the sky, and the sky melts away as the card rises ── */}

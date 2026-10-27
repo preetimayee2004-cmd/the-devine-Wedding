@@ -7,8 +7,11 @@ import { isMusicOn, onMusicChange, pauseMusic, playMusic } from "@/lib/music";
  * off. It shows the song as the gate's tap left it, and pauses or resumes it. While the guest scrolls
  * down it tucks itself away, so it never sits over what they're reading; it comes back as they scroll
  * up, or a moment after they stop (and stays while it has the keyboard's focus).
+ *
+ * `corner="left"`: during the opening, in the gate's own place for it (upper left, Skip being upper
+ * right), so it stays where the guest saw it as the gate fades.
  */
-export function MusicToggle({ visible }: { visible: boolean }) {
+export function MusicToggle({ visible, corner = "right" }: { visible: boolean; corner?: "left" | "right" }) {
   const [playing, setPlaying] = useState(isMusicOn);
   const button = useRef<HTMLButtonElement>(null);
   const tucked = useTuckOnScroll(button);
@@ -16,6 +19,7 @@ export function MusicToggle({ visible }: { visible: boolean }) {
   useEffect(() => onMusicChange(setPlaying), []);
 
   const shown = visible && !tucked;
+  const left = corner === "left";
   return (
     <button
       ref={button}
@@ -23,9 +27,12 @@ export function MusicToggle({ visible }: { visible: boolean }) {
       onClick={() => (playing ? pauseMusic() : playMusic())}
       aria-pressed={playing}
       aria-label={playing ? "Music on: pause the song" : "Music off: play the song"}
+      // hidden (not merely tucked away): out of the way of a keyboard and a screen reader too
+      aria-hidden={!visible || undefined}
+      tabIndex={visible ? undefined : -1}
       data-music-toggle
-      className={`fixed right-5 z-40 flex h-10 w-10 items-center justify-center rounded-full border border-gold/70 bg-ivory/80 text-navy shadow-[0_4px_14px_-6px_rgb(var(--navy)/0.35)] backdrop-blur-sm transition-[opacity,transform] duration-300 hover:bg-ivory ${shown ? "opacity-100" : "pointer-events-none opacity-0 motion-safe:-translate-y-3"}`}
-      style={{ top: "calc(var(--status-bar) + 22px)" }}
+      className={`fixed ${left ? "left-4" : "right-5"} z-40 flex h-10 w-10 items-center justify-center rounded-full border border-gold/70 bg-ivory/80 text-navy shadow-[0_4px_14px_-6px_rgb(var(--navy)/0.35)] backdrop-blur-sm transition-[opacity,transform] duration-300 hover:bg-ivory ${shown ? "opacity-100" : "pointer-events-none opacity-0 motion-safe:-translate-y-3"}`}
+      style={{ top: `calc(var(--status-bar) + ${left ? 12 : 22}px)` }}
     >
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
         {/* a speaker */}
