@@ -241,6 +241,7 @@ function Scene({ calendar, note }: { calendar: CalendarItem | null; note: string
           draggable={false}
         />
         <Arch />
+        <BlessingFlowers />
       </div>
 
       <p className="rs-thanks rs-in" style={at(AT.heading - 150)}>
@@ -524,6 +525,57 @@ function BelLeaves() {
           <path d="M20 22C26 28.5 37 27.5 39.2 19 33 12 23 13.5 20 22Z" />
           <path d="M20 21V5M19 22 5 19.5M21 22 35 19.5" stroke="#f2f6ef" strokeWidth="0.6" fill="none" />
         </svg>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * Once the scene opens, a few flowers drift down over Mahadev and Maa Parvati — white jasmine, as in
+ * her hair, and soft pink petals — each falling once, slowly, swaying on the air and turning gently,
+ * fading as it reaches their feet. Where each starts (% across), its kind, size (px), when it sets off
+ * (ms after the scene opens), how long it falls (ms), how far it sways (px) and how much it turns.
+ */
+const FLOWERS = [
+  [22, "jasmine", 20, 1500, 5600, 14, 140],
+  [64, "petal", 14, 1750, 6200, 18, -200],
+  [44, "jasmine", 17, 2050, 5800, 12, 180],
+  [80, "petal", 13, 2300, 6400, 16, 220],
+  [12, "petal", 16, 2550, 6000, 20, -160],
+  [55, "jasmine", 21, 2850, 6300, 15, 120],
+  [33, "petal", 12, 3150, 5700, 13, -240],
+  [72, "jasmine", 16, 3450, 6100, 17, 160],
+  [18, "jasmine", 14, 3800, 5900, 12, -130],
+  [48, "petal", 16, 4100, 6500, 19, 210],
+  [86, "jasmine", 17, 4450, 5800, 14, -170],
+  [38, "petal", 13, 4800, 6200, 16, 190],
+] as const;
+
+function BlessingFlowers() {
+  return (
+    <div aria-hidden className="rs-flowers">
+      {FLOWERS.map(([left, kind, size, delay, fall, sway, turn], i) => (
+        <span
+          key={i}
+          className="rs-flower"
+          style={{ left: `${left}%`, "--delay": `${delay}ms`, "--fall": `${fall}ms`, "--sway": `${sway}px`, "--turn": `${turn}deg`, "--size": `${size}px` } as CSSProperties}
+        >
+          <span className="rs-flower-sway" style={{ animationDuration: `${1700 + (i % 4) * 260}ms` }}>
+            {kind === "jasmine" ? (
+              <svg viewBox="-10 -10 20 20" className="rs-flower-shape">
+                {[0, 72, 144, 216, 288].map((a) => (
+                  <ellipse key={a} cx="0" cy="-4.6" rx="2.6" ry="4.6" fill="#fffdf8" stroke="#e6dccb" strokeWidth="0.5" transform={`rotate(${a})`} />
+                ))}
+                <circle r="1.7" fill="#f2c45a" />
+              </svg>
+            ) : (
+              <svg viewBox="-10 -10 20 20" className="rs-flower-shape">
+                <path d="M0 -8C5 -5 6 2 0 8 -6 2 -5 -5 0 -8Z" fill="#f6b8c6" stroke="#e48aa2" strokeWidth="0.5" />
+                <path d="M0 -5.5V5" stroke="#fbd6df" strokeWidth="0.7" strokeLinecap="round" />
+              </svg>
+            )}
+          </span>
+        </span>
       ))}
     </div>
   );

@@ -1088,6 +1088,64 @@
     aspect-ratio: 3 / 4;
     margin-top: 16px;
   }
+  /* flowers drifting down over the couple once the scene opens: each falls once, slowly, swaying and
+     turning a little, and fades as it reaches their feet (the box is the art's own, in its own height units) */
+  .rs-flowers {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    overflow: hidden;
+    pointer-events: none;
+    container-type: size;
+  }
+  .rs-flower {
+    position: absolute;
+    top: -6%;
+    width: var(--size);
+    height: var(--size);
+    opacity: 0;
+    animation: rs-flower-fall var(--fall) cubic-bezier(0.32, 0.06, 0.58, 1) var(--delay) both;
+    filter: drop-shadow(0 1px 1.5px rgb(84 60 24 / 0.25));
+  }
+  .rs-flower-sway {
+    display: block;
+    width: 100%;
+    height: 100%;
+    animation: rs-flower-sway 2s ease-in-out infinite alternate;
+  }
+  .rs-flower-shape {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  @keyframes rs-flower-fall {
+    0% {
+      opacity: 0;
+      transform: translateY(0) rotate(0deg);
+    }
+    10% {
+      opacity: 1;
+    }
+    82% {
+      opacity: 0.95;
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(96cqh) rotate(var(--turn));
+    }
+  }
+  @keyframes rs-flower-sway {
+    from {
+      transform: translateX(calc(var(--sway) * -1)) rotate(-14deg);
+    }
+    to {
+      transform: translateX(var(--sway)) rotate(14deg);
+    }
+  }
+  .rs[data-still] .rs-flowers {
+    display: none;
+  }
   .rs-arch {
     position: absolute;
     inset: 0;
