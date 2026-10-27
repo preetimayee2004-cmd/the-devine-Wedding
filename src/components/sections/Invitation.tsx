@@ -329,6 +329,7 @@ export function Invitation() {
           <div className="relative mt-[var(--std-gap)]" style={rise(3)}>
             <ScratchReveal
               hint={t.scratchHint}
+              note={t.scratchNote}
               tapLabel={t.tapToReveal}
               shown={card}
               delay={quiet ? 0 : 3 * MOTION.staggerMs * pace}
