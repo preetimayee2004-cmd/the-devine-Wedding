@@ -172,12 +172,12 @@ export function OpeningGate({ seal, sky, invited, guest, label, devanagari = fal
       tabIndex={-1}
       onClick={begin}
       onKeyDown={onKey}
-      className="gate fixed inset-0 z-[60] flex cursor-pointer select-none flex-col items-center justify-center overflow-hidden px-6 outline-none"
+      className="gate fixed inset-0 z-[60] grid cursor-pointer select-none grid-rows-[minmax(0,1fr)_auto_minmax(0,1fr)] justify-items-center overflow-hidden px-6 outline-none"
       data-still={still}
       data-opened={opened}
       style={{
-        paddingTop: "calc(var(--status-bar) + 64px)",
-        paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 40px)",
+        // the same above and below, so the seal sits in the very middle of the screen (clear of the corner buttons)
+        paddingBlock: "calc(var(--status-bar) + 64px)",
         opacity: phase === "leaving" ? 0 : 1,
         transition: `opacity ${reduced ? REDUCED_FADE_MS : FADE_MS}ms ease-out`,
         pointerEvents: phase === "waiting" ? undefined : "none",
@@ -187,18 +187,21 @@ export function OpeningGate({ seal, sky, invited, guest, label, devanagari = fal
       <img aria-hidden src={sky} alt="" draggable={false} className="gate-sky" />
       <span aria-hidden className="gate-tint" />
 
-      {/* ── the invitation: for a named guest, their name first ── */}
-      {guest && (
-        <p className="gate-words gate-gold gate-name relative mb-1.5 max-w-[18rem] text-balance text-center font-display text-[29px] font-semibold italic leading-tight">
-          {guest}
+      {/* ── above the seal, the invitation: for a named guest, their name first ── */}
+      <div className="flex flex-col items-center self-end pb-5">
+        {guest && (
+          <p className="gate-words gate-gold gate-name relative mb-1.5 max-w-[18rem] text-balance text-center font-display text-[29px] font-semibold italic leading-tight">
+            {guest}
+          </p>
+        )}
+        <p className={`gate-words gate-gold relative ${devanagari ? "font-deva text-[17px]" : `${words} text-[13px] tracking-[0.38em]`}`}>
+          {invited}
         </p>
-      )}
-      <p className={`gate-words gate-gold relative ${devanagari ? "font-deva text-[17px]" : `${words} text-[13px] tracking-[0.38em]`}`}>
-        {invited}
-      </p>
-      <LotusRule className="gate-words relative mt-2.5" />
+        <LotusRule className="gate-words relative mt-2.5" />
+      </div>
 
-      <div className="gate-stage relative mt-5 flex items-center justify-center">
+      {/* ── the seal, in the very middle ── */}
+      <div className="gate-stage relative flex items-center justify-center">
         {/* a soft warm light behind it all */}
         <span aria-hidden className="gate-glow" />
         {/* the mandala, in three layers: a dotted outer ring turning once in two minutes… */}
@@ -306,11 +309,13 @@ export function OpeningGate({ seal, sky, invited, guest, label, devanagari = fal
         {!reduced && <span aria-hidden className="gate-bloom" />}
       </div>
 
-      {/* a small gold diamond line, and the invitation to open it */}
-      <SealRule className="gate-words relative mt-6" />
-      <p className={`gate-hint gate-gold relative mt-2.5 ${devanagari ? "font-deva text-[15px]" : `${words} text-[12.5px] tracking-[0.34em]`}`}>
-        <span className="gate-pulse">{label}</span>
-      </p>
+      {/* ── below it, a small gold diamond line, and the invitation to open it ── */}
+      <div className="flex flex-col items-center self-start pt-6">
+        <SealRule className="gate-words relative" />
+        <p className={`gate-hint gate-gold relative mt-2.5 ${devanagari ? "font-deva text-[15px]" : `${words} text-[12.5px] tracking-[0.34em]`}`}>
+          <span className="gate-pulse">{label}</span>
+        </p>
+      </div>
 
       {/* the song: on, unless the guest turns it off before the tap */}
       <button
