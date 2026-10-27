@@ -154,7 +154,7 @@ export const wedding = {
     /** The same, for a guest named in the link. */
     quoteFor: "Every ritual, a blessing; every moment, a memory we hope to share with you, {guest}.",
     /** Under the arch: how to see the other ceremonies. */
-    hint: "Tap the arch frame to see the events",
+    hint: "Tap the arch frame, or let the events turn by themselves",
     list: list<Ceremony>([
       {
         name: "Ganesh Pujan",
@@ -363,7 +363,7 @@ export const wedding = {
     messageFor: "{guest}, your presence would make our celebration even more special.",
     /** Over the button, in the gold-framed label. */
     presence: "Your presence is our blessing",
-    button: "Join the Celebration",
+    button: "Accept the Invitation",
     /** The small pill floating at the foot of the screen until the invitation is accepted. */
     shortcut: "RSVP",
     /** Once accepted, over the scene: for a named guest, and for anyone. */
@@ -464,14 +464,16 @@ export const wedding = {
     intro: "For any questions or assistance, our families are always happy to help.",
     /** The same, for a guest named in the link (about as long, so the section still fits one screen). */
     introFor: "For anything you need, {guest}, our families are always happy to help.",
-    /** One for each side: who to call, and how they are related to the bride or the groom. */
+    /**
+     * One for each side: who to call, and how they are related to the bride or the groom. (The side
+     * isn't shown; it names the window for a screen reader while the name is still to come.)
+     */
     family: list<FamilyContact>([
       // SAMPLE: the bride's brother and the groom's sister, as named in the family section above
       { side: "The Bride's Family", name: "Ankit", relation: "Bride's brother", phone: null },
       { side: "The Groom's Family", name: "Shreya", relation: "Groom's sister", phone: null },
     ]),
-    coordinationTitle: "Wedding Coordination",
-    coordinationNote: "For assistance with guest arrangements and wedding details.",
+    /** The coordinators, each in a palace window like the families' (their role in place of a relation). */
     coordinators: list<Coordinator>([
       // SAMPLE names
       { role: "Guest Coordinator", name: "Rohan", phone: null },

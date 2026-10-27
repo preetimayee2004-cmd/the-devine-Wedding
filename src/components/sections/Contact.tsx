@@ -1,7 +1,6 @@
 import { useRef, useState, type CSSProperties } from "react";
 import { wedding } from "@/config/wedding";
 import { usePersonal } from "@/context/GuestContext";
-import type { Coordinator, FamilyContact } from "@/config/types";
 import { useElementSize } from "@/hooks/useElementSize";
 import { useInView } from "@/hooks/useInView";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
@@ -18,33 +17,29 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
  * double gold line, a small kalash at its peak, fading out below), a small gold lotus rule beneath.
  * Then the two families side by side (on a phone too), each in a miniature palace window: a pointed
  * arch on straight sides, a fine double antique-gold outline, a cream parchment ground with a faint
- * grain, a tiny gold lotus on its peak — the side in small gold capitals, the person's name in navy
- * serif, their relationship in small gold capitals, and a navy "Call" pill with a phone.
- *
- * Then "Wedding Coordination" and its line, over a connected directory: a fine gold line down the
- * left (a bead at each end), each coordinator a row — the role in gold capitals and the name in navy
- * serif on the left, a round navy call button on the right — a fine gold line between rows, a tiny
- * lotus where it meets the line down the side. Last, "We're just a call away." over a small lotus; a
- * faint palace skyline rests at the foot of the section.
+ * grain, a tiny gold lotus on its peak — the person's name in navy serif, their relationship in small
+ * gold capitals, and a navy "Call" pill with a phone. Beneath them, the two coordinators in windows
+ * just alike, their role in place of a relationship. Last, "We're just a call away." over a small
+ * lotus; a faint palace skyline rests at the foot of the section.
  *
  * A call button dials its number (a tel: link, labelled with it for screen readers); until a number
  * is given it only says, quietly, that the number is coming (see `contact` in the config).
  *
- * As it is reached: the heading rises in and the arch behind it fades up; each window's gold outline
- * draws itself (the second a beat after the first), the ground and the lotus follow, then its words
- * and its button one by one; the line down the directory draws, the rows rise in one after another,
- * their lotuses with them; then the closing line. Reduced motion: plain fades.
+ * As it is reached: the heading rises in and the arch behind it fades up; each pair of windows, as it
+ * comes into view, draws its gold outlines (the second a beat after the first), the ground and the
+ * lotus follow, then the words and the button one by one; then the closing line. Reduced motion:
+ * plain fades.
  */
 export function Contact() {
   const { contact } = wedding;
   const personal = usePersonal();
   const ref = useRef<HTMLElement>(null);
   const familyRef = useRef<HTMLDivElement>(null);
-  const dirRef = useRef<HTMLDivElement>(null);
+  const coordRef = useRef<HTMLDivElement>(null);
   const closingRef = useRef<HTMLDivElement>(null);
   const seen = useInView(ref, { threshold: 0.12 });
   const familySeen = useInView(familyRef, { threshold: 0.25 });
-  const dirSeen = useInView(dirRef, { threshold: 0.3 });
+  const coordSeen = useInView(coordRef, { threshold: 0.25 });
   const closingSeen = useInView(closingRef, { threshold: 0.5 });
   const reduced = usePrefersReducedMotion();
   const t = (ms: number) => (reduced ? 0 : ms);
@@ -85,27 +80,33 @@ export function Contact() {
       {/* the two families, each in a palace window */}
       <div ref={familyRef} className="ct-family" data-shown={familySeen || undefined}>
         {contact.family.map((person, i) => (
-          <FamilyWindow key={person.side} person={person} show={familySeen} at={t(i * 200)} reduced={reduced} />
+          <ContactWindow
+            key={person.side}
+            name={person.name}
+            relation={person.relation}
+            phone={person.phone}
+            label={person.side}
+            show={familySeen}
+            at={t(i * 200)}
+            reduced={reduced}
+          />
         ))}
       </div>
 
-      {/* wedding coordination: a connected directory */}
-      <div ref={dirRef} className="mx-auto mt-12 max-w-[24rem]" data-shown={dirSeen || undefined}>
-        <Reveal show={dirSeen} delay={t(0)}>
-          <h3 className="ct-coord-title">{contact.coordinationTitle}</h3>
-          <p className="mt-1 text-center text-[13px] leading-snug text-slate">{contact.coordinationNote}</p>
-        </Reveal>
-        <div className="ct-dir">
-          <span aria-hidden className="ct-dir-line" />
-          <ul>
-            {contact.coordinators.map((c, i) => (
-              <Reveal key={c.role} as="li" show={dirSeen} delay={t(500 + i * 260)} className="ct-dir-row">
-                {i > 0 && <TinyLotus className="ct-dir-lotus" />}
-                <CoordinatorRow person={c} />
-              </Reveal>
-            ))}
-          </ul>
-        </div>
+      {/* the coordinators, in windows just alike */}
+      <div ref={coordRef} className="ct-family ct-coords" data-shown={coordSeen || undefined}>
+        {contact.coordinators.map((person, i) => (
+          <ContactWindow
+            key={person.role}
+            name={person.name}
+            relation={person.role}
+            phone={person.phone}
+            label={person.role}
+            show={coordSeen}
+            at={t(i * 200)}
+            reduced={reduced}
+          />
+        ))}
       </div>
 
       {/* the closing line */}
@@ -143,14 +144,31 @@ function windowPath(w: number, h: number, i: number, open = false) {
 }
 
 /**
- * One family's contact in a miniature palace window: the outline drawn to the window's own size (so
- * the arch never stretches), a parchment ground, a tiny lotus on the peak; the words and the button.
+ * One contact in a miniature palace window — a family's or a coordinator's: the outline drawn to the
+ * window's own size (so the arch never stretches), a parchment ground, a tiny lotus on the peak; the
+ * name, the relationship (or role) and the button. `label` names the window for a screen reader.
  */
-function FamilyWindow({ person, show, at, reduced }: { person: FamilyContact; show: boolean; at: number; reduced: boolean }) {
+function ContactWindow({
+  name,
+  relation,
+  phone,
+  label,
+  show,
+  at,
+  reduced,
+}: {
+  name: string | null;
+  relation: string | null;
+  phone: string | null;
+  label: string;
+  show: boolean;
+  at: number;
+  reduced: boolean;
+}) {
   const [ref, box] = useElementSize<HTMLElement>();
   const words = (ms: number) => at + (reduced ? 0 : ms);
   return (
-    <article ref={ref} className="ct-window" aria-label={person.side} style={{ "--at": `${at}ms` } as CSSProperties}>
+    <article ref={ref} className="ct-window" aria-label={name && relation ? `${name}, ${relation}` : label} style={{ "--at": `${at}ms` } as CSSProperties}>
       {box && (
         <svg aria-hidden className="ct-window-art" width={box.w} height={box.h} viewBox={`0 0 ${box.w} ${box.h}`}>
           <path d={windowPath(box.w, box.h, 0.75)} className="ct-window-ground" />
@@ -161,27 +179,16 @@ function FamilyWindow({ person, show, at, reduced }: { person: FamilyContact; sh
       )}
       <TinyLotus className="ct-window-lotus" />
       <div className="ct-window-body">
-        <Reveal show={show} delay={words(650)}>
-          <p className="ct-side">{person.side}</p>
+        <Reveal show={show} delay={words(700)}>
+          <p className={`ct-name${name ? "" : " ct-tbc"}`}>{name ?? "Details to come"}</p>
         </Reveal>
-        {person.name ? (
-          <>
-            <Reveal show={show} delay={words(760)}>
-              <p className="ct-name">{person.name}</p>
-            </Reveal>
-            {person.relation && (
-              <Reveal show={show} delay={words(860)}>
-                <p className="ct-relation">{person.relation}</p>
-              </Reveal>
-            )}
-          </>
-        ) : (
-          <Reveal show={show} delay={words(760)}>
-            <p className="ct-name ct-tbc">Details to come</p>
+        {relation && (
+          <Reveal show={show} delay={words(820)}>
+            <p className="ct-relation">{relation}</p>
           </Reveal>
         )}
-        <Reveal show={show} delay={words(980)}>
-          <CallButton phone={person.phone} who={person.name ?? person.side} />
+        <Reveal show={show} delay={words(960)}>
+          <CallButton phone={phone} who={name ? `${name}, ${relation ?? label}` : label} />
         </Reveal>
       </div>
     </article>
@@ -239,43 +246,27 @@ const telHref = (phone: string) => `tel:+${phone.replace(/\D/g, "")}`;
  * "Call": a tel: link when there is a number (labelled with it for screen readers); without one, the
  * same button, which only says that the number is coming.
  */
-function CallButton({ phone, who, round = false }: { phone: string | null; who: string; round?: boolean }) {
+function CallButton({ phone, who }: { phone: string | null; who: string }) {
   const [asked, setAsked] = useState(false);
-  const cls = round ? "ct-call-round" : "ct-call";
-  const inner = round ? (
-    <Icon name="phone" className="h-5 w-5" strokeWidth={1.6} />
-  ) : (
+  const inner = (
     <>
       <Icon name="phone" className="h-4 w-4" strokeWidth={1.6} /> Call
     </>
   );
   if (phone)
     return (
-      <a href={telHref(phone)} className={cls} aria-label={`Call ${who}, ${showPhone(phone)}`}>
+      <a href={telHref(phone)} className="ct-call" aria-label={`Call ${who}, ${showPhone(phone)}`}>
         {inner}
       </a>
     );
   return (
-    <span className={round ? "ct-call-wrap ct-call-wrap-round" : "ct-call-wrap"}>
-      <button type="button" className={cls} aria-label={`Call ${who} (number coming soon)`} onClick={() => setAsked(true)}>
+    <span className="ct-call-wrap">
+      <button type="button" className="ct-call" aria-label={`Call ${who} (number coming soon)`} onClick={() => setAsked(true)}>
         {inner}
       </button>
       <span className="ct-soon" role="status" data-on={asked || undefined}>
         {asked ? "Number coming soon" : ""}
       </span>
     </span>
-  );
-}
-
-/** A coordinator: role and name on the left, a round call button on the right. */
-function CoordinatorRow({ person }: { person: Coordinator }) {
-  return (
-    <>
-      <div className="min-w-0 flex-1 text-left">
-        <p className="ct-role">{person.role}</p>
-        <p className={`ct-row-name${person.name ? "" : " ct-tbc"}`}>{person.name ?? "Details to come"}</p>
-      </div>
-      <CallButton phone={person.phone} who={person.name ? `${person.name}, ${person.role}` : `the ${person.role}`} round />
-    </>
   );
 }

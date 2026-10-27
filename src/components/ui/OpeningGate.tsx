@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
-import { playMusic, preloadMusic } from "@/lib/music";
+import { playMusic, playMusicAtFirstTouch, preloadMusic } from "@/lib/music";
 
 interface OpeningGateProps {
   /** The golden ॐ wax seal at its centre. */
@@ -28,6 +28,8 @@ interface OpeningGateProps {
 const OPEN_MS = 950;
 const FADE_MS = 650;
 const REDUCED_FADE_MS = 300;
+// No tap for this long (while the page is in view): the seal opens by itself.
+const AUTO_OPEN_MS = 7000;
 
 // A few gold motes drifting slowly about the seal: fixed, hand-spread values (where round the seal,
 // in degrees; how far out, as a share of the stage's half-width; size px; seconds; delay s), so every
@@ -74,8 +76,10 @@ const GRAINS = Array.from({ length: 28 }, (_, i) => {
  * fading in (unless the guest turned the sound off in the corner first), and the seal opens — a warm
  * glow, a fine gold line drawn round its edge, a small press, and it melts into gold dust as a soft
  * light spreads out into the clouds; then the gate fades and the opening's hands begin beneath it.
- * Skip goes straight to the card (the song starting too). Only transform and opacity move (and the
- * one gold line); reduced motion gets a plain fade.
+ * Skip goes straight to the card (the song starting too). With no tap for 7s while the page is in
+ * view, the seal opens by itself in just the same way (the song then starts at the guest's first tap
+ * anywhere, as a browser allows sound only from one). Only transform and opacity move (and the one
+ * gold line); reduced motion gets a plain fade.
  */
 export function OpeningGate({ seal, sky, invited, guest, label, devanagari = false, reduced, onBegin, onSkip, onGone }: OpeningGateProps) {
   const [phase, setPhase] = useState<"waiting" | "opening" | "leaving">("waiting");
@@ -85,6 +89,12 @@ export function OpeningGate({ seal, sky, invited, guest, label, devanagari = fal
   const root = useRef<HTMLDivElement>(null);
   const tilt = useRef<HTMLDivElement>(null);
   const shine = useRef<HTMLSpanElement>(null);
+  // the seal has loaded (the 7s before it opens by itself count from when the guest can see it)
+  const sealImg = useRef<HTMLImageElement>(null);
+  const [sealShown, setSealShown] = useState(false);
+  useEffect(() => {
+    if (sealImg.current?.complete) setSealShown(true);
+  }, []);
 
   useEffect(() => {
     // focused (without a ring), so Enter or Space opens it straight away; the seal itself is a tab stop
@@ -124,15 +134,18 @@ export function OpeningGate({ seal, sky, invited, guest, label, devanagari = fal
 
   const later = (ms: number, fn: () => void) => timers.current.push(window.setTimeout(fn, ms));
 
-  const begin = () => {
+  /** Open the seal: from a tap, or by itself (`auto`) when no tap has come. */
+  const begin = (auto = false) => {
     if (phase !== "waiting") return;
-    try {
-      navigator.vibrate?.(30);
-    } catch {
-      // some browsers refuse vibration — no matter
-    }
-    // the song starts on the tap itself (browsers allow sound only from a tap)
-    if (sound) playMusic();
+    if (!auto)
+      try {
+        navigator.vibrate?.(30);
+      } catch {
+        // some browsers refuse vibration — no matter
+      }
+    // the song starts on the tap itself (browsers allow sound only from a tap); opened by itself, at
+    // the guest's first tap anywhere
+    if (sound) (auto ? playMusicAtFirstTouch : playMusic)();
     if (reduced) {
       setPhase("leaving");
       onBegin();
@@ -146,6 +159,26 @@ export function OpeningGate({ seal, sky, invited, guest, label, devanagari = fal
     });
     later(OPEN_MS + FADE_MS, onGone);
   };
+
+  // no tap for 7s from when the seal shows, while the page is in view: it opens by itself (the count
+  // starts again whenever the page comes back into view, so a link opened in a background tab still
+  // waits for the guest)
+  const beginRef = useRef(begin);
+  beginRef.current = begin;
+  useEffect(() => {
+    if (phase !== "waiting" || !sealShown) return;
+    let id = 0;
+    const arm = () => {
+      clearTimeout(id);
+      if (!document.hidden) id = window.setTimeout(() => beginRef.current(true), AUTO_OPEN_MS);
+    };
+    arm();
+    document.addEventListener("visibilitychange", arm);
+    return () => {
+      clearTimeout(id);
+      document.removeEventListener("visibilitychange", arm);
+    };
+  }, [phase, sealShown]);
 
   const skip = () => {
     if (phase !== "waiting") return;
@@ -170,7 +203,7 @@ export function OpeningGate({ seal, sky, invited, guest, label, devanagari = fal
     <div
       ref={root}
       tabIndex={-1}
-      onClick={begin}
+      onClick={() => begin()}
       onKeyDown={onKey}
       className="gate fixed inset-0 z-[60] grid cursor-pointer select-none grid-rows-[minmax(0,1fr)_auto_minmax(0,1fr)] justify-items-center overflow-hidden px-6 outline-none"
       data-still={still}
@@ -258,7 +291,16 @@ export function OpeningGate({ seal, sky, invited, guest, label, devanagari = fal
             <span aria-hidden className="gate-halo" />
             <span className="gate-float">
               <span className="gate-seal-box">
-                <img src={seal} alt="" draggable={false} className="gate-seal" />
+                <img
+                  ref={sealImg}
+                  src={seal}
+                  alt=""
+                  draggable={false}
+                  className="gate-seal"
+                  onLoad={() => setSealShown(true)}
+                  // if it can't load, the count starts anyway
+                  onError={() => setSealShown(true)}
+                />
                 {/* light from the upper left on the raised metal */}
                 <span aria-hidden className="gate-emboss" style={{ WebkitMaskImage: `url(${seal})`, maskImage: `url(${seal})` }} />
                 {!reduced && (

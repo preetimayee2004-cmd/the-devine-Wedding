@@ -16,7 +16,7 @@ import { TempleBells, TempleGroup } from "@/components/art/Temple";
  *
  * At the top a gold trishul with a fine rule beneath it, temple bells hanging alike from the upper
  * corners. Beneath them, first, the invitation: "A Sacred Celebration", one line, and one maroon
- * button, "Join the Celebration →". Tapped (once; more taps are ignored), the acceptance is sent —
+ * button, "Accept the Invitation →". Tapped (once; more taps are ignored), the acceptance is sent —
  * saved to the family's database when there is one — and only when that has succeeded does the
  * invitation give way to the scene (if it fails, the button stays, with the reason). Nothing is
  * remembered on the phone: every visit, a reload too, starts with the button.

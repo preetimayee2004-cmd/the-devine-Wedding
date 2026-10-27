@@ -5,7 +5,9 @@ import { wedding } from "@/config/wedding";
  * the opening, and `assets.musicLoop`). It plays from the top once, then loops seamlessly between two
  * of the tune's own downbeats, so the join falls on the beat. Web Audio does the looping, sample-exact.
  *
- * It starts only from a tap — the gate's "Tap to open" (or Skip), or the sound button — fading in; it
+ * It starts only from a tap — the gate's "Tap to open" (or Skip), or the sound button — fading in (when
+ * the gate opens by itself, at the guest's first tap or key anywhere: a browser allows sound only
+ * from one); it
  * fades out when turned off, and rests while the page is hidden (resuming when it's back, if it was
  * on). The file is fetched ahead at the gate, so a tap starts it at once.
  */
@@ -124,6 +126,23 @@ export function playMusic() {
   clearTimeout(resting);
   tell();
   void start();
+}
+
+/**
+ * The gate opened by itself, before any tap: the song starts at the guest's first tap or key anywhere
+ * (a tap on the sound button is left to the button itself).
+ */
+export function playMusicAtFirstTouch() {
+  // the events a browser counts as the guest's own gesture
+  const gestures = ["pointerup", "touchend", "mousedown", "keydown"] as const;
+  const stop = () => gestures.forEach((g) => document.removeEventListener(g, onGesture, true));
+  function onGesture(e: Event) {
+    stop();
+    const target = e.target as Element | null;
+    if (target?.closest?.("[data-music-toggle]")) return;
+    playMusic();
+  }
+  gestures.forEach((g) => document.addEventListener(g, onGesture, true));
 }
 
 export function pauseMusic() {

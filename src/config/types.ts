@@ -78,7 +78,7 @@ export interface Contact {
 
 /** A family member to call (Contact & Assistance). Null fields show as "to come". */
 export interface FamilyContact {
-  /** "The Bride's Family", "The Groom's Family". */
+  /** "The Bride's Family", "The Groom's Family" — not shown; it names the window for a screen reader. */
   side: string;
   name: string | null;
   /** Their actual relationship, e.g. "Bride's brother". */

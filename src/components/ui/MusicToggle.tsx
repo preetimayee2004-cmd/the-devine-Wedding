@@ -23,6 +23,7 @@ export function MusicToggle({ visible }: { visible: boolean }) {
       onClick={() => (playing ? pauseMusic() : playMusic())}
       aria-pressed={playing}
       aria-label={playing ? "Music on: pause the song" : "Music off: play the song"}
+      data-music-toggle
       className={`fixed right-5 z-40 flex h-10 w-10 items-center justify-center rounded-full border border-gold/70 bg-ivory/80 text-navy shadow-[0_4px_14px_-6px_rgb(var(--navy)/0.35)] backdrop-blur-sm transition-[opacity,transform] duration-300 hover:bg-ivory ${shown ? "opacity-100" : "pointer-events-none opacity-0 motion-safe:-translate-y-3"}`}
       style={{ top: "calc(var(--status-bar) + 22px)" }}
     >

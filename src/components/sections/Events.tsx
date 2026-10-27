@@ -16,7 +16,10 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
  * venue (a small ivory button with a gold edge: a tap opens it in Google Maps) and dress code.
  *
  * To the next: a tap on the arch, a swipe left, the › under it (‹ or a swipe right for the one
- * before), or a gold progress mark; after the last, the first. The change (0.8s; taps meanwhile
+ * before), or a gold progress mark; after the last, the first. Untouched, they turn by themselves
+ * every 4.5s while the arch is on screen (any turn starts the count again; it waits while the mouse
+ * rests on the arch or the keyboard is in it, and a screen reader isn't told of these turns — only of
+ * the guest's own; with reduced motion they wait for the guest). The change (0.8s; taps meanwhile
  * are ignored): the ceremony shown fades out, its picture easing down a little (0.3s); a small
  * gold ornament glimmers where it stood; the next picture fades in, growing from 96% to 100%
  * (0.45s), and its words rise softly in just after. The progress marks move at once. The arch and
@@ -28,6 +31,9 @@ const ART = { w: 1098, h: 1228 };
 
 /** The change (ms): out by 300, the ornament between, in by ~780; reduced motion, a crossfade. */
 const DONE = { full: 800, reduced: 420 } as const;
+
+/** Untouched, the next ceremony comes after this long (ms), while the arch is on screen. */
+const AUTO_MS = 4500;
 
 /** Where a venue is on Google Maps (the wedding's own link for the main venue, when it has one). */
 function mapsHref(venue: string) {
@@ -59,12 +65,18 @@ export function Events() {
   const swiped = useRef(0);
   const timers = useRef<number[]>([]);
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
+  // the turns wait while the mouse rests on the arch or the keyboard is in it
+  const [hold, setHold] = useState(false);
+  // the last turn was the guest's own (a screen reader is told of those only)
+  const [byGuest, setByGuest] = useState(false);
+  const [tick, setTick] = useState(0);
 
-  const go = (to: number) => {
+  const go = (to: number, guest = true) => {
     const from = indexRef.current;
     if (busy.current || n < 2 || to === from) return;
     busy.current = true;
     turns.current += 1;
+    setByGuest(guest);
     setTurn({ from, n: turns.current });
     setIndex(to);
     timers.current.push(
@@ -79,6 +91,18 @@ export function Events() {
   };
   const next = () => go((indexRef.current + 1) % n);
   const prev = () => go((indexRef.current - 1 + n) % n);
+
+  // untouched, they turn by themselves while the arch is on screen; any turn starts the count again
+  useEffect(() => {
+    if (!archSeen || reduced || hold || n < 2) return;
+    const id = window.setTimeout(() => {
+      // mid-change (the guest's own, just now): count again
+      if (busy.current) setTick((k) => k + 1);
+      else go((indexRef.current + 1) % n, false);
+    }, AUTO_MS);
+    return () => window.clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- go reads only refs and setters
+  }, [archSeen, reduced, hold, n, index, tick]);
 
   // a swipe on the arch: left for the next, right for the one before
   const onPointerDown = (e: PointerEvent) => (touch.current = { x: e.clientX, y: e.clientY });
@@ -108,7 +132,15 @@ export function Events() {
   const still = reduced || undefined;
 
   return (
-    <section id="events" ref={sectionRef} aria-labelledby="events-heading" className="relative px-[var(--gutter)] pb-3 pt-5">
+    <section
+      id="events"
+      ref={sectionRef}
+      aria-labelledby="events-heading"
+      className="relative px-[var(--gutter)] pb-3 pt-5"
+      // the keyboard in the arch or its controls: the turns wait (a tap's focus doesn't hold them)
+      onFocus={(e) => e.target.matches(":focus-visible") && setHold(true)}
+      onBlur={(e) => !e.currentTarget.contains(e.relatedTarget as Node | null) && setHold(false)}
+    >
       <SectionHeading id="events-heading" title={events.title} intro={`“${personal(events.quoteFor, events.quote)}”`} show={seen} />
 
       <div
@@ -119,6 +151,9 @@ export function Events() {
         onPointerDown={onPointerDown}
         onPointerUp={onPointerUp}
         onPointerCancel={() => (touch.current = null)}
+        // the mouse resting on the arch: the turns wait
+        onPointerEnter={(e) => e.pointerType === "mouse" && setHold(true)}
+        onPointerLeave={(e) => e.pointerType === "mouse" && setHold(false)}
       >
         {/* the arch with its flowers: still */}
         <img src={assets.eventsArch} alt="" width={ART.w} height={ART.h} draggable={false} className="ea-layer" />
@@ -134,7 +169,7 @@ export function Events() {
 
         {/* the ceremony that was, fading out; the one that is (the same element once it has come in) */}
         {turn && list[turn.from] && <Card key={`old-${turn.n}`} ceremony={list[turn.from]} role="old" />}
-        {ceremony && <Card key={`at-${index}`} ceremony={ceremony} role={turn ? "new" : "rest"} />}
+        {ceremony && <Card key={`at-${index}`} ceremony={ceremony} role={turn ? "new" : "rest"} live={byGuest} />}
 
         {/* between them, a small gold ornament glimmers where the couple stood */}
         {turn && !reduced && <Ornament key={`orn-${turn.n}`} />}
@@ -183,10 +218,10 @@ export function Events() {
 }
 
 /** One ceremony's card: the couple in the arch's upper part, its words below them. */
-function Card({ ceremony, role }: { ceremony: Ceremony; role: "rest" | "old" | "new" }) {
+function Card({ ceremony, role, live = false }: { ceremony: Ceremony; role: "rest" | "old" | "new"; live?: boolean }) {
   const gone = role === "old";
   return (
-    <div className="ev-card" data-role={role} aria-hidden={gone || undefined} aria-live={gone ? undefined : "polite"}>
+    <div className="ev-card" data-role={role} aria-hidden={gone || undefined} aria-live={gone ? undefined : live ? "polite" : "off"}>
       <div className="ev-figure">
         {ceremony.image ? (
           <img src={ceremony.image.src} alt={gone ? "" : ceremony.image.alt} width={ceremony.image.width} height={ceremony.image.height} draggable={false} />
