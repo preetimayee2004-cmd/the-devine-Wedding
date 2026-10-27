@@ -4033,10 +4033,12 @@
   }
   /* the opening; the frame reaches past it (116% wide: its leaves 11% out to the left, 25% up), so the
      opening is nudged right to centre the whole, with room above for the leaves */
+  /* (about a tenth larger than it was: on a narrow phone the outermost leaf tips just meet the
+     screen's edges) */
   .hc {
     position: relative;
-    width: min(calc(100% / 1.17), 400px);
-    margin: calc(18% + 8px) auto 30px;
+    width: min(calc(100% / 1.065), 430px);
+    margin: calc(18% + 8px) auto 20px;
     translate: 3.16% 0;
     container-type: inline-size;
     perspective: 900px;
@@ -4087,15 +4089,14 @@
     height: 100%;
     overflow: visible;
     transform: translateZ(-1px);
-    filter: drop-shadow(0 8px 22px rgb(84 60 24 / 0.16));
+    filter: drop-shadow(0 8px 22px rgb(84 60 24 / 0.14));
     transition: opacity 700ms ease-out;
   }
-  /* the mount in the site's antique gold, gently gilded */
+  /* the mount in warm ivory: thin ivory lines between the photos */
   .hc-mount path {
-    fill: url(#hc-gold);
-    stroke: url(#hc-gold);
-    /* a thin gold rim just past the opening: the heart's edge reads even where leaves hid the frame's
-       line in the picture */
+    fill: url(#hc-ivory);
+    stroke: url(#hc-ivory);
+    /* a thin ivory rim just past the opening, inside the frame's gold line */
     stroke-width: 1.1;
     stroke-linejoin: round;
   }
@@ -4107,7 +4108,9 @@
     pointer-events: none;
     user-select: none;
     transform: translateZ(-2px) scale(1.0022);
-    filter: drop-shadow(0 4px 8px rgb(18 41 74 / 0.12));
+    /* a little quieter, so the leaves never compete with the photos */
+    opacity: 0.84;
+    filter: saturate(0.88) drop-shadow(0 4px 8px rgb(18 41 74 / 0.1));
     transition: opacity 700ms ease-out;
   }
   .hc[data-phase="before"] .hc-frame {
@@ -4146,7 +4149,7 @@
     inset: 0;
     overflow: hidden;
     border-radius: 4px;
-    background: rgb(214 192 148);
+    background: rgb(238 228 208);
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
   }
@@ -4217,7 +4220,8 @@
     }
   }
 
-  /* the lightbox: the whole photo on a night-blue veil, its caption, ‹ 3 / 9 ›, and × */
+  /* the lightbox: the whole photo on a night-blue veil, its caption, ‹ 3 / 9 ›, and × — the photo
+     always clear of × above and the caption and arrows below */
   .hc-lb-stage {
     position: absolute;
     inset: 0;
@@ -4226,13 +4230,21 @@
     align-items: center;
     justify-content: center;
     margin: 0;
-    padding: 56px 16px 24px;
+    padding: calc(var(--status-bar, 0px) + 68px) 16px calc(env(safe-area-inset-bottom, 0px) + 20px);
     touch-action: none;
   }
+  /* at the photo's own shape (--ar, width / height): as wide as the screen allows, and never taller
+     than the room left by ×, the caption and the arrows */
   .hc-lb-frame {
+    --ar: 0.75;
     position: relative;
-    width: min(92vw, calc(68dvh * 0.75));
-    aspect-ratio: 3 / 4;
+    flex: none;
+    width: min(
+      calc(100vw - 32px),
+      640px,
+      calc((100dvh - var(--status-bar, 0px) - env(safe-area-inset-bottom, 0px) - 200px) * var(--ar))
+    );
+    aspect-ratio: var(--ar);
     overflow: hidden;
     border: 1px solid rgb(var(--gold) / 0.45);
     border-radius: 12px;
@@ -4267,7 +4279,8 @@
     inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    /* the frame is the photo's own shape, so nothing is cropped or stretched */
+    object-fit: contain;
     user-select: none;
     -webkit-user-drag: none;
   }
@@ -4280,12 +4293,16 @@
     opacity: 1;
   }
   .hc-lb-caption {
+    max-width: 22rem;
     min-height: 1.3em;
     margin-top: 14px;
     font-family: var(--font-display);
-    font-size: 20px;
+    font-size: 19px;
     font-style: italic;
-    color: rgb(var(--ivory) / 0.92);
+    font-weight: 500;
+    line-height: 1.3;
+    letter-spacing: 0.01em;
+    color: rgb(var(--ivory) / 0.9);
     text-align: center;
     animation: hc-lb-caption 400ms ease-out both;
   }
@@ -4301,15 +4318,35 @@
     gap: 22px;
     margin-top: 12px;
   }
-  .hc-lb-btn {
+  /* the arrows and ×: one family — 44px rings in a fine gold line on the night blue */
+  .hc-lb-btn,
+  .hc-lb-close {
     display: grid;
     place-items: center;
-    width: 40px;
-    height: 40px;
-    border: 1px solid rgb(var(--gold) / 0.5);
+    width: 44px;
+    height: 44px;
+    border: 1px solid rgb(var(--gold) / 0.55);
     border-radius: 9999px;
-    color: rgb(var(--gold));
+    background: rgb(255 249 239 / 0.04);
     -webkit-tap-highlight-color: transparent;
+    transition:
+      background-color 200ms ease,
+      border-color 200ms ease,
+      transform 150ms ease;
+  }
+  .hc-lb-btn {
+    color: rgb(var(--gold));
+  }
+  @media (hover: hover) {
+    .hc-lb-btn:hover,
+    .hc-lb-close:hover {
+      border-color: rgb(var(--gold) / 0.9);
+      background: rgb(255 249 239 / 0.1);
+    }
+  }
+  .hc-lb-btn:active,
+  .hc-lb-close:active {
+    transform: scale(0.94);
   }
   .hc-lb-btn:focus-visible,
   .hc-lb-close:focus-visible {
@@ -4322,19 +4359,15 @@
     font-size: 12px;
     letter-spacing: 0.2em;
     text-align: center;
-    color: rgb(var(--ivory) / 0.65);
+    color: rgb(var(--ivory) / 0.72);
   }
+  /* ×, in the upper right, clear of the status bar and a notch */
   .hc-lb-close {
     position: absolute;
-    right: 12px;
+    top: calc(var(--status-bar, 0px) + 12px);
+    right: max(12px, env(safe-area-inset-right, 0px));
     z-index: 2;
-    display: grid;
-    place-items: center;
-    width: 44px;
-    height: 44px;
-    border-radius: 9999px;
     color: rgb(var(--ivory));
-    -webkit-tap-highlight-color: transparent;
   }
   @media (prefers-reduced-motion: reduce) {
     .hc-lb-caption,

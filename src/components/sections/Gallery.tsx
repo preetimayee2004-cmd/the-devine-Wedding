@@ -18,7 +18,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 /**
  * Section 07 — "Our Gallery": the couple's photos as a heart.
  *
- * Fourteen photos of different sizes, the same thin antique-gold gap between all of them, together
+ * Fourteen photos of different sizes, the same thin ivory gap between all of them, together
  * make a heart inside a double gold heart line wreathed in eucalyptus (the couple's picture of it,
  * its white keyed away, the leaves recoloured a dusty Shiva blue): each tile is clipped to the inner
  * line's opening, traced from the picture; the frame lies behind them, so its leaves tuck behind the
@@ -31,10 +31,11 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
  * mouse on a computer; the small tiles move more than the large. At rest each tile is drawn back
  * to its place, so the gaps stay even.
  *
- * A tap opens the photo in a lightbox: the whole photo grows out of its tile onto a night-blue
- * veil, with its caption and ‹ 3 / 9 › — a swipe sideways (or the arrows, or the arrow keys) for
- * the next or the one before, through all the photos once each; a swipe down, ×, a tap on the
- * veil or Escape closes it back into a tile. With more photos than the heart shows, every 3s one
+ * A tap opens the photo in a lightbox: the whole photo, at its own shape, grows out of its tile onto
+ * a night-blue veil, with its caption and ‹ 3 / 9 › — a swipe sideways (or the arrows, or the arrow
+ * keys) for the next or the one before, through all the photos once each; a swipe down, ×, a tap on
+ * the veil, Escape or the phone's back button closes it back into a tile, the page where it was.
+ * With more photos than the heart shows, every 3s one
  * tile turns over (rotateY 180°) to show one of the others — one at a time, never while the
  * lightbox is open or the heart is being tilted.
  *
@@ -69,7 +70,7 @@ const FLIP_MS = 3000;
 const TILES: readonly { box: readonly [number, number, number, number]; photo: string; crop: Crop }[] = [
   { box: [0, 0, 0.25, 0.3], photo: "/photos/gallery-1.webp", crop: [0, 0.02, 1] },
   { box: [0.25, 0, 0.5, 0.3], photo: "/photos/gallery-4.webp", crop: [0, 0, 1] },
-  { box: [0.5, 0, 0.75, 0.14], photo: "/photos/gallery-1.webp", crop: [0.075, 0.075, 0.7] },
+  { box: [0.5, 0, 0.75, 0.14], photo: "/photos/gallery-1.webp", crop: [0.05, 0.03, 0.7] },
   { box: [0.5, 0.14, 0.75, 0.3], photo: "/photos/gallery-2.webp", crop: [0, 0.08, 1] },
   { box: [0.75, 0, 1, 0.3], photo: "/photos/gallery-6.webp", crop: [0, 0.05, 1] },
   { box: [0, 0.3, 0.3, 0.46], photo: "/photos/gallery-9.webp", crop: [0.05, 0.12, 0.9] },
@@ -80,7 +81,7 @@ const TILES: readonly { box: readonly [number, number, number, number]; photo: s
   { box: [0.08, 0.62, 0.36, 0.78], photo: "/photos/gallery-7.webp", crop: [0, 0.12, 1] },
   { box: [0.36, 0.62, 0.64, 0.78], photo: "/photos/gallery-5.webp", crop: [0, 0.02, 1] },
   { box: [0.64, 0.62, 0.93, 0.78], photo: "/photos/gallery-7.webp", crop: [0.3, 0.15, 0.65] },
-  { box: [0.26, 0.78, 0.77, 1], photo: "/photos/gallery-4.webp", crop: [0.2, 0.14, 0.75] },
+  { box: [0.26, 0.78, 0.77, 1], photo: "/photos/gallery-4.webp", crop: [0.15, 0.06, 0.75] },
 ];
 
 /**
@@ -462,14 +463,13 @@ export function Gallery() {
         >
           <div className="hc-beat">
             <div ref={tiltRef} className="hc-tilt">
-              {/* the gilded mount: the gaps between the tiles, and a rim round the heart as thin as they are */}
+              {/* the ivory mount: the gaps between the tiles, and a rim round the heart as thin as they are */}
               <svg className="hc-mount" viewBox={`0 0 100 ${(100 * RATIO).toFixed(2)}`} preserveAspectRatio="none" aria-hidden>
                 <defs>
-                  <linearGradient id="hc-gold" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0" stopColor="#d9bd82" />
-                    <stop offset="0.45" stopColor="#b89554" />
-                    <stop offset="0.7" stopColor="#cdaa68" />
-                    <stop offset="1" stopColor="#9c7a3e" />
+                  {/* warm ivory, a breath deeper toward the foot */}
+                  <linearGradient id="hc-ivory" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stopColor="#fffaf0" />
+                    <stop offset="1" stopColor="#f6ead3" />
                   </linearGradient>
                 </defs>
                 <path d={HEART_PATH} />
@@ -540,10 +540,11 @@ export function Gallery() {
 }
 
 /**
- * The lightbox, on a night-blue veil: the whole photo grows out of its tile, with its caption and
- * ‹ 3 / 9 ›. A swipe sideways (the arrows, the arrow keys) turns to the next or the one before;
- * a swipe down — or ×, a tap on the veil, Escape — closes it back into a tile showing it. Focus
- * returns to the tile, and the page keeps its place.
+ * The lightbox, on a night-blue veil: the whole photo, at its own shape (portrait or landscape, as
+ * large as the screen allows between × and the caption), grows out of its tile, with its caption and
+ * ‹ 3 / 9 ›. A swipe sideways (the arrows, the arrow keys) turns to the next or the one before — one
+ * turn at a time; a swipe down — or ×, a tap on the veil, Escape, the phone's back button — closes it
+ * back into a tile showing it. Focus returns to the tile, and the page keeps its place.
  */
 function Lightbox({
   photos,
@@ -570,6 +571,13 @@ function Lightbox({
   const touch = useRef<{ x: number; y: number; dy: number; mode: "" | "x" | "y" } | null>(null);
   // when a swipe ended: the click that follows it does not close
   const swiped = useRef(0);
+  // each photo's shape (width / height), once its small copy has loaded; 3:4 until then
+  const [shapes, setShapes] = useState<Record<number, number>>({});
+  // the last turn, so quick taps turn one photo at a time
+  const lastStep = useRef(0);
+  // the phone's back button: a history entry while the photo is open, so back closes it
+  const pushed = useRef(false);
+  const popped = useRef(false);
   useScrollLock(true);
   const photo = photos[index];
   const n = photos.length;
@@ -604,10 +612,10 @@ function Lightbox({
     if (!reduced) el.style.transform = onto(from);
     void el.offsetWidth;
     requestAnimationFrame(() => {
-      el.style.transition = reduced ? "opacity 250ms linear" : "transform 480ms cubic-bezier(0.22, 1, 0.36, 1), opacity 260ms ease-out";
+      el.style.transition = reduced ? "opacity 250ms linear" : "transform 380ms cubic-bezier(0.22, 1, 0.36, 1), opacity 240ms ease-out";
       el.style.transform = "none";
       el.style.opacity = "1";
-      veil.style.transition = reduced ? "opacity 250ms linear" : "opacity 360ms ease-out";
+      veil.style.transition = reduced ? "opacity 250ms linear" : "opacity 300ms ease-out";
       veil.style.opacity = "1";
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -628,24 +636,42 @@ function Lightbox({
       const y = window.scrollY;
       dialog?.close();
       if (window.scrollY !== y) window.scrollTo({ top: y, behavior: "instant" });
+      // closed here (not by the back button): take back the history entry made on opening
+      if (!popped.current && (history.state as { hcPhoto?: boolean } | null)?.hcPhoto) history.back();
       onClosed();
     };
     if (!el || !veil) return done();
     if (reduced) {
       el.style.transition = veil.style.transition = "opacity 220ms linear";
     } else {
-      el.style.transition = "transform 400ms cubic-bezier(0.4, 0, 0.2, 1), opacity 260ms ease 140ms";
+      el.style.transition = "transform 340ms cubic-bezier(0.4, 0, 0.2, 1), opacity 220ms ease 120ms";
       el.style.transform = onto(target(index));
-      veil.style.transition = "opacity 360ms ease";
+      veil.style.transition = "opacity 300ms ease";
     }
     el.style.opacity = veil.style.opacity = "0";
-    window.setTimeout(done, reduced ? 230 : 410);
+    window.setTimeout(done, reduced ? 230 : 350);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduced, onClosed, index]);
 
+  // the phone's back button closes the photo, rather than leaving the page
+  useEffect(() => {
+    if (!pushed.current) {
+      history.pushState({ ...((history.state as object | null) ?? {}), hcPhoto: true }, "");
+      pushed.current = true;
+    }
+    const onPop = () => {
+      popped.current = true;
+      close();
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, [close]);
+
   const step = useCallback(
     (d: 1 | -1) => {
-      if (n < 2 || closing.current) return;
+      // one turn at a time: quick taps don't pile up
+      if (n < 2 || closing.current || Date.now() - lastStep.current < 280) return;
+      lastStep.current = Date.now();
       setDir(d);
       onStep(d);
     },
@@ -721,7 +747,7 @@ function Lightbox({
       }}
       className="hc-lb fixed inset-0 m-0 h-[100dvh] max-h-none w-screen max-w-none overflow-hidden bg-transparent p-0 backdrop:bg-transparent"
     >
-      <div ref={veilRef} aria-hidden className="absolute inset-0 bg-navy-deep/[0.96]" />
+      <div ref={veilRef} aria-hidden className="absolute inset-0 bg-navy-deep/[0.985]" />
       {/* a tap on the veil (not the photo or its controls) closes */}
       <figure
         className="hc-lb-stage"
@@ -731,10 +757,22 @@ function Lightbox({
         onPointerCancel={() => (touch.current = null)}
         onClick={(e) => e.target === e.currentTarget && Date.now() - swiped.current > 450 && close()}
       >
-        <div ref={frameRef} className="hc-lb-frame">
+        <div ref={frameRef} className="hc-lb-frame" style={{ "--ar": shapes[index] ?? 0.75 } as CSSProperties}>
           {/* turned to, the photo slides in from the side the swipe came from */}
           <div key={index} className="hc-lb-photo" data-dir={dir !== 0 && !reduced ? dir : undefined}>
-            <img src={photo.thumb ?? photo.src} alt="" aria-hidden width={484} height={648} draggable={false} className="hc-lb-img" />
+            <img
+              src={photo.thumb ?? photo.src}
+              alt=""
+              aria-hidden
+              width={484}
+              height={648}
+              draggable={false}
+              className="hc-lb-img"
+              onLoad={(e) => {
+                const { naturalWidth: w, naturalHeight: h } = e.currentTarget;
+                if (w && h) setShapes((s) => (s[index] ? s : { ...s, [index]: w / h }));
+              }}
+            />
             <img
               src={photo.src}
               alt={photo.alt}
@@ -767,7 +805,7 @@ function Lightbox({
           </div>
         )}
       </figure>
-      <button type="button" onClick={close} aria-label="Close" className="hc-lb-close" style={{ top: "calc(var(--status-bar, 0px) + 14px)" }}>
+      <button type="button" onClick={close} aria-label="Close the photo" className="hc-lb-close">
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden>
           <path d="M4.5 4.5l9 9M13.5 4.5l-9 9" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
         </svg>
