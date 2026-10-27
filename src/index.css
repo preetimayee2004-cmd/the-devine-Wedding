@@ -1088,8 +1088,9 @@
     aspect-ratio: 3 / 4;
     margin-top: 16px;
   }
-  /* flowers drifting down over the couple once the scene opens: each falls once, slowly, swaying and
-     turning a little, and fades as it reaches their feet (the box is the art's own, in its own height units) */
+  /* rose petals drifting down over the couple once the scene opens: each falls once, slowly, swaying
+     and tumbling (it turns and shows its edge), and fades as it reaches their feet (the box is the
+     art's own, in its own height units) */
   .rs-flowers {
     position: absolute;
     inset: 0;
@@ -1105,7 +1106,7 @@
     height: var(--size);
     opacity: 0;
     animation: rs-flower-fall var(--fall) cubic-bezier(0.32, 0.06, 0.58, 1) var(--delay) both;
-    filter: drop-shadow(0 1px 1.5px rgb(84 60 24 / 0.25));
+    filter: drop-shadow(0 1.5px 1.5px rgb(90 20 30 / 0.28));
   }
   .rs-flower-sway {
     display: block;
@@ -1136,11 +1137,14 @@
     }
   }
   @keyframes rs-flower-sway {
-    from {
-      transform: translateX(calc(var(--sway) * -1)) rotate(-14deg);
+    0% {
+      transform: translateX(calc(var(--sway) * -1)) rotate(-24deg) scaleX(1);
     }
-    to {
-      transform: translateX(var(--sway)) rotate(14deg);
+    50% {
+      transform: translateX(0) rotate(0deg) scaleX(0.35);
+    }
+    100% {
+      transform: translateX(var(--sway)) rotate(24deg) scaleX(1);
     }
   }
   .rs[data-still] .rs-flowers {

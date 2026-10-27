@@ -539,49 +539,65 @@ function BelLeaves() {
 }
 
 /**
- * Once the scene opens, a few flowers drift down over Mahadev and Maa Parvati — white jasmine, as in
- * her hair, and soft pink petals — each falling once, slowly, swaying on the air and turning gently,
- * fading as it reaches their feet. Where each starts (% across), its kind, size (px), when it sets off
- * (ms after the scene opens), how long it falls (ms), how far it sways (px) and how much it turns.
+ * Once the scene opens, rose petals drift down over the couple — deep red, rose and soft pink — each
+ * falling once, slowly, swaying on the air and tumbling as a real petal does (it turns and shows its
+ * edge), fading as it reaches their feet. Where each starts (% across), its shade, size (px), when it
+ * sets off (ms after the scene opens), how long it falls (ms), how far it sways (px) and how much it
+ * turns.
  */
-const FLOWERS = [
-  [22, "jasmine", 20, 1500, 5600, 14, 140],
-  [64, "petal", 14, 1750, 6200, 18, -200],
-  [44, "jasmine", 17, 2050, 5800, 12, 180],
-  [80, "petal", 13, 2300, 6400, 16, 220],
-  [12, "petal", 16, 2550, 6000, 20, -160],
-  [55, "jasmine", 21, 2850, 6300, 15, 120],
-  [33, "petal", 12, 3150, 5700, 13, -240],
-  [72, "jasmine", 16, 3450, 6100, 17, 160],
-  [18, "jasmine", 14, 3800, 5900, 12, -130],
-  [48, "petal", 16, 4100, 6500, 19, 210],
-  [86, "jasmine", 17, 4450, 5800, 14, -170],
-  [38, "petal", 13, 4800, 6200, 16, 190],
+const PETALS = [
+  [20, 0, 20, 1500, 5600, 16, 160],
+  [62, 1, 17, 1700, 6200, 20, -210],
+  [42, 2, 15, 1950, 5800, 14, 190],
+  [78, 0, 18, 2150, 6400, 18, 230],
+  [10, 1, 16, 2400, 6000, 22, -170],
+  [54, 0, 21, 2650, 6300, 17, 130],
+  [32, 2, 14, 2900, 5700, 15, -250],
+  [70, 1, 17, 3150, 6100, 19, 170],
+  [16, 0, 15, 3450, 5900, 14, -140],
+  [48, 2, 18, 3700, 6500, 21, 220],
+  [86, 1, 16, 3950, 5800, 16, -180],
+  [36, 0, 17, 4250, 6200, 18, 200],
+  [60, 2, 14, 4500, 6000, 15, -230],
+  [26, 1, 19, 4800, 6300, 20, 150],
+] as const;
+
+/** The three shades: a light heart, a deeper edge. */
+const SHADES = [
+  ["#e04a5e", "#8f1426"],
+  ["#f0687a", "#b0243f"],
+  ["#f8a0ae", "#d0506a"],
 ] as const;
 
 function BlessingFlowers() {
   return (
     <div aria-hidden className="rs-flowers">
-      {FLOWERS.map(([left, kind, size, delay, fall, sway, turn], i) => (
+      <svg width="0" height="0" className="absolute">
+        <defs>
+          {SHADES.map(([light, deep], i) => (
+            <radialGradient key={i} id={`rs-rose-${i}`} cx="0.42" cy="0.38" r="0.7">
+              <stop offset="0" stopColor={light} />
+              <stop offset="1" stopColor={deep} />
+            </radialGradient>
+          ))}
+        </defs>
+      </svg>
+      {PETALS.map(([left, shade, size, delay, fall, sway, turn], i) => (
         <span
           key={i}
           className="rs-flower"
           style={{ left: `${left}%`, "--delay": `${delay}ms`, "--fall": `${fall}ms`, "--sway": `${sway}px`, "--turn": `${turn}deg`, "--size": `${size}px` } as CSSProperties}
         >
-          <span className="rs-flower-sway" style={{ animationDuration: `${1700 + (i % 4) * 260}ms` }}>
-            {kind === "jasmine" ? (
-              <svg viewBox="-10 -10 20 20" className="rs-flower-shape">
-                {[0, 72, 144, 216, 288].map((a) => (
-                  <ellipse key={a} cx="0" cy="-4.6" rx="2.6" ry="4.6" fill="#fffdf8" stroke="#e6dccb" strokeWidth="0.5" transform={`rotate(${a})`} />
-                ))}
-                <circle r="1.7" fill="#f2c45a" />
-              </svg>
-            ) : (
-              <svg viewBox="-10 -10 20 20" className="rs-flower-shape">
-                <path d="M0 -8C5 -5 6 2 0 8 -6 2 -5 -5 0 -8Z" fill="#f6b8c6" stroke="#e48aa2" strokeWidth="0.5" />
-                <path d="M0 -5.5V5" stroke="#fbd6df" strokeWidth="0.7" strokeLinecap="round" />
-              </svg>
-            )}
+          <span className="rs-flower-sway" style={{ animationDuration: `${1600 + (i % 5) * 220}ms` }}>
+            {/* a rose petal: broad and rounded, the faintest dip at its top, narrowing to its base, cupped (a lighter heart, a darker rim) */}
+            <svg viewBox="-10 -10 20 20" className="rs-flower-shape">
+              <path
+                d="M0 -7.6C3.4 -8.8 8.4 -7 9 -2.4 9.4 2.6 5.2 6.8 0.4 8.8 -4.8 6.9 -9.2 2.8 -8.8 -2.2 -8.3 -7 -3.6 -8.9 0 -7.6Z"
+                fill={`url(#rs-rose-${shade})`}
+              />
+              <path d="M0 -4.6C-0.6 -0.4 -0.4 3.6 0 7" stroke="rgb(255 225 230 / 0.45)" strokeWidth="0.7" strokeLinecap="round" fill="none" />
+              <path d="M-6 -5.2C-3.8 -7.4 -1.2 -7.4 0.4 -6.6" stroke="rgb(255 235 238 / 0.5)" strokeWidth="0.8" strokeLinecap="round" fill="none" />
+            </svg>
           </span>
         </span>
       ))}
