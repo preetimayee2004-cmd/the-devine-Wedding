@@ -11,7 +11,8 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
  *
  * "Wedding Events" and one quote above the couple's gold temple arch, wreathed in lotus and banana
  * leaves, with the music of the celebration and a festive elephant at its foot — all of it still.
- * Inside the arch, one ceremony at a time: the couple dressed for it, then its name, date and time,
+ * Inside the arch, one ceremony at a time: its illustration (the couple dressed for it, Ganesha for
+ * the Ganesh Pujan, the doli for the Vidaai…), then its name, date and time,
  * venue (a small ivory button with a gold edge: a tap opens it in Google Maps) and dress code.
  *
  * To the next: a tap on the arch, a swipe left, the › under it (‹ or a swipe right for the one
