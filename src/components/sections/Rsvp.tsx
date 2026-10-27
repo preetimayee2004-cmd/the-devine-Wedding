@@ -229,17 +229,25 @@ function Scene({ calendar, note }: { calendar: CalendarItem | null; note: string
       {/* the temple arch, and Mahadev and Maa Parvati within it */}
       <div className="rs-art">
         <span aria-hidden className="rs-glow" style={at(AT.figures)} />
-        <img
-          className="rs-figures"
-          style={at(AT.figures)}
-          src={wedding.assets.rsvpCouple}
-          alt="Mahadev holding Maa Parvati close, both with eyes closed, jasmine in her hair and the crescent moon in his"
-          width={wedding.assets.rsvpCoupleSize.width}
-          height={wedding.assets.rsvpCoupleSize.height}
-          loading="lazy"
-          decoding="async"
-          draggable={false}
-        />
+        {/* the couple's photograph in the arch, as through a window: cut to the arch's inner line, its foot
+            melting into the page */}
+        <svg role="img" aria-label={wedding.assets.rsvpCouple.alt} viewBox="0 0 300 400" className="rs-figures" style={at(AT.figures)}>
+          <defs>
+            <clipPath id="rs-window">
+              <path d="M48 400V172C48 132 94 112 121 92C137 80 146 66 150 50C154 66 163 80 179 92C206 112 252 132 252 172V400Z" />
+            </clipPath>
+            <linearGradient id="rs-photo-fade" gradientUnits="userSpaceOnUse" x1="0" y1="300" x2="0" y2="396">
+              <stop offset="0" stopColor="#fff" />
+              <stop offset="1" stopColor="#000" />
+            </linearGradient>
+            <mask id="rs-photo-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="300" height="400">
+              <rect width="300" height="400" fill="url(#rs-photo-fade)" />
+            </mask>
+          </defs>
+          <g clipPath="url(#rs-window)" mask="url(#rs-photo-mask)">
+            <image href={wedding.assets.rsvpCouple.src} x="48" y="50" width="204" height="350" preserveAspectRatio="xMidYMid slice" />
+          </g>
+        </svg>
         <Arch />
         <BlessingFlowers />
       </div>

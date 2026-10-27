@@ -604,12 +604,14 @@ export const wedding = {
     rsvpShivling: "/art/rsvp-shivling.svg",
     rsvpNandi: "/art/rsvp-nandi.webp",
     /**
-     * Section 08 (RSVP): Mahadev holding Maa Parvati close, eyes closed — the couple's chosen painting,
-     * cut out of its red ground (the halo's arc and the corner flowers left behind) so it stands in the
-     * gold arch on the site's own sky.
+     * Section 08 (RSVP), once accepted: the couple's photograph, seen through the gold arch as through a
+     * window — cut to the arch's inner line, its foot melting into the page (it is cropped to the arch's
+     * tall shape from the middle, so keep the faces near the centre).
      */
-    rsvpCouple: "/art/shiva-parvati-embrace.webp",
-    rsvpCoupleSize: { width: 695, height: 969 },
+    rsvpCouple: {
+      src: "/photos/rsvp-couple.webp",
+      alt: "The couple on a boat on the river, foreheads touching, gulls flying in the blue sky above them",
+    },
     /** Soft-edged bloom used for every watercolour reveal. */
     watercolorMask: "/art/watercolor-mask.png",
     /** The golden ॐ wax seal on the gate before the opening ("Touch to begin"). */
