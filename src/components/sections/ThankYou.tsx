@@ -119,7 +119,8 @@ export function ThankYou() {
         </div>
       </div>
 
-      <Reveal show={seen} delay={at(1300)} as="p" className="mt-6 font-script text-[30px] leading-tight text-gold-ink">
+      {/* in the plain serif, upright and a good size, so a guest of any age reads it at a glance */}
+      <Reveal show={seen} delay={at(1300)} as="p" className="mt-6 font-display text-[22px] font-semibold leading-snug tracking-[0.01em] text-gold-ink">
         {copy.eyebrow}
       </Reveal>
       <Reveal show={seen} delay={at(1450)}>
