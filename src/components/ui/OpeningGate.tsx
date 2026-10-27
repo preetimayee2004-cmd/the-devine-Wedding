@@ -190,11 +190,11 @@ export function OpeningGate({ seal, sky, invited, guest, label, devanagari = fal
       {/* ── above the seal, the invitation: for a named guest, their name first ── */}
       <div className="flex flex-col items-center self-end pb-5">
         {guest && (
-          <p className="gate-words gate-gold gate-name relative mb-1.5 max-w-[18rem] text-balance text-center font-display text-[29px] font-semibold italic leading-tight">
+          <p className="gate-words gate-ivory gate-name relative mb-1.5 max-w-[18rem] text-balance text-center font-display text-[29px] font-semibold italic leading-tight">
             {guest}
           </p>
         )}
-        <p className={`gate-words gate-gold relative ${devanagari ? "font-deva text-[17px]" : `${words} text-[13px] tracking-[0.38em]`}`}>
+        <p className={`gate-words gate-ivory relative ${devanagari ? "font-deva text-[17px]" : `${words} text-[13px] tracking-[0.38em]`}`}>
           {invited}
         </p>
         <LotusRule className="gate-words relative mt-2.5" />
@@ -312,7 +312,7 @@ export function OpeningGate({ seal, sky, invited, guest, label, devanagari = fal
       {/* ── below it, a small gold diamond line, and the invitation to open it ── */}
       <div className="flex flex-col items-center self-start pt-6">
         <SealRule className="gate-words relative" />
-        <p className={`gate-hint gate-gold relative mt-2.5 ${devanagari ? "font-deva text-[15px]" : `${words} text-[12.5px] tracking-[0.34em]`}`}>
+        <p className={`gate-hint gate-ivory relative mt-2.5 ${devanagari ? "font-deva text-[15px]" : `${words} text-[12.5px] tracking-[0.34em]`}`}>
           <span className="gate-pulse">{label}</span>
         </p>
       </div>
