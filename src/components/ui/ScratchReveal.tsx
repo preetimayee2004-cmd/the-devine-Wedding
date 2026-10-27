@@ -158,6 +158,7 @@ export function ScratchReveal({
     const lotus = (cx: number) => {
       ctx.save();
       ctx.translate(cx, mid + 0.5);
+      ctx.scale(1.15, 1.15);
       ctx.strokeStyle = "#9c7a3e";
       ctx.fillStyle = "rgba(214, 178, 108, 0.7)";
       ctx.lineWidth = 0.8;
@@ -206,7 +207,7 @@ export function ScratchReveal({
     const text = hint.toUpperCase();
     const spaced = !/[ऀ-ॿ]/.test(text);
     const room = W - 2 * (CORNER + 24);
-    let size = 10.5;
+    let size = 11.5;
     const ls = ctx as CanvasRenderingContext2D & { letterSpacing?: string };
     for (; size > 8; size -= 0.25) {
       ctx.font = `600 ${size}px ${family}`;
