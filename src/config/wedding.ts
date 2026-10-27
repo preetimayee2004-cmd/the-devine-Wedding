@@ -233,10 +233,15 @@ export const wedding = {
     /**
      * Spare illustrations, kept ready but not shown: to use one, set an event's `image` to it (and add
      * an event with it, if it's a new one). Cut-outs like the rest, from the couple's pictures.
-     * (A groom-alone picture is still wanted: the one offered was a stock illustration with its
-     * maker's watermark, so it isn't used.)
      */
     spareArt: {
+      /** For the groom's own ceremonies (his Haldi, the Sehra Bandi…): standing, arms folded. */
+      groom: {
+        src: "/art/events/option-groom.webp",
+        width: 194,
+        height: 608,
+        alt: "The groom standing with his arms folded, in a yellow paisley Nehru jacket over a white kurta and pyjama, brown loafers",
+      },
       /** For the bride's own ceremonies (Mehendi, Chooda, her Haldi…): seated on a bench between bright cushions. */
       bride: {
         src: "/art/events/option-bride.webp",
