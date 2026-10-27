@@ -230,6 +230,28 @@ export const wedding = {
         image: { src: "/art/events/griha-pravesh.webp", width: 250, height: 586, alt: "The bride, seen from behind, stepping into her new home, leaving footprints in red alta" },
       },
     ]),
+    /**
+     * Spare illustrations, kept ready but not shown: to use one, set an event's `image` to it (and add
+     * an event with it, if it's a new one). Cut-outs like the rest, from the couple's pictures.
+     * (A groom-alone picture is still wanted: the one offered was a stock illustration with its
+     * maker's watermark, so it isn't used.)
+     */
+    spareArt: {
+      /** For the bride's own ceremonies (Mehendi, Chooda, her Haldi…): seated on a bench between bright cushions. */
+      bride: {
+        src: "/art/events/option-bride.webp",
+        width: 477,
+        height: 560,
+        alt: "The bride seated on a low bench between bright cushions, in a red lehenga and orange choli, a sheer red dupatta round her, before a splash of pink",
+      },
+      /** For the couple together (the wedding, the reception…): side by side in red and ivory. */
+      couple: {
+        src: "/art/events/option-couple.webp",
+        width: 388,
+        height: 640,
+        alt: "The bride and groom side by side, she in an embroidered red lehenga and veil, he in an ivory sherwani with a red turban and stole",
+      },
+    } satisfies Record<string, NonNullable<Ceremony["image"]>>,
   },
 
   /** Section 06 — two families. SAMPLE: real names and photos replace these. */
