@@ -3,13 +3,11 @@ import { wedding } from "@/config/wedding";
 import { useGuest } from "@/context/GuestContext";
 import { REDUCED_MOTION_QUERY } from "@/hooks/useMediaQuery";
 import { useLang } from "@/lib/lang";
-import { directionsUrl } from "@/lib/maps";
 import { EASE, MOTION } from "@/lib/motion";
 import { glideTo, USER_INPUT_EVENTS } from "@/lib/scroll";
 import { snapToNext } from "@/lib/snap";
 import { readSessionFlag, writeSessionFlag } from "@/lib/session";
 import { formatVenueDate, parseVenueDateTime } from "@/lib/venueTime";
-import { Icon } from "@/components/art/Icons";
 import { ScratchReveal } from "@/components/ui/ScratchReveal";
 import { GoldMotes } from "@/components/ui/GoldMotes";
 import { LangToggle } from "@/components/ui/LangToggle";
@@ -31,8 +29,8 @@ import { PetalShower } from "@/components/ui/PetalShower";
  *   release  the glow widens and fades, a few gold motes drift outward, and
  *            the hands fade gently into the sky; then the sky melts away
  *   reveal   only once the hands are gone, the card rises in, top to bottom:
- *            the names, the date and the
- *            venue (a map link); then the painting of Mahadev blessing Maa
+ *            the names and the date (the venue is left to the couple section
+ *            and the venue section); then the painting of Mahadev blessing Maa
  *            Parvati before the Himalaya, down to the very foot of the
  *            screen, with the blessing line and "View the Invitation" over
  *            its lower edge; a few petals fall
@@ -188,14 +186,13 @@ export function Invitation() {
     return parts ? formatVenueDate(parts, hindi ? "hi-IN" : "en-IN") : null;
   }, [hindi]);
 
-  const { invitation: copy, couple, venue, assets } = wedding;
+  const { invitation: copy, couple, assets } = wedding;
   const t = hindi
     ? { ...copy.hindi, bride: copy.hindi.names.bride, groom: copy.hindi.names.groom }
     : {
         ...copy,
         bride: couple.bride.displayName,
         groom: couple.groom.displayName,
-        venue: [venue.name, venue.city].filter(Boolean).join(", "),
       };
   // Hindi lines are set in the Devanagari face; English in the serif (the script is only for the title)
   const serif = hindi ? "font-deva" : "font-display";
@@ -346,23 +343,6 @@ export function Invitation() {
               </p>
             </ScratchReveal>
           </div>
-        )}
-
-        {/* the venue: tap for directions (the tap area is taller than the line, so its top margin is less) */}
-        {t.venue && (
-          <a
-            href={directionsUrl(venue)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`group relative mt-[calc(var(--std-gap)-10px)] inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-3 text-[15px] font-semibold text-navy transition-colors duration-300 hover:bg-ivory/60 ${serif}`}
-            style={rise(4)}
-          >
-            <Icon name="pin" className="h-[18px] w-[18px] shrink-0 text-gold-ink" />
-            <span className="underline decoration-gold/70 decoration-dotted decoration-1 underline-offset-[5px] group-hover:decoration-solid">
-              {t.venue}
-            </span>
-            <Icon name="external" className="h-3.5 w-3.5 shrink-0 text-gold-ink" />
-          </a>
         )}
       </div>
 
