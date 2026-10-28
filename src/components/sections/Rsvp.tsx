@@ -5,6 +5,7 @@ import { useElementSize } from "@/hooks/useElementSize";
 import { useInView } from "@/hooks/useInView";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
 import { acceptInvitation, BackendError, type Acceptance } from "@/lib/backend";
+import { useCopy } from "@/lib/lang";
 import { RSVP_ACCEPTED } from "@/lib/rsvpEvents";
 import { downloadIcs, googleCalendarUrl, weddingCalendarItem } from "@/lib/calendar";
 import { Icon } from "@/components/art/Icons";
@@ -66,7 +67,7 @@ type CalendarItem = NonNullable<ReturnType<typeof weddingCalendarItem>>;
 type Phase = "idle" | "sending" | "leaving" | "open";
 
 export function Rsvp() {
-  const { rsvp } = wedding;
+  const rsvp = useCopy(wedding.rsvp);
   const { guestName, fromLink } = useGuest();
   const personal = usePersonal();
   const ref = useRef<HTMLElement>(null);
@@ -178,7 +179,7 @@ export function Rsvp() {
                     aria-disabled={phase !== "idle" || undefined}
                     data-phase={phase}
                   >
-                    {phase === "sending" ? "Sending your joy…" : error ? "Try again" : rsvp.button}
+                    {phase === "sending" ? rsvp.sending : error ? rsvp.tryAgain : rsvp.button}
                     <svg
                       aria-hidden
                       viewBox="0 0 20 10"
@@ -202,7 +203,7 @@ export function Rsvp() {
                 )}
                 {error && (
                   <p role="alert" className="mx-auto mt-3 max-w-[18rem] text-[13.5px] leading-snug text-[#9a3b2e]">
-                    We couldn't send your acceptance. {error}
+                    {rsvp.sendFailed} {error}
                   </p>
                 )}
               </Label>
@@ -230,7 +231,7 @@ export function Rsvp() {
 
 /** The scene that opens once the acceptance is saved (its parts timed from the moment it opens). */
 function Scene({ calendar, note }: { calendar: CalendarItem | null; note: string }) {
-  const { rsvp } = wedding;
+  const rsvp = useCopy(wedding.rsvp);
   const personal = usePersonal();
   return (
     <div className="rs-scene flex flex-col items-center" aria-live="polite">
@@ -275,7 +276,7 @@ function Scene({ calendar, note }: { calendar: CalendarItem | null; note: string
 
       {calendar && (
         <div className="rs-in mt-8 flex flex-col items-center" style={at(AT.button)}>
-          <AddToCalendar calendar={calendar} label={rsvp.calendarButton} />
+          <AddToCalendar calendar={calendar} label={rsvp.calendarButton} googleDone={rsvp.googleDone} icsDone={rsvp.icsDone} />
         </div>
       )}
       <p className="rs-note rs-in" style={at(AT.link)}>
@@ -286,16 +287,27 @@ function Scene({ calendar, note }: { calendar: CalendarItem | null; note: string
 }
 
 /** "Add to calendar": opens two choices, and says exactly what each one did. */
-function AddToCalendar({ calendar, label }: { calendar: CalendarItem; label: string }) {
+function AddToCalendar({
+  calendar,
+  label,
+  googleDone,
+  icsDone,
+}: {
+  calendar: CalendarItem;
+  label: string;
+  /** What each choice did, in the card's language. */
+  googleDone: string;
+  icsDone: string;
+}) {
   const [open, setOpen] = useState(false);
   const [feedback, setFeedback] = useState("");
   const google = () => {
     window.open(googleCalendarUrl(calendar), "_blank", "noopener,noreferrer");
-    setFeedback("Google Calendar has opened in a new tab — tap Save there to keep the date.");
+    setFeedback(googleDone);
   };
   const ics = () => {
     downloadIcs(calendar);
-    setFeedback("A calendar file (.ics) has been downloaded — open it to add the wedding to your calendar.");
+    setFeedback(icsDone);
   };
   return (
     <>

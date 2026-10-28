@@ -35,6 +35,8 @@ export const wedding = {
     city: "Varanasi",
     /** A Google Maps link to the exact spot; when null, directions search for name + address. */
     mapsUrl: null as string | null,
+    /** As shown on हिं (the links to the map always use the English above). */
+    hindi: { name: "कैलाश वाटिका", address: "सारनाथ रोड, वाराणसी, उत्तर प्रदेश", city: "वाराणसी" },
   },
 
   /**
@@ -51,6 +53,9 @@ export const wedding = {
      */
     youreInvited: "You're invited",
     touchToBegin: "Tap to open",
+    /** The gate's and the opening's Skip, and what it is called for a screen reader. */
+    skip: "Skip",
+    skipLabel: "Skip the opening",
     title: "Save the Date",
     blessing: "With the blessings of Mahadev and Maa Parvati, two hearts begin their sacred journey together.",
     request: "request the honour of your presence as they celebrate their union",
@@ -75,6 +80,8 @@ export const wedding = {
     hindi: {
       youreInvited: "आप आमंत्रित हैं",
       touchToBegin: "खोलने के लिए स्पर्श करें",
+      skip: "छोड़ें",
+      skipLabel: "शुरुआत छोड़ें",
       title: "शुभ विवाह",
       blessing: "महादेव और माँ पार्वती के आशीर्वाद से, दो हृदय अपनी पवित्र यात्रा आरंभ कर रहे हैं।",
       names: { bride: "प्रीति", groom: "शिवाशीष" },
@@ -100,7 +107,9 @@ export const wedding = {
     /** With the EN / हिं switch on हिं. */
     hindi: {
       welcome: "स्वागतम्",
+      dear: "प्रिय {guest},",
       invited: "आप सादर आमंत्रित हैं",
+      copied: "कॉपी हो गया",
     },
   },
 
@@ -155,6 +164,15 @@ export const wedding = {
     quoteFor: "Every ritual, a blessing; every moment, a memory we hope to share with you, {guest}.",
     /** Under the arch: how to see the other ceremonies. */
     hint: "Tap the arch frame, or let the events turn by themselves",
+    /** Before each ceremony's dress code. */
+    dressCodeLabel: "Dress code",
+    hindi: {
+      title: "विवाह समारोह",
+      quote: "हर रस्म एक आशीर्वाद, हर पल एक याद — जिसे हम आपके साथ बाँटना चाहते हैं।",
+      quoteFor: "हर रस्म एक आशीर्वाद, हर पल एक याद — जिसे हम आपके साथ बाँटना चाहते हैं, {guest}।",
+      hint: "मेहराब पर स्पर्श करें, या समारोहों को अपने आप बदलने दें",
+      dressCodeLabel: "परिधान",
+    },
     list: list<Ceremony>([
       {
         name: "Ganesh Pujan",
@@ -162,6 +180,7 @@ export const wedding = {
         time: "10:00 AM",
         venue: "Kailash Vatika, Varanasi",
         dressCode: "Reds and yellows",
+        hindi: { name: "गणेश पूजन", date: "मंगलवार, 9 फ़रवरी 2027", time: "सुबह 10:00 बजे", venue: "कैलाश वाटिका, वाराणसी", dressCode: "लाल और पीले रंग" },
         image: { src: "/art/events/ganesh-pujan.webp", width: 500, height: 600, alt: "Lord Ganesha seated on a lotus in a gold crown and yellow dhoti, blessing, a lotus and a bowl of laddoos in his hands, his mouse at his feet" },
       },
       {
@@ -170,6 +189,7 @@ export const wedding = {
         time: "10:00 AM",
         venue: "Kailash Vatika, Varanasi",
         dressCode: "Yellow and white",
+        hindi: { name: "हल्दी", date: "बुधवार, 10 फ़रवरी 2027", time: "सुबह 10:00 बजे", venue: "कैलाश वाटिका, वाराणसी", dressCode: "पीला और सफ़ेद" },
         image: { src: "/art/events/haldi.webp", width: 586, height: 640, alt: "The couple at the Haldi in yellow, marigold petals falling as they dance" },
       },
       {
@@ -178,6 +198,7 @@ export const wedding = {
         time: "4:00 PM",
         venue: "Kailash Vatika, Varanasi",
         dressCode: "Shades of green",
+        hindi: { name: "मेहंदी", date: "बुधवार, 10 फ़रवरी 2027", time: "शाम 4:00 बजे", venue: "कैलाश वाटिका, वाराणसी", dressCode: "हरे रंग की छटाएँ" },
         image: { src: "/art/events/mehendi.webp", width: 444, height: 531, alt: "The couple at the Mehendi, her hands painted with henna, she in green" },
       },
       {
@@ -186,6 +207,7 @@ export const wedding = {
         time: "7:00 PM",
         venue: "The Lawn, Kailash Vatika",
         dressCode: "Indo-western glam",
+        hindi: { name: "संगीत", date: "गुरुवार, 11 फ़रवरी 2027", time: "शाम 7:00 बजे", venue: "लॉन, कैलाश वाटिका", dressCode: "इंडो-वेस्टर्न ग्लैमर" },
         image: { src: "/art/events/sangeet.webp", width: 509, height: 600, alt: "The couple on a swing wound with flowers, she in a pink and mint lehenga, he in a floral sherwani" },
       },
       {
@@ -194,6 +216,7 @@ export const wedding = {
         time: "6:00 PM",
         venue: "Kailash Vatika, Varanasi",
         dressCode: "Festive colours",
+        hindi: { name: "बारात", date: "शुक्रवार, 12 फ़रवरी 2027", time: "शाम 6:00 बजे", venue: "कैलाश वाटिका, वाराणसी", dressCode: "उत्सव के रंग" },
         image: { src: "/art/events/baraat.webp", width: 872, height: 520, alt: "The groom in a sherwani and safa arriving in a vintage car garlanded with roses, his friends dancing around him" },
       },
       {
@@ -202,6 +225,7 @@ export const wedding = {
         time: "7:30 PM",
         venue: "Kailash Vatika, Varanasi",
         dressCode: "Pastels and gold",
+        hindi: { name: "शुभ विवाह", date: "शुक्रवार, 12 फ़रवरी 2027", time: "शाम 7:30 बजे", venue: "कैलाश वाटिका, वाराणसी", dressCode: "पेस्टल और सुनहरा" },
         image: { src: "/art/events/wedding.webp", width: 433, height: 640, alt: "The bride and groom in blush pink and gold, walking hand in hand" },
       },
       {
@@ -210,6 +234,7 @@ export const wedding = {
         time: "7:30 PM",
         venue: "Kailash Vatika, Varanasi",
         dressCode: "Evening formal",
+        hindi: { name: "स्वागत समारोह", date: "शनिवार, 13 फ़रवरी 2027", time: "शाम 7:30 बजे", venue: "कैलाश वाटिका, वाराणसी", dressCode: "शाम का औपचारिक परिधान", credit: "चित्र: @aarchi_sharma_" },
         image: { src: "/art/events/reception.webp", width: 506, height: 556, alt: "The couple dancing, she twirling in a red lehenga, he in a tuxedo" },
         credit: "Illustration by @aarchi_sharma_",
       },
@@ -219,6 +244,7 @@ export const wedding = {
         time: "10:00 AM",
         venue: "Kailash Vatika, Varanasi",
         dressCode: "Soft traditional",
+        hindi: { name: "विदाई", date: "रविवार, 14 फ़रवरी 2027", time: "सुबह 10:00 बजे", venue: "कैलाश वाटिका, वाराणसी", dressCode: "सौम्य पारंपरिक" },
         image: { src: "/art/events/vidaai.webp", width: 652, height: 560, alt: "The bride in her doli, carried by two bearers in turbans" },
       },
       {
@@ -227,6 +253,7 @@ export const wedding = {
         time: "5:00 PM",
         venue: "Groom's home, Varanasi",
         dressCode: "Traditional",
+        hindi: { name: "गृह प्रवेश", date: "रविवार, 14 फ़रवरी 2027", time: "शाम 5:00 बजे", venue: "वर का घर, वाराणसी", dressCode: "पारंपरिक" },
         image: { src: "/art/events/griha-pravesh.webp", width: 250, height: 586, alt: "The bride, seen from behind, stepping into her new home, leaving footprints in red alta" },
       },
     ]),
@@ -266,23 +293,31 @@ export const wedding = {
     intro: "Held in our elders' blessings and our families' love, two homes become one.",
     /** The same, for a guest named in the link. */
     introFor: "Held in our elders' blessings and our families' love, two homes become one — and you, {guest}, are family to us.",
+    hindi: {
+      eyebrow: "दो परिवार, एक उत्सव",
+      title: "उनके आशीर्वाद के साथ",
+      intro: "बड़ों के आशीर्वाद और परिवारों के प्रेम में, दो घर एक हो रहे हैं।",
+      introFor: "बड़ों के आशीर्वाद और परिवारों के प्रेम में, दो घर एक हो रहे हैं — और {guest}, आप भी हमारे परिवार का हिस्सा हैं।",
+    },
     sides: list<FamilySide>([
       {
         title: "The Bride's Family",
+        hindi: { title: "वधू पक्ष" },
         photo: { src: "/photos/family-bride.webp", alt: "The bride in her bridal jewels, her mother kissing her cheek" },
         members: [
-          { relation: "Parents", name: "Smt. Sunita & Shri Rakesh Kumar" },
-          { relation: "Grandparents", name: "Smt. Kamla Devi & Shri Harinarayan" },
-          { relation: "Brother", name: "Ankit" },
+          { relation: "Parents", name: "Smt. Sunita & Shri Rakesh Kumar", hindi: { relation: "माता-पिता", name: "श्रीमती सुनीता एवं श्री राकेश कुमार" } },
+          { relation: "Grandparents", name: "Smt. Kamla Devi & Shri Harinarayan", hindi: { relation: "दादा-दादी", name: "श्रीमती कमला देवी एवं श्री हरिनारायण" } },
+          { relation: "Brother", name: "Ankit", hindi: { relation: "भाई", name: "अंकित" } },
         ],
       },
       {
         title: "The Groom's Family",
+        hindi: { title: "वर पक्ष" },
         photo: { src: "/photos/family-groom.webp", alt: "The groom in a red sherwani and safa, hugged by his family" },
         members: [
-          { relation: "Parents", name: "Smt. Meera & Shri Prakash Chandra" },
-          { relation: "Grandmother", name: "Smt. Savitri Devi" },
-          { relation: "Sister", name: "Shreya" },
+          { relation: "Parents", name: "Smt. Meera & Shri Prakash Chandra", hindi: { relation: "माता-पिता", name: "श्रीमती मीरा एवं श्री प्रकाश चंद्र" } },
+          { relation: "Grandmother", name: "Smt. Savitri Devi", hindi: { relation: "दादी", name: "श्रीमती सावित्री देवी" } },
+          { relation: "Sister", name: "Shreya", hindi: { relation: "बहन", name: "श्रेया" } },
         ],
       },
     ]),
@@ -305,6 +340,12 @@ export const wedding = {
     title: "Our Gallery",
     intro: "Moments we hold close, like the moon in Mahadev's locks.",
     hint: "Tap a photo",
+    hindi: {
+      eyebrow: "यादगार पल",
+      title: "हमारी तस्वीरें",
+      intro: "पल जिन्हें हम संजोकर रखते हैं, जैसे महादेव की जटाओं में चंद्रमा।",
+      hint: "किसी तस्वीर पर स्पर्श करें",
+    },
     /**
      * The frame round the photos: a double gold heart line wreathed in eucalyptus (the couple's picture,
      * its white keyed away, the leaves recoloured a dusty Shiva blue); the photos fill its opening.
@@ -316,6 +357,7 @@ export const wedding = {
         thumb: "/photos/thumbs/gallery-1.webp",
         alt: "The couple seated close on the old stone steps, she in a red silk saree, he in a white kurta",
         caption: "Side by side",
+        hindi: { caption: "साथ-साथ" },
         focus: "52% 40%",
       },
       {
@@ -323,6 +365,7 @@ export const wedding = {
         thumb: "/photos/thumbs/gallery-3.webp",
         alt: "He holds her close on the steps; she smiles, eyes lowered",
         caption: "Held close",
+        hindi: { caption: "बाँहों में" },
         focus: "50% 40%",
       },
       {
@@ -330,6 +373,7 @@ export const wedding = {
         thumb: "/photos/thumbs/gallery-4.webp",
         alt: "Forehead to forehead, his hand on her cheek",
         caption: "Forehead to forehead",
+        hindi: { caption: "माथे से माथा" },
         focus: "45% 40%",
       },
       {
@@ -337,6 +381,7 @@ export const wedding = {
         thumb: "/photos/thumbs/gallery-5.webp",
         alt: "He kisses her forehead as she smiles, by the old stone wall",
         caption: "A kiss on the forehead",
+        hindi: { caption: "माथे पर एक चुंबन" },
         focus: "55% 40%",
       },
       {
@@ -344,6 +389,7 @@ export const wedding = {
         thumb: "/photos/thumbs/gallery-6.webp",
         alt: "Seated on the steps, she in front of him, both smiling",
         caption: "Smiles on the steps",
+        hindi: { caption: "सीढ़ियों पर मुस्कानें" },
         focus: "50% 45%",
       },
       {
@@ -351,6 +397,7 @@ export const wedding = {
         thumb: "/photos/thumbs/gallery-7.webp",
         alt: "Arm in arm, walking down the old stone steps",
         caption: "Walking on together",
+        hindi: { caption: "साथ चलते हुए" },
         focus: "50% 50%",
       },
       {
@@ -358,6 +405,7 @@ export const wedding = {
         thumb: "/photos/thumbs/gallery-2.webp",
         alt: "On a stone path by the ghat steps, they reach for each other's hands as if to dance",
         caption: "A dance on the ghats",
+        hindi: { caption: "घाट पर एक नृत्य" },
         focus: "50% 50%",
       },
       {
@@ -365,6 +413,7 @@ export const wedding = {
         thumb: "/photos/thumbs/gallery-8.webp",
         alt: "On the old ghat steps, a few steps apart, smiling at each other",
         caption: "A few steps apart",
+        hindi: { caption: "कुछ कदम की दूरी" },
         focus: "50% 35%",
       },
       {
@@ -372,6 +421,7 @@ export const wedding = {
         thumb: "/photos/thumbs/gallery-9.webp",
         alt: "By the stone ledge of the ghat, she leans on the wall as he looks on",
         caption: "By the ghat wall",
+        hindi: { caption: "घाट की दीवार के पास" },
         focus: "50% 30%",
       },
     ]),
@@ -406,6 +456,35 @@ export const wedding = {
     reachedFor: "Your acceptance has reached the family, {guest}.",
     tellFamily: "Please also let the family know you're coming.",
     tellFamilyFor: "{guest}, please also let the family know you're coming.",
+    /** While the acceptance is on its way, if it fails, and what each calendar choice did. */
+    sending: "Sending your joy…",
+    tryAgain: "Try again",
+    sendFailed: "We couldn't send your acceptance.",
+    googleDone: "Google Calendar has opened in a new tab — tap Save there to keep the date.",
+    icsDone: "A calendar file (.ics) has been downloaded — open it to add the wedding to your calendar.",
+    hindi: {
+      title: "एक पावन उत्सव",
+      message: "आपकी उपस्थिति हमारे उत्सव को और भी ख़ास बना देगी।",
+      messageFor: "{guest}, आपकी उपस्थिति हमारे उत्सव को और भी ख़ास बना देगी।",
+      presence: "आपकी उपस्थिति ही हमारा आशीर्वाद है",
+      button: "निमंत्रण स्वीकार करें",
+      hint: "बटन पर स्पर्श करें",
+      shortcut: "स्वीकारें",
+      thanksFor: "धन्यवाद, {guest} — आपके साथ उत्सव मनाने की प्रतीक्षा है!",
+      thanks: "धन्यवाद — आपके साथ उत्सव मनाने की प्रतीक्षा है!",
+      blessing: "महादेव और माँ पार्वती की कृपा से, हम इस शुभ अवसर को आपके साथ मनाने की प्रतीक्षा कर रहे हैं।",
+      closing: "हर हर महादेव",
+      calendarButton: "कैलेंडर में जोड़ें",
+      reached: "आपकी स्वीकृति परिवार तक पहुँच गई है।",
+      reachedFor: "{guest}, आपकी स्वीकृति परिवार तक पहुँच गई है।",
+      tellFamily: "कृपया परिवार को भी बता दें कि आप आ रहे हैं।",
+      tellFamilyFor: "{guest}, कृपया परिवार को भी बता दें कि आप आ रहे हैं।",
+      sending: "आपकी ख़ुशी भेजी जा रही है…",
+      tryAgain: "फिर से कोशिश करें",
+      sendFailed: "आपकी स्वीकृति नहीं भेजी जा सकी।",
+      googleDone: "Google Calendar नए टैब में खुल गया है — तारीख़ रखने के लिए वहाँ Save दबाएँ।",
+      icsDone: "एक कैलेंडर फ़ाइल (.ics) डाउनलोड हो गई है — विवाह को अपने कैलेंडर में जोड़ने के लिए इसे खोलें।",
+    },
   },
 
   /** Section 09 — the blessing wall. Sample wishes show until real ones arrive. */
@@ -421,20 +500,76 @@ export const wedding = {
     /** Shown once a blessing is saved (never before). */
     thanks: "Your blessing joins their journey of love.",
     thanksFor: "Thank you, {guest}. Your blessing joins their journey of love.",
+    /** The rest of the wall's words: the signature, the box's notes, the links and the sheet. */
+    signed: "With love",
+    signedBy: "With love · {name}",
+    signedAs: "Signed with love, {guest}",
+    signedAnon: "Signed “With love”",
+    needWords: "Please write a few words for the couple first.",
+    tooLong: "Please keep your wish under {max} characters.",
+    retry: "Please try again.",
+    sendFailed: "We couldn't send your blessing.",
+    tryAgain: "Try again",
+    viewAll: "View all wishes",
+    another: "Leave another blessing",
+    sentRemote: "It has been sent to the couple, with love.",
+    sentLocal: "It is kept on this phone, with love.",
+    allTitle: "All Blessings",
+    countOne: "{n} wish with love",
+    countMany: "{n} wishes with love",
+    hindi: {
+      eyebrow: "प्रेम और आशीर्वाद के साथ",
+      title: "आशीर्वाद दीवार",
+      quote: "आपके दिल हमेशा एक-दूसरे में अपना घर पाएँ।",
+      placeholder: "दंपति के लिए दिल से एक शुभकामना लिखें…",
+      placeholderFor: "{guest}, दंपति के लिए दिल से एक शुभकामना लिखें…",
+      formTitle: "आशीर्वाद दें",
+      button: "अपना आशीर्वाद भेजें",
+      thanks: "आपका आशीर्वाद उनके प्रेम की यात्रा में शामिल हो गया।",
+      thanksFor: "धन्यवाद, {guest}। आपका आशीर्वाद उनके प्रेम की यात्रा में शामिल हो गया।",
+      signed: "सप्रेम",
+      signedBy: "सप्रेम · {name}",
+      signedAs: "सप्रेम, {guest}",
+      signedAnon: "“सप्रेम” के साथ",
+      needWords: "कृपया पहले दंपति के लिए कुछ शब्द लिखें।",
+      tooLong: "कृपया अपनी शुभकामना {max} अक्षरों से कम रखें।",
+      retry: "कृपया फिर से कोशिश करें।",
+      sendFailed: "आपका आशीर्वाद नहीं भेजा जा सका।",
+      tryAgain: "फिर से कोशिश करें",
+      viewAll: "सभी शुभकामनाएँ देखें",
+      another: "एक और आशीर्वाद दें",
+      sentRemote: "यह प्रेम सहित दंपति तक भेज दिया गया है।",
+      sentLocal: "यह प्रेम सहित इसी फ़ोन पर सहेजा गया है।",
+      allTitle: "सभी आशीर्वाद",
+      countOne: "{n} शुभकामना, प्रेम सहित",
+      countMany: "{n} शुभकामनाएँ, प्रेम सहित",
+    },
     samples: list<Wish>([
       {
         id: "s1",
         name: "Family & Friends",
         message: "May your life together be filled with love, laughter and divine blessings.",
+        hindi: { name: "परिवार और मित्र", message: "आपका साथ का जीवन प्रेम, हँसी और ईश्वरीय आशीर्वाद से भरा रहे।" },
       },
-      { id: "s2", name: "Mausi & Mausa", message: "Wishing you a lifetime of beautiful memories." },
-      { id: "s3", name: "Nani", message: "May Mahadev bless your journey together." },
+      {
+        id: "s2",
+        name: "Mausi & Mausa",
+        message: "Wishing you a lifetime of beautiful memories.",
+        hindi: { name: "मौसी और मौसा", message: "आपको जीवन भर सुंदर यादों की शुभकामनाएँ।" },
+      },
+      { id: "s3", name: "Nani", message: "May Mahadev bless your journey together.", hindi: { name: "नानी", message: "महादेव आपकी इस साथ की यात्रा को आशीर्वाद दें।" } },
       {
         id: "s4",
         name: "College friends",
         message: "Can't wait to dance at your Sangeet! Two wonderful people, one beautiful story.",
+        hindi: { name: "कॉलेज के दोस्त", message: "आपके संगीत में नाचने का इंतज़ार है! दो प्यारे लोग, एक सुंदर कहानी।" },
       },
-      { id: "s5", name: "Aditi", message: "May every sunrise bring you closer, and every evening find you laughing." },
+      {
+        id: "s5",
+        name: "Aditi",
+        message: "May every sunrise bring you closer, and every evening find you laughing.",
+        hindi: { name: "अदिति", message: "हर सुबह आपको और क़रीब लाए, और हर शाम आपको हँसते हुए पाए।" },
+      },
     ]),
   },
 
@@ -446,6 +581,19 @@ export const wedding = {
   travel: {
     eyebrow: "Venue & Guest Arrangements",
     title: "Finding Your Way",
+    /** Over the venue, its directions link, and over the ways in. */
+    destination: "The Wedding Destination",
+    directions: "Find your way",
+    reachLabel: "How to Reach",
+    reachTitle: "All Roads Lead Here",
+    hindi: {
+      eyebrow: "स्थल और अतिथि व्यवस्था",
+      title: "रास्ता खोजें",
+      destination: "विवाह स्थल",
+      directions: "रास्ता देखें",
+      reachLabel: "कैसे पहुँचें",
+      reachTitle: "सभी राहें यहीं आती हैं",
+    },
     /** The three ways in, each a stop on the river line; a tap opens its detail. */
     points: list<TravelPoint>([
       {
@@ -456,6 +604,14 @@ export const wedding = {
         distance: "about 25 km",
         time: "50 min",
         detail: "Prepaid taxis and app cabs wait outside arrivals. We'll gladly pick you up on 11 & 12 February.",
+        hindi: {
+          label: "हवाई मार्ग से",
+          name: "लाल बहादुर शास्त्री हवाई अड्डा",
+          place: "बाबतपुर",
+          distance: "लगभग 25 किमी",
+          time: "50 मिनट",
+          detail: "आगमन के बाहर प्रीपेड टैक्सी और ऐप कैब मिलती हैं। 11 और 12 फ़रवरी को हम ख़ुशी से आपको लेने आएँगे।",
+        },
       },
       {
         kind: "rail",
@@ -465,6 +621,14 @@ export const wedding = {
         distance: "about 10 km",
         time: "30 min",
         detail: "Autos and app cabs at the main exit; ask for Sarnath Road. Pickups on 11 & 12 February too.",
+        hindi: {
+          label: "रेल मार्ग से",
+          name: "वाराणसी जंक्शन",
+          place: "कैंटोनमेंट",
+          distance: "लगभग 10 किमी",
+          time: "30 मिनट",
+          detail: "मुख्य निकास पर ऑटो और ऐप कैब मिलते हैं; सारनाथ रोड कहें। 11 और 12 फ़रवरी को यहाँ से भी लेने की व्यवस्था है।",
+        },
       },
       {
         kind: "local",
@@ -474,6 +638,14 @@ export const wedding = {
         distance: "across Varanasi",
         time: "on call",
         detail: "Ola, Uber, autos and e-rickshaws run all over the city. Show the driver the venue on the map.",
+        hindi: {
+          label: "सड़क मार्ग से",
+          name: "लोकल कैब या ऑटो",
+          place: "शहर में कहीं से भी",
+          distance: "पूरे वाराणसी में",
+          time: "फ़ोन पर",
+          detail: "Ola, Uber, ऑटो और ई-रिक्शा पूरे शहर में चलते हैं। ड्राइवर को नक़्शे पर स्थल दिखा दें।",
+        },
       },
     ]),
   },
@@ -493,20 +665,35 @@ export const wedding = {
     intro: "For any questions or assistance, our families are always happy to help.",
     /** The same, for a guest named in the link (about as long, so the section still fits one screen). */
     introFor: "For anything you need, {guest}, our families are always happy to help.",
+    /** In a window still waiting for its person; the call button; and what it says without a number. */
+    tbc: "Details to come",
+    call: "Call",
+    soon: "Number coming soon",
+    hindi: {
+      eyebrow: "आपके लिए हम हैं",
+      title: "संपर्क और सहायता",
+      intro: "किसी भी प्रश्न या सहायता के लिए, हमारे परिवार सदा तत्पर हैं।",
+      introFor: "{guest}, आपको जो भी चाहिए, हमारे परिवार सदा तत्पर हैं।",
+      tbc: "विवरण जल्द",
+      call: "कॉल करें",
+      soon: "नंबर जल्द आएगा",
+      closing: "हम बस एक फ़ोन की दूरी पर हैं।",
+      closingFor: "{guest}, हम बस एक फ़ोन की दूरी पर हैं।",
+    },
     /**
      * One for each side: who to call, and how they are related to the bride or the groom. (The side
      * isn't shown; it names the window for a screen reader while the name is still to come.)
      */
     family: list<FamilyContact>([
       // SAMPLE: the bride's brother and the groom's sister, as named in the family section above
-      { side: "The Bride's Family", name: "Ankit", relation: "Bride's brother", phone: null },
-      { side: "The Groom's Family", name: "Shreya", relation: "Groom's sister", phone: null },
+      { side: "The Bride's Family", name: "Ankit", relation: "Bride's brother", phone: null, hindi: { side: "वधू पक्ष", name: "अंकित", relation: "वधू के भाई" } },
+      { side: "The Groom's Family", name: "Shreya", relation: "Groom's sister", phone: null, hindi: { side: "वर पक्ष", name: "श्रेया", relation: "वर की बहन" } },
     ]),
     /** The coordinators, each in a palace window like the families' (their role in place of a relation). */
     coordinators: list<Coordinator>([
       // SAMPLE names
-      { role: "Guest Coordinator", name: "Rohan", phone: null },
-      { role: "Wedding Coordinator", name: "Neha Verma", phone: null },
+      { role: "Guest Coordinator", name: "Rohan", phone: null, hindi: { role: "अतिथि समन्वयक", name: "रोहन" } },
+      { role: "Wedding Coordinator", name: "Neha Verma", phone: null, hindi: { role: "विवाह समन्वयक", name: "नेहा वर्मा" } },
     ]),
     /** The closing line at the foot of the section. */
     closing: "We're just a call away.",
@@ -521,6 +708,12 @@ export const wedding = {
       "Thank you for being a part of our beautiful beginning. May the blessings of Mahadev always guide our journey.",
     messageFor:
       "Thank you, {guest}, for being a part of our beautiful beginning. May the blessings of Mahadev always guide our journey.",
+    hindi: {
+      eyebrow: "कृतज्ञता से भरे दिलों से",
+      title: "धन्यवाद",
+      message: "हमारी इस सुंदर शुरुआत का हिस्सा बनने के लिए धन्यवाद। महादेव का आशीर्वाद सदा हमारी राह दिखाए।",
+      messageFor: "{guest}, हमारी इस सुंदर शुरुआत का हिस्सा बनने के लिए धन्यवाद। महादेव का आशीर्वाद सदा हमारी राह दिखाए।",
+    },
   },
 
   /** The footer — the last page, small and quiet: a blessing, the mantra, an emblem, the couple's initials. */
@@ -528,6 +721,10 @@ export const wedding = {
     blessing: "May the blessings of Mahadev and Maa Parvati guide your journey with love, harmony, and eternal happiness.",
     mantra: "॥ हर हर महादेव ॥",
     backToTop: "Back to Top",
+    hindi: {
+      blessing: "महादेव और माँ पार्वती का आशीर्वाद आपकी यात्रा को प्रेम, सामंजस्य और अनंत सुख से भर दे।",
+      backToTop: "ऊपर जाएँ",
+    },
   },
 
   /**

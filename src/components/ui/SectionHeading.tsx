@@ -19,7 +19,7 @@ export function SectionHeading({ id, eyebrow, title, intro, show, delay = 0 }: S
           show={show}
           delay={delay}
           as="p"
-          className="font-sans text-[11px] font-medium uppercase tracking-eyebrow text-gold-ink"
+          className="sh-eyebrow font-sans text-[11px] font-medium uppercase tracking-eyebrow text-gold-ink"
         >
           {eyebrow}
         </Reveal>

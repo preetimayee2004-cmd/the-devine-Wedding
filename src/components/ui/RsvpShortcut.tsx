@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { wedding } from "@/config/wedding";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
 import { useTuckOnScroll } from "@/hooks/useTuckOnScroll";
+import { useCopy } from "@/lib/lang";
 import { RSVP_ACCEPTED } from "@/lib/rsvpEvents";
 
 /**
@@ -17,6 +18,7 @@ export function RsvpShortcut() {
   const [rsvpInView, setRsvpInView] = useState(false);
   const [accepted, setAccepted] = useState(false);
   const button = useRef<HTMLButtonElement>(null);
+  const { shortcut } = useCopy(wedding.rsvp);
   const tucked = useTuckOnScroll(button);
 
   useEffect(() => {
@@ -57,7 +59,7 @@ export function RsvpShortcut() {
         <path d="M12 13.5C15 13 17.4 10.8 18 7.6 15 8 12.8 10.4 12 13.5Z" />
         <path d="M7 15.2H17" />
       </svg>
-      {wedding.rsvp.shortcut}
+      {shortcut}
     </button>
   );
 }

@@ -3,7 +3,7 @@ import { wedding } from "@/config/wedding";
 import { useGuest } from "@/context/GuestContext";
 import { useInView } from "@/hooks/useInView";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
-import { useLang } from "@/lib/lang";
+import { inLang, useLang } from "@/lib/lang";
 import { directionsUrl } from "@/lib/maps";
 import { EASE } from "@/lib/motion";
 import { formatVenueDate, parseVenueDateTime } from "@/lib/venueTime";
@@ -38,7 +38,11 @@ export function Couple() {
   const arrived = useInView(ref, { threshold: 0.3 });
   const hindi = useLang() === "hi";
   const { guestName } = useGuest();
-  const { coupleWelcome: copy, couple, venue, assets } = wedding;
+  const { couple, assets } = wedding;
+  // the words, and the place as shown, in the card's language (the directions link keeps the English)
+  const copy = inLang(wedding.coupleWelcome, hindi);
+  const place = inLang(wedding.venue, hindi);
+  const names = hindi ? wedding.invitation.hindi.names : { bride: couple.bride.displayName, groom: couple.groom.displayName };
   const { coupleArch, coupleArchSize, coupleBells, coupleGarlands, coupleScene, coupleSceneSize } = assets;
 
   // "Dear {guest}," — the guest's name from their link, set in bold (without one, the fallback name)
@@ -47,8 +51,8 @@ export function Couple() {
 
   const date = useMemo(() => {
     const parts = parseVenueDateTime(wedding.wedding.dateTime);
-    return parts ? formatVenueDate(parts) : null;
-  }, []);
+    return parts ? formatVenueDate(parts, hindi ? "hi-IN" : "en-IN") : null;
+  }, [hindi]);
 
   // a tap on the hashtag copies it, and "Copied" shows for a moment
   const [copied, setCopied] = useState(false);
@@ -136,7 +140,7 @@ export function Couple() {
           className={`couple-welcome-word text-[30px] font-semibold leading-none ${hindi ? "font-deva" : "font-display italic"}`}
           style={appear(0)}
         >
-          {hindi ? copy.hindi.welcome : copy.welcome}
+          {copy.welcome}
         </p>
         <p
           className="mt-[14px] max-w-full font-display text-[20px] font-medium leading-tight text-navy [overflow-wrap:anywhere]"
@@ -151,7 +155,7 @@ export function Couple() {
           className={`mt-0.5 text-[14px] font-medium leading-snug text-slate ${hindi ? "font-deva" : "font-display italic"}`}
           style={appear(2)}
         >
-          {hindi ? copy.hindi.invited : copy.invited}
+          {copy.invited}
         </p>
 
         {/* the couple, one above the other */}
@@ -159,9 +163,9 @@ export function Couple() {
           className="mt-[20px] flex w-full flex-col items-center font-display text-[clamp(34px,10vw,44px)] font-semibold italic leading-[1.1] text-navy [overflow-wrap:anywhere]"
           style={appear(3)}
         >
-          <span className="block max-w-full">{couple.bride.displayName}</span>
+          <span className="block max-w-full">{names.bride}</span>
           <span className="block text-[0.55em] font-semibold not-italic leading-[1.1] text-gold-ink">&amp;</span>
-          <span className="block max-w-full">{couple.groom.displayName}</span>
+          <span className="block max-w-full">{names.groom}</span>
         </h2>
 
         <span aria-hidden className="couple-rule mt-[14px]" style={appear(4)} />
@@ -201,19 +205,19 @@ export function Couple() {
         {/* the full location as one button: the pin beside the venue and its address, a small arrow;
             a tap opens the directions */}
         <a
-          href={directionsUrl(venue)}
+          href={directionsUrl(wedding.venue)}
           target="_blank"
           rel="noopener noreferrer"
           className="couple-place"
-          aria-label={`Directions to ${venue.name}, ${venue.address} (opens Google Maps)`}
+          aria-label={`${place.name}, ${place.address} (Google Maps)`}
           style={appear(6)}
         >
           <span aria-hidden className="couple-place-pin">
             <Icon name="pin" className="h-[18px] w-[18px]" strokeWidth={1.6} />
           </span>
           <span className="couple-place-words">
-            <span className="couple-place-name">{venue.name}</span>
-            <span className="couple-place-address">{venue.address}</span>
+            <span className="couple-place-name">{place.name}</span>
+            <span className="couple-place-address">{place.address}</span>
           </span>
           <Icon name="external" className="couple-place-out" />
         </a>

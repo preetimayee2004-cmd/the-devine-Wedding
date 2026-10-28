@@ -4,6 +4,7 @@ import { usePersonal } from "@/context/GuestContext";
 import type { FamilySide } from "@/config/types";
 import { useInView } from "@/hooks/useInView";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
+import { inLang, useCopy, useLang } from "@/lib/lang";
 import { EASE } from "@/lib/motion";
 import { LotusRule } from "@/components/art/Ornaments";
 import { TempleBells, TempleSilhouette } from "@/components/art/Temple";
@@ -23,7 +24,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
  * appears, then the photograph within it, then the names; the two sides take turns.
  */
 export function Family() {
-  const { family } = wedding;
+  const family = useCopy(wedding.family);
   const personal = usePersonal();
   const sectionRef = useRef<HTMLElement>(null);
   const pairRef = useRef<HTMLDivElement>(null);
@@ -63,7 +64,10 @@ export function Family() {
   );
 }
 
-function Side({ side, show, reduced, delay }: { side: FamilySide; show: boolean; reduced: boolean; delay: number }) {
+function Side({ side: own, show, reduced, delay }: { side: FamilySide; show: boolean; reduced: boolean; delay: number }) {
+  // its title and its people, in the card's language
+  const hindi = useLang() === "hi";
+  const side = { ...inLang(own, hindi), members: own.members.map((m) => inLang(m, hindi)) };
   const photoIn = delay + (reduced ? 0 : 450);
   const appear = (ms: number, extra?: CSSProperties): CSSProperties =>
     reduced
@@ -96,7 +100,7 @@ function Side({ side, show, reduced, delay }: { side: FamilySide; show: boolean;
         <dl className="mt-3 space-y-3">
           {side.members.map((m, i) => (
             <Reveal key={m.relation + m.name} show={show} delay={photoIn + 380 + i * 110}>
-              <dt className="font-sans text-[10px] font-semibold uppercase tracking-[0.24em] text-gold-ink">{m.relation}</dt>
+              <dt className="fam-relation font-sans text-[10px] font-semibold uppercase tracking-[0.24em] text-gold-ink">{m.relation}</dt>
               <dd className="mt-1 text-balance font-display text-[18px] font-medium leading-snug text-navy">{m.name}</dd>
             </Reveal>
           ))}

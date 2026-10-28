@@ -5,6 +5,7 @@ import { useGuest, usePersonal } from "@/context/GuestContext";
 import { useInView } from "@/hooks/useInView";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
 import { addWish, BackendError, backendMode, listWishes, newId } from "@/lib/backend";
+import { inLang, useCopy, useLang } from "@/lib/lang";
 import { LotusRule } from "@/components/art/Ornaments";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -41,13 +42,16 @@ function clean(raw: string): string {
     .trim();
 }
 
-const signature = (w: Wish) => (w.name ? `With love · ${w.name}` : "With love");
+/** "With love · Aditi" (or just "With love"), in the card's language. */
+const signature = (w: Wish, words: { signed: string; signedBy: string }) =>
+  w.name ? words.signedBy.replace("{name}", w.name) : words.signed;
 
 /** The button glows at least this long before it turns into the lotus (a local save is instant). */
 const GLOW_MS = 650;
 
 export function BlessingWall() {
-  const { wishes: copy } = wedding;
+  const copy = useCopy(wedding.wishes);
+  const hindi = useLang() === "hi";
   const { guestName, fromLink } = useGuest();
   const personal = usePersonal();
   const sectionRef = useRef<HTMLElement>(null);
@@ -86,7 +90,11 @@ export function BlessingWall() {
     return () => window.clearTimeout(id);
   }, [hangSeen, reduced, roll]);
 
-  const all = useMemo(() => [...real, ...copy.samples.filter((s) => !real.some((r) => r.id === s.id))], [real, copy.samples]);
+  // the guests' own wishes as they wrote them; the samples in the card's language
+  const all = useMemo(
+    () => [...real, ...copy.samples.filter((s) => !real.some((r) => r.id === s.id)).map((s) => inLang(s, hindi))],
+    [real, copy.samples, hindi],
+  );
   const shown = all.slice(0, 3);
   const t = (ms: number) => (reduced ? 0 : ms);
 
@@ -95,12 +103,12 @@ export function BlessingWall() {
     if (state.kind === "sending") return;
     const message = clean(text);
     if (message.length < 2) {
-      setHint("Please write a few words for the couple first.");
+      setHint(copy.needWords);
       textRef.current?.focus();
       return;
     }
     if (message.length > copy.maxLength) {
-      setHint(`Please keep your wish under ${copy.maxLength} characters.`);
+      setHint(copy.tooLong.replace("{max}", String(copy.maxLength)));
       textRef.current?.focus();
       return;
     }
@@ -122,7 +130,7 @@ export function BlessingWall() {
       setState({ kind: "sent", wish });
     } catch (err) {
       // the words stay in the box, ready to try again
-      setState({ kind: "error", message: err instanceof BackendError ? err.message : "Please try again." });
+      setState({ kind: "error", message: err instanceof BackendError ? err.message : copy.retry });
     }
   };
 
@@ -165,13 +173,13 @@ export function BlessingWall() {
             {shown.map((w, i) => (
               <Fragment key={w.id}>
                 {i > 0 && <WishDivider />}
-                <WishItem wish={w} side={i % 2 ? "right" : "left"} fresh={sent && state.wish.id === w.id} />
+                <WishItem wish={w} side={i % 2 ? "right" : "left"} fresh={sent && state.wish.id === w.id} words={copy} />
               </Fragment>
             ))}
 
             <div className="mt-7 flex justify-center">
               <button type="button" onClick={() => setViewAll(true)} className="bw-glass">
-                <span>View all wishes</span>
+                <span>{copy.viewAll}</span>
                 <svg aria-hidden viewBox="0 0 20 10" className="bw-glass-arrow" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M1 5h17M14 1.5 18 5l-4 3.5" />
                 </svg>
@@ -210,10 +218,10 @@ export function BlessingWall() {
                     <span id="wish-hint" role={invalid ? "alert" : undefined} className={invalid ? "text-[#9a3b2e]" : ""}>
                       {hint ??
                         (state.kind === "error"
-                          ? `We couldn't send your blessing. ${state.message}`
+                          ? `${copy.sendFailed} ${state.message}`
                           : fromLink
-                            ? `Signed with love, ${guestName}`
-                            : "Signed “With love”")}
+                            ? copy.signedAs.replace("{guest}", guestName)
+                            : copy.signedAnon)}
                     </span>
                     <span id="wish-count" className="shrink-0 tabular-nums">
                       {text.length} / {copy.maxLength}
@@ -227,7 +235,7 @@ export function BlessingWall() {
                 <span aria-hidden className="bw-send-orn" />
                 <button type="submit" disabled={state.kind === "sending" || sent} aria-busy={state.kind === "sending" || undefined} className="bw-send">
                   <SendLotus />
-                  <span className="bw-send-label">{state.kind === "error" ? "Try again" : copy.button}</span>
+                  <span className="bw-send-label">{state.kind === "error" ? copy.tryAgain : copy.button}</span>
                 </button>
                 <span aria-hidden className="bw-send-orn bw-send-orn-r" />
                 {sent && <Bloom />}
@@ -238,7 +246,7 @@ export function BlessingWall() {
               <div className="bw-done" aria-live="polite">
                 <p className="bw-done-thanks">{personal(copy.thanksFor, copy.thanks)}</p>
                 <p className="bw-done-where">
-                  {backendMode === "remote" ? "It has been sent to the couple, with love." : "It is kept on this phone, with love."}
+                  {backendMode === "remote" ? copy.sentRemote : copy.sentLocal}
                 </p>
                 <div className="bw-done-again">
                   <button
@@ -250,7 +258,7 @@ export function BlessingWall() {
                     className="bw-glass"
                   >
                     <SendLotus className="bw-glass-lotus" />
-                    <span>Leave another blessing</span>
+                    <span>{copy.another}</span>
                   </button>
                 </div>
               </div>
@@ -261,9 +269,9 @@ export function BlessingWall() {
       </div>
 
       <Sheet open={viewAll} onClose={() => setViewAll(false)} label="All wishes">
-        <h3 className="text-center text-[28px]">All Blessings</h3>
+        <h3 className="text-center text-[28px]">{copy.allTitle}</h3>
         <p className="mt-1 text-center font-sans text-[11px] font-medium uppercase tracking-[0.22em] text-gold-ink">
-          {all.length} {all.length === 1 ? "wish" : "wishes"} with love
+          {(all.length === 1 ? copy.countOne : copy.countMany).replace("{n}", String(all.length))}
         </p>
         <div className="mt-3 flex justify-center">
           <LotusRule />
@@ -272,7 +280,7 @@ export function BlessingWall() {
           {all.map((w) => (
             <li key={w.id}>
               <p className="whitespace-pre-line text-balance font-display text-[18px] font-medium italic leading-snug text-navy">{w.message}</p>
-              <p className="bw-from mt-2">{signature(w)}</p>
+              <p className="bw-from mt-2">{signature(w, copy)}</p>
             </li>
           ))}
         </ul>
@@ -292,7 +300,17 @@ function Roller({ className }: { className: string }) {
 }
 
 /** One blessing on the scroll: a gold quotation mark, the words, the sender after a short rule. */
-function WishItem({ wish, side, fresh }: { wish: Wish; side: "left" | "right"; fresh: boolean }) {
+function WishItem({
+  wish,
+  side,
+  fresh,
+  words,
+}: {
+  wish: Wish;
+  side: "left" | "right";
+  fresh: boolean;
+  words: { signed: string; signedBy: string };
+}) {
   return (
     <figure className="bw-item" data-side={side} data-fresh={fresh || undefined}>
       <span aria-hidden className="bw-q">
@@ -301,7 +319,7 @@ function WishItem({ wish, side, fresh }: { wish: Wish; side: "left" | "right"; f
       <blockquote className="bw-item-text">{wish.message}</blockquote>
       <figcaption className="bw-from mt-2.5">
         <span aria-hidden className="bw-from-rule" />
-        {signature(wish)}
+        {signature(wish, words)}
       </figcaption>
     </figure>
   );

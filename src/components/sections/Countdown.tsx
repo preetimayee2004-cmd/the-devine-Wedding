@@ -39,7 +39,7 @@ export function Countdown() {
     if (!when) return null;
     const d = formatVenueDate(when, locale);
     const zone =
-      when.hour === null ? null : zoneLabel(venueInstant(when, wedding.wedding.timeZone), wedding.wedding.timeZone);
+      when.hour === null ? null : zoneLabel(venueInstant(when, wedding.wedding.timeZone), wedding.wedding.timeZone, locale);
     return [d.weekday, `${d.day} ${d.month} ${d.year}`, d.time && [d.time, zone].filter(Boolean).join(" ")]
       .filter(Boolean)
       .join(" · ");

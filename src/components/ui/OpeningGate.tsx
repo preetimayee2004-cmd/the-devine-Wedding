@@ -12,6 +12,9 @@ interface OpeningGateProps {
   guest?: string;
   /** "Tap to open", in the card's language. */
   label: string;
+  /** "Skip", and what it is called for a screen reader, in the card's language. */
+  skip: string;
+  skipLabel: string;
   /** The words are in Hindi (set in Devanagari, without letter-spacing, which would break its joins). */
   devanagari?: boolean;
   reduced: boolean;
@@ -81,7 +84,7 @@ const GRAINS = Array.from({ length: 28 }, (_, i) => {
  * anywhere, as a browser allows sound only from one). Only transform and opacity move (and the one
  * gold line); reduced motion gets a plain fade.
  */
-export function OpeningGate({ seal, sky, invited, guest, label, devanagari = false, reduced, onBegin, onSkip, onGone }: OpeningGateProps) {
+export function OpeningGate({ seal, sky, invited, guest, label, skip: skipWord, skipLabel, devanagari = false, reduced, onBegin, onSkip, onGone }: OpeningGateProps) {
   const [phase, setPhase] = useState<"waiting" | "opening" | "leaving">("waiting");
   // the song plays from the tap unless the guest turns it off here first
   const [sound, setSound] = useState(true);
@@ -384,11 +387,11 @@ export function OpeningGate({ seal, sky, invited, guest, label, devanagari = fal
           e.stopPropagation();
           skip();
         }}
-        aria-label="Skip the opening"
+        aria-label={skipLabel}
         className="gate-chip fixed right-4 inline-flex h-10 items-center gap-1.5 rounded-full pl-4 pr-3 font-display text-[15px] font-semibold tracking-[0.06em]"
         style={{ top: "calc(var(--status-bar) + 12px)" }}
       >
-        Skip
+        {skipWord}
         <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
           <path d="M3 8h9.5M8.8 4.2 12.6 8l-3.8 3.8" />
         </svg>

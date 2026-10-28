@@ -4,6 +4,7 @@ import { usePersonal } from "@/context/GuestContext";
 import type { Ceremony } from "@/config/types";
 import { useInView } from "@/hooks/useInView";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
+import { inLang, useCopy, useLang } from "@/lib/lang";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 
 /**
@@ -44,7 +45,9 @@ function mapsHref(venue: string) {
 }
 
 export function Events() {
-  const { events, assets } = wedding;
+  const { assets } = wedding;
+  const events = useCopy(wedding.events);
+  const hindi = useLang() === "hi";
   const personal = usePersonal();
   const list = events.list;
   const n = list.length;
@@ -165,8 +168,8 @@ export function Events() {
         />
 
         {/* the ceremony that was, fading out; the one that is (the same element once it has come in) */}
-        {turn && list[turn.from] && <Card key={`old-${turn.n}`} ceremony={list[turn.from]} role="old" />}
-        {ceremony && <Card key={`at-${index}`} ceremony={ceremony} role={turn ? "new" : "rest"} live={byGuest} />}
+        {turn && list[turn.from] && <Card key={`old-${turn.n}`} ceremony={list[turn.from]} role="old" hindi={hindi} dressCode={events.dressCodeLabel} />}
+        {ceremony && <Card key={`at-${index}`} ceremony={ceremony} role={turn ? "new" : "rest"} live={byGuest} hindi={hindi} dressCode={events.dressCodeLabel} />}
 
         {/* between them, a small gold ornament glimmers where the couple stood */}
         {turn && !reduced && <Ornament key={`orn-${turn.n}`} />}
@@ -206,7 +209,7 @@ export function Events() {
         <p className="ev-hint">{events.hint}</p>
         {ceremony?.credit && (
           <p key={index} className="ev-credit" data-new={turn ? "" : undefined}>
-            {ceremony.credit}
+            {inLang(ceremony, hindi).credit}
           </p>
         )}
       </div>
@@ -214,9 +217,22 @@ export function Events() {
   );
 }
 
-/** One ceremony's card: the couple in the arch's upper part, its words below them. */
-function Card({ ceremony, role, live = false }: { ceremony: Ceremony; role: "rest" | "old" | "new"; live?: boolean }) {
+/** One ceremony's card: the couple in the arch's upper part, its words below them (in the card's language; the map link keeps the English venue). */
+function Card({
+  ceremony,
+  role,
+  live = false,
+  hindi,
+  dressCode,
+}: {
+  ceremony: Ceremony;
+  role: "rest" | "old" | "new";
+  live?: boolean;
+  hindi: boolean;
+  dressCode: string;
+}) {
   const gone = role === "old";
+  const shown = inLang(ceremony, hindi);
   return (
     <div className="ev-card" data-role={role} aria-hidden={gone || undefined} aria-live={gone ? undefined : live ? "polite" : "off"}>
       <div className="ev-figure">
@@ -227,13 +243,13 @@ function Card({ ceremony, role, live = false }: { ceremony: Ceremony; role: "res
         )}
       </div>
       <div className="ev-words">
-        <h3 className="ev-name">{ceremony.name}</h3>
+        <h3 className="ev-name">{shown.name}</h3>
         <p className="ev-when">
-          {ceremony.date}
+          {shown.date}
           <span aria-hidden className="ev-sep">
             {" · "}
           </span>
-          <span className="whitespace-nowrap">{ceremony.time}</span>
+          <span className="whitespace-nowrap">{shown.time}</span>
         </p>
         <p className="ev-venue">
           <a
@@ -242,20 +258,20 @@ function Card({ ceremony, role, live = false }: { ceremony: Ceremony; role: "res
             rel="noopener noreferrer"
             tabIndex={gone ? -1 : undefined}
             className="ev-venue-link"
-            aria-label={`${ceremony.venue} — open in Google Maps`}
+            aria-label={`${shown.venue} — Google Maps`}
           >
             <svg aria-hidden viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z" />
               <circle cx="12" cy="10" r="2.4" />
             </svg>
-            <span>{ceremony.venue}</span>
+            <span>{shown.venue}</span>
             <svg aria-hidden viewBox="0 0 24 24" className="ev-venue-out" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M8 16 16 8M10 8h6v6" />
             </svg>
           </a>
         </p>
         <p className="ev-dress">
-          <span className="ev-label">Dress code</span> {ceremony.dressCode}
+          <span className="ev-label">{dressCode}</span> {shown.dressCode}
         </p>
       </div>
     </div>

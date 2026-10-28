@@ -15,9 +15,10 @@
     --gold: 208 175 114; /* #D0AF72 — fine lines and ornaments only */
     --ivory: 255 249 239; /* #FFF9EF — cards, button text */
 
-    /* ── Typography: change fonts here ── */
-    --font-display: "Cormorant Garamond", Georgia, serif;
-    --font-body: "Jost", system-ui, -apple-system, "Segoe UI", sans-serif;
+    /* ── Typography: change fonts here ── (each with the Devanagari face after it, so Hindi words —
+       which the Latin faces don't have — are set in it wherever they fall) */
+    --font-display: "Cormorant Garamond", "Tiro Devanagari Sanskrit", Georgia, serif;
+    --font-body: "Jost", "Tiro Devanagari Sanskrit", system-ui, -apple-system, "Segoe UI", sans-serif;
     --font-deva: "Tiro Devanagari Sanskrit", "Noto Serif Devanagari", serif;
     --font-script: "Pinyon Script", cursive;
 
@@ -27,6 +28,42 @@
     --gutter: 1.5rem;
     /* Breathing room above a section that doesn't arrive on a connecting line. */
     --section-gap: 1.25rem; /* small: a Ganga separator stands between the sections */
+  }
+
+  /* Hindi (the EN / हिं switch on हिं): every section reads in Hindi. Letter-spacing breaks
+     Devanagari's joins, so it is off everywhere; capitals simply don't apply to it. */
+  :root[lang="hi"] body * {
+    letter-spacing: normal !important;
+  }
+  /* the small labels, sized for Latin capitals, read too small in Devanagari: a size or two up */
+  :root[lang="hi"] .sh-eyebrow,
+  :root[lang="hi"] .fw-kicker,
+  :root[lang="hi"] .fw-label {
+    font-size: 14px;
+  }
+  :root[lang="hi"] .rs-presence {
+    font-size: 14px;
+  }
+  :root[lang="hi"] .fam-relation,
+  :root[lang="hi"] .fw-point-label,
+  :root[lang="hi"] .ct-relation,
+  :root[lang="hi"] .bw-from {
+    font-size: 12.5px;
+  }
+  :root[lang="hi"] .ev-label {
+    font-size: 0.95em;
+  }
+  /* the countdown's units: only their Hindi names (the seconds' bead stays) */
+  :root[lang="hi"] .cd-label-en {
+    font-size: 0;
+  }
+  :root[lang="hi"] .cd-label-hi {
+    font-size: 13px;
+  }
+  /* (its bead, which sat by the English name, beside the Hindi one instead) */
+  :root[lang="hi"] .cd-bead {
+    right: -31px;
+    top: 9px;
   }
 
   html {

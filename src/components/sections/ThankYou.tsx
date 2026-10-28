@@ -3,6 +3,7 @@ import { wedding } from "@/config/wedding";
 import { usePersonal } from "@/context/GuestContext";
 import { useInView } from "@/hooks/useInView";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
+import { useCopy } from "@/lib/lang";
 import { EASE } from "@/lib/motion";
 import { Reveal } from "@/components/ui/Reveal";
 
@@ -20,7 +21,8 @@ const HALO_DOTS = Array.from({ length: 12 }, (_, i) => {
 
 export function ThankYou() {
   const personal = usePersonal();
-  const { thankYou: copy, assets } = wedding;
+  const { assets } = wedding;
+  const copy = useCopy(wedding.thankYou);
   const ref = useRef<HTMLElement>(null);
   const seen = useInView(ref, { threshold: 0.25 });
   const reduced = usePrefersReducedMotion();

@@ -2,6 +2,7 @@ import { useRef, type CSSProperties, type MouseEvent } from "react";
 import { wedding } from "@/config/wedding";
 import { useInView } from "@/hooks/useInView";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
+import { useCopy, useLang } from "@/lib/lang";
 
 /**
  * The footer — the invitation's last page, small and quiet: on the page's own ivory, a soft golden
@@ -35,7 +36,11 @@ const BEADS = Array.from({ length: 8 }, (_, i) => {
 const at = (ms: number) => ({ "--at": `${ms}ms` }) as CSSProperties;
 
 export function Footer() {
-  const { footer: copy, couple, credits } = wedding;
+  const { couple, credits } = wedding;
+  const copy = useCopy(wedding.footer);
+  // the couple's names (and so their initials) in the card's language
+  const names =
+    useLang() === "hi" ? wedding.invitation.hindi.names : { bride: couple.bride.displayName, groom: couple.groom.displayName };
   const ref = useRef<HTMLElement>(null);
   const seen = useInView(ref, { threshold: 0.3 });
   const reduced = usePrefersReducedMotion();
@@ -86,16 +91,16 @@ export function Footer() {
 
       <p className="cf-initials">
         <span className="sr-only">
-          {couple.bride.displayName} and {couple.groom.displayName}
+          {names.bride} &amp; {names.groom}
         </span>
         <span aria-hidden className="cf-in" style={at(900)}>
-          {initial(couple.bride.displayName)}
+          {initial(names.bride)}
         </span>
         <svg aria-hidden viewBox="0 0 24 22" className="cf-heart cf-in" style={at(1050)}>
           <path d="M12 19.6C6.2 15.4 2.6 12 2.6 8.2 2.6 5.5 4.7 3.4 7.3 3.4 9.2 3.4 10.9 4.4 12 6 13.1 4.4 14.8 3.4 16.7 3.4 19.3 3.4 21.4 5.5 21.4 8.2 21.4 12 17.8 15.4 12 19.6Z" />
         </svg>
         <span aria-hidden className="cf-in" style={at(1200)}>
-          {initial(couple.groom.displayName)}
+          {initial(names.groom)}
         </span>
       </p>
 

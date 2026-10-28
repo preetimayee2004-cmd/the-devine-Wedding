@@ -4,6 +4,7 @@ import { usePersonal } from "@/context/GuestContext";
 import { useElementSize } from "@/hooks/useElementSize";
 import { useInView } from "@/hooks/useInView";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
+import { inLang, useCopy, useLang } from "@/lib/lang";
 import { Icon } from "@/components/art/Icons";
 import { Lotus, LotusRule } from "@/components/art/Ornaments";
 import { Reveal } from "@/components/ui/Reveal";
@@ -31,7 +32,10 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
  * plain fades.
  */
 export function Contact() {
-  const { contact } = wedding;
+  const contact = useCopy(wedding.contact);
+  const hindi = useLang() === "hi";
+  // the window's words, in the card's language: "Details to come", "Call", "Number coming soon"
+  const words = { tbc: contact.tbc, call: contact.call, soon: contact.soon };
   const personal = usePersonal();
   const ref = useRef<HTMLElement>(null);
   const familyRef = useRef<HTMLDivElement>(null);
@@ -79,34 +83,42 @@ export function Contact() {
 
       {/* the two families, each in a palace window */}
       <div ref={familyRef} className="ct-family" data-shown={familySeen || undefined}>
-        {contact.family.map((person, i) => (
-          <ContactWindow
-            key={person.side}
-            name={person.name}
-            relation={person.relation}
-            phone={person.phone}
-            label={person.side}
-            show={familySeen}
-            at={t(i * 200)}
-            reduced={reduced}
-          />
-        ))}
+        {contact.family.map((own, i) => {
+          const person = inLang(own, hindi);
+          return (
+            <ContactWindow
+              key={own.side}
+              name={person.name}
+              relation={person.relation}
+              phone={person.phone}
+              label={person.side}
+              say={words}
+              show={familySeen}
+              at={t(i * 200)}
+              reduced={reduced}
+            />
+          );
+        })}
       </div>
 
       {/* the coordinators, in windows just alike */}
       <div ref={coordRef} className="ct-family ct-coords" data-shown={coordSeen || undefined}>
-        {contact.coordinators.map((person, i) => (
-          <ContactWindow
-            key={person.role}
-            name={person.name}
-            relation={person.role}
-            phone={person.phone}
-            label={person.role}
-            show={coordSeen}
-            at={t(i * 200)}
-            reduced={reduced}
-          />
-        ))}
+        {contact.coordinators.map((own, i) => {
+          const person = inLang(own, hindi);
+          return (
+            <ContactWindow
+              key={own.role}
+              name={person.name}
+              relation={person.role}
+              phone={person.phone}
+              label={person.role}
+              say={words}
+              show={coordSeen}
+              at={t(i * 200)}
+              reduced={reduced}
+            />
+          );
+        })}
       </div>
 
       {/* the closing line */}
@@ -153,6 +165,7 @@ function ContactWindow({
   relation,
   phone,
   label,
+  say,
   show,
   at,
   reduced,
@@ -161,6 +174,8 @@ function ContactWindow({
   relation: string | null;
   phone: string | null;
   label: string;
+  /** "Details to come", "Call", "Number coming soon", in the card's language. */
+  say: { tbc: string; call: string; soon: string };
   show: boolean;
   at: number;
   reduced: boolean;
@@ -180,7 +195,7 @@ function ContactWindow({
       <TinyLotus className="ct-window-lotus" />
       <div className="ct-window-body">
         <Reveal show={show} delay={words(700)}>
-          <p className={`ct-name${name ? "" : " ct-tbc"}`}>{name ?? "Details to come"}</p>
+          <p className={`ct-name${name ? "" : " ct-tbc"}`}>{name ?? say.tbc}</p>
         </Reveal>
         {relation && (
           <Reveal show={show} delay={words(820)}>
@@ -188,7 +203,7 @@ function ContactWindow({
           </Reveal>
         )}
         <Reveal show={show} delay={words(960)}>
-          <CallButton phone={phone} who={name ? `${name}, ${relation ?? label}` : label} />
+          <CallButton phone={phone} who={name ? `${name}, ${relation ?? label}` : label} words={say} />
         </Reveal>
       </div>
     </article>
@@ -246,11 +261,11 @@ const telHref = (phone: string) => `tel:+${phone.replace(/\D/g, "")}`;
  * "Call": a tel: link when there is a number (labelled with it for screen readers); without one, the
  * same button, which only says that the number is coming.
  */
-function CallButton({ phone, who }: { phone: string | null; who: string }) {
+function CallButton({ phone, who, words }: { phone: string | null; who: string; words: { call: string; soon: string } }) {
   const [asked, setAsked] = useState(false);
   const inner = (
     <>
-      <Icon name="phone" className="h-4 w-4" strokeWidth={1.6} /> Call
+      <Icon name="phone" className="h-4 w-4" strokeWidth={1.6} /> {words.call}
     </>
   );
   if (phone)
@@ -265,7 +280,7 @@ function CallButton({ phone, who }: { phone: string | null; who: string }) {
         {inner}
       </button>
       <span className="ct-soon" role="status" data-on={asked || undefined}>
-        {asked ? "Number coming soon" : ""}
+        {asked ? words.soon : ""}
       </span>
     </span>
   );

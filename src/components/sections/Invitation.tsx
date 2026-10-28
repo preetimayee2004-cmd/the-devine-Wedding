@@ -435,6 +435,8 @@ export function Invitation() {
           invited={t.youreInvited}
           guest={isPersonalized ? guestName : undefined}
           label={t.touchToBegin}
+          skip={t.skip}
+          skipLabel={t.skipLabel}
           devanagari={hindi}
           reduced={still}
           onBegin={leaveGate}
@@ -483,7 +485,7 @@ export function Invitation() {
           className={`fixed right-4 z-40 rounded-full border border-gold/70 bg-ivory/75 px-4 py-1.5 font-display text-[15px] font-semibold tracking-[0.08em] text-navy backdrop-blur-sm transition-opacity duration-500 hover:bg-ivory/90 ${beat >= 0 ? "opacity-100" : "pointer-events-none opacity-0"}`}
           style={{ top: "calc(var(--status-bar) + 12px)" }}
         >
-          Skip <span aria-hidden>›</span>
+          {t.skip} <span aria-hidden>›</span>
         </button>
       )}
     </section>

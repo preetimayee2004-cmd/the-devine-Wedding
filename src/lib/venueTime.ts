@@ -35,6 +35,12 @@ export interface FormattedVenueDate {
   time: string | null; // "7:30 PM"
 }
 
+/** "शाम 7:30 बजे": the time as said in Hindi — the part of the day, the hour on the clock, "बजे". */
+function hindiTime(hour: number, minute: number) {
+  const part = hour >= 4 && hour < 12 ? "सुबह" : hour >= 12 && hour < 16 ? "दोपहर" : hour >= 16 && hour < 20 ? "शाम" : "रात";
+  return `${part} ${hour % 12 || 12}:${String(minute).padStart(2, "0")} बजे`;
+}
+
 export function formatVenueDate(p: VenueDateTime, locale = "en-IN"): FormattedVenueDate {
   const asUtc = new Date(Date.UTC(p.year, p.month - 1, p.day, p.hour ?? 0, p.minute ?? 0));
   const fmt = (o: Intl.DateTimeFormatOptions) =>
@@ -46,7 +52,12 @@ export function formatVenueDate(p: VenueDateTime, locale = "en-IN"): FormattedVe
     month: fmt({ month: "long" }),
     monthShort: fmt({ month: "short" }),
     year: String(p.year),
-    time: p.hour === null ? null : fmt({ hour: "numeric", minute: "2-digit", hour12: true }).toUpperCase(),
+    time:
+      p.hour === null
+        ? null
+        : locale.startsWith("hi")
+          ? hindiTime(p.hour, p.minute ?? 0)
+          : fmt({ hour: "numeric", minute: "2-digit", hour12: true }).toUpperCase(),
   };
 }
 
@@ -86,7 +97,9 @@ export function dateKey(p: VenueDateTime): string {
 }
 
 /** Short zone label for guests abroad, e.g. "IST" / "GMT+5:30". */
-export function zoneLabel(utcMs: number, timeZone: string): string {
+export function zoneLabel(utcMs: number, timeZone: string, locale = "en-IN"): string {
   const parts = new Intl.DateTimeFormat("en-IN", { timeZone, timeZoneName: "short" }).formatToParts(new Date(utcMs));
-  return parts.find((p) => p.type === "timeZoneName")?.value ?? timeZone;
+  const label = parts.find((p) => p.type === "timeZoneName")?.value ?? timeZone;
+  // in Hindi, India's own time by its name
+  return locale.startsWith("hi") && label === "IST" ? "(भारतीय समय)" : label;
 }

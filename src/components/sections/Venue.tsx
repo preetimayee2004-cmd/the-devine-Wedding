@@ -3,6 +3,7 @@ import { wedding } from "@/config/wedding";
 import type { TravelPoint } from "@/config/types";
 import { useInView } from "@/hooks/useInView";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
+import { inLang, useCopy, useLang } from "@/lib/lang";
 import { directionsUrl, mapEmbedUrl } from "@/lib/maps";
 import { formatVenueDate, parseVenueDateTime, venueInstant, zoneLabel } from "@/lib/venueTime";
 import { Icon } from "@/components/art/Icons";
@@ -28,7 +29,12 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
  * rise in. Buttons are at least 48px tall. Reduced motion: plain fades, no ripple.
  */
 export function Venue() {
-  const { venue, travel } = wedding;
+  // the words and the place as shown, in the card's language (the map and the directions keep the English)
+  const { venue } = wedding;
+  const hindi = useLang() === "hi";
+  const travel = useCopy(wedding.travel);
+  const place = inLang(venue, hindi);
+  const points = useMemo(() => travel.points.map((p) => inLang(p, hindi)), [travel.points, hindi]);
   const sectionRef = useRef<HTMLElement>(null);
   const travelRef = useRef<HTMLDivElement>(null);
   const seen = useInView(sectionRef, { threshold: 0.06 });
@@ -39,10 +45,10 @@ export function Venue() {
   const when = useMemo(() => {
     const p = parseVenueDateTime(wedding.wedding.dateTime);
     if (!p) return null;
-    const d = formatVenueDate(p);
-    const zone = p.hour === null ? null : zoneLabel(venueInstant(p, wedding.wedding.timeZone), wedding.wedding.timeZone);
+    const d = formatVenueDate(p, hindi ? "hi-IN" : "en-IN");
+    const zone = p.hour === null ? null : zoneLabel(venueInstant(p, wedding.wedding.timeZone), wedding.wedding.timeZone, hindi ? "hi-IN" : "en-IN");
     return `${d.weekday}, ${d.day} ${d.month} ${d.year}${d.time ? ` · ${d.time}${zone ? ` ${zone}` : ""}` : ""}`;
-  }, []);
+  }, [hindi]);
   const [mapLoaded, setMapLoaded] = useState(false);
 
   return (
@@ -67,7 +73,7 @@ export function Venue() {
                 {seen && (
                   <iframe
                     src={mapEmbedUrl(venue)}
-                    title={`Map of ${venue.name}`}
+                    title={place.name}
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
                     className="fw-map-frame absolute left-0 w-full border-0"
@@ -86,15 +92,15 @@ export function Venue() {
                 <SmallLotus />
               </span>
             </div>
-            <p className="fw-kicker">The Wedding Destination</p>
+            <p className="fw-kicker">{travel.destination}</p>
             <h3 id="venue-name" className="fw-venue-name">
-              {venue.name}
+              {place.name}
             </h3>
-            <p className="fw-address">{venue.address}</p>
+            <p className="fw-address">{place.address}</p>
             {when && <p className="fw-when">{when}</p>}
             <a href={directionsUrl(venue)} target="_blank" rel="noopener noreferrer" className="fw-directions" onPointerDown={reduced ? undefined : ripple}>
               <Compass />
-              Find your way
+              {travel.directions}
             </a>
           </article>
         </Reveal>
@@ -102,10 +108,10 @@ export function Venue() {
         {/* a sacred journey */}
         <div ref={travelRef} className="fw-journey" data-shown={travelSeen || undefined} data-still={reduced || undefined}>
           <Reveal show={travelSeen} delay={t(0)}>
-            <p className="fw-label">How to Reach</p>
-            <h3 className="fw-journey-title">All Roads Lead Here</h3>
+            <p className="fw-label">{travel.reachLabel}</p>
+            <h3 className="fw-journey-title">{travel.reachTitle}</h3>
           </Reveal>
-          <Journey points={travel.points} show={travelSeen} reduced={reduced} />
+          <Journey points={points} show={travelSeen} reduced={reduced} />
         </div>
 
       </div>
@@ -164,7 +170,7 @@ function Journey({ points, show, reduced }: { points: readonly TravelPoint[]; sh
         </svg>
       )}
       {points.map((p, i) => (
-        <Row key={p.name} point={p} index={i} show={show} reduced={reduced} />
+        <Row key={p.kind} point={p} index={i} show={show} reduced={reduced} />
       ))}
     </ol>
   );
@@ -181,7 +187,7 @@ function Row({ point, index, show, reduced }: { point: TravelPoint; index: numbe
           <Icon name={point.kind} className="h-[18px] w-[18px]" strokeWidth={1.4} />
         </span>
         <Reveal as="span" show={show} delay={reduced ? 0 : 450 + index * 220} className="block min-w-0 flex-1 text-left">
-          <span className="block font-sans text-[10px] font-semibold uppercase tracking-[0.22em] text-gold-ink">{point.label}</span>
+          <span className="fw-point-label block font-sans text-[10px] font-semibold uppercase tracking-[0.22em] text-gold-ink">{point.label}</span>
           <span className="block font-display text-[19px] font-semibold leading-snug text-navy">{point.name}</span>
           <span className="block font-sans text-[12.5px] text-slate">
             {[point.place, point.distance, point.time].map((x) => x.split(" ").join(NBSP)).join(" · ")}

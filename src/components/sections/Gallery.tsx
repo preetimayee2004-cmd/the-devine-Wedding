@@ -13,6 +13,7 @@ import type { Photo } from "@/config/types";
 import { useInView } from "@/hooks/useInView";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
 import { useScrollLock } from "@/hooks/useScrollLock";
+import { inLang, useCopy, useLang } from "@/lib/lang";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 
 /**
@@ -229,8 +230,13 @@ function ready(src: string) {
 type Orientation = typeof DeviceOrientationEvent & { requestPermission?: () => Promise<string> };
 
 export function Gallery() {
-  const { gallery } = wedding;
-  const photos = useMemo(() => gallery.photos.filter((p): p is Shown => Boolean(p.src)), [gallery.photos]);
+  const gallery = useCopy(wedding.gallery);
+  const hindi = useLang() === "hi";
+  // each photo's caption in the card's language
+  const photos = useMemo(
+    () => gallery.photos.filter((p): p is Shown => Boolean(p.src)).map((p) => inLang(p, hindi)),
+    [gallery.photos, hindi],
+  );
   const n = photos.length;
   const sectionRef = useRef<HTMLElement>(null);
   const heartRef = useRef<HTMLDivElement>(null);

@@ -1,4 +1,9 @@
-/** Shapes of the lists in wedding.ts, so real details can replace the samples safely. */
+/**
+ * Shapes of the lists in wedding.ts, so real details can replace the samples safely.
+ *
+ * Each item may carry `hindi`: the same words in Hindi, shown when the EN / हिं switch is on हिं
+ * (anything left out stays as written).
+ */
 
 /** A photo slot: `src: null` shows a soft watercolour placeholder until a photo is added. */
 export interface Photo {
@@ -10,6 +15,7 @@ export interface Photo {
   focus?: string;
   /** Gallery only: a small copy for the heart's tiles (the full `src` is loaded when one is tapped). */
   thumb?: string;
+  hindi?: { alt?: string; caption?: string };
 }
 
 export type Motif = "lotus" | "diya" | "kalash" | "crescent" | "knot";
@@ -34,23 +40,28 @@ export interface Ceremony {
   image?: { src: string; width: number; height: number; alt: string };
   /** The illustration's artist, shown small under the arch while this card is up (optional). */
   credit?: string;
+  hindi?: Partial<Pick<Ceremony, "name" | "date" | "time" | "venue" | "dressCode" | "credit">>;
 }
 
 export interface FamilyMember {
   relation: string;
   name: string;
+  hindi?: { relation?: string; name?: string };
 }
 
 export interface FamilySide {
   title: string;
   photo: Photo;
   members: FamilyMember[];
+  hindi?: { title?: string };
 }
 
 export interface Wish {
   id: string;
   name: string | null;
   message: string;
+  /** Samples only (a guest's own wish is shown as they wrote it). */
+  hindi?: { name?: string; message?: string };
 }
 
 export type TravelKind = "air" | "rail" | "bus" | "local";
@@ -67,6 +78,7 @@ export interface TravelPoint {
   time: string;
   /** Shown when the stop is opened. */
   detail: string;
+  hindi?: Partial<Pick<TravelPoint, "label" | "name" | "place" | "distance" | "time" | "detail">>;
 }
 
 export interface Contact {
@@ -85,6 +97,7 @@ export interface FamilyContact {
   relation: string | null;
   /** International format without "+"; null hides the call button. */
   phone: string | null;
+  hindi?: { side?: string; name?: string; relation?: string };
 }
 
 /** A coordinator to call (Contact & Assistance). */
@@ -92,6 +105,7 @@ export interface Coordinator {
   role: string;
   name: string | null;
   phone: string | null;
+  hindi?: { role?: string; name?: string };
 }
 
 /** Widens a list written inside the `as const` config to its real type. */
