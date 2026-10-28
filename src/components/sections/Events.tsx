@@ -18,7 +18,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
  *
  * To the next: a tap on the arch, a swipe left, the › under it (‹ or a swipe right for the one
  * before), or a gold progress mark; after the last, the first. Untouched, they turn by themselves
- * every 3s while the arch is on screen, wherever the mouse is and with reduced motion too (any turn
+ * every 7s while the arch is on screen, wherever the mouse is and with reduced motion too (any turn
  * starts the count again; it waits only while the keyboard is in the arch or its controls, and a
  * screen reader isn't told of these turns — only of the guest's own). The change (0.8s; taps meanwhile
  * are ignored): the ceremony shown fades out, its picture easing down a little (0.3s); a small
@@ -34,7 +34,7 @@ const ART = { w: 1098, h: 1228 };
 const DONE = { full: 800, reduced: 420 } as const;
 
 /** Untouched, the next ceremony comes after this long (ms), while the arch is on screen. */
-const AUTO_MS = 3000;
+const AUTO_MS = 7000;
 
 /** Where a venue is on Google Maps (the wedding's own link for the main venue, when it has one). */
 function mapsHref(venue: string) {

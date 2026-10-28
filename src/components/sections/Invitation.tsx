@@ -72,6 +72,9 @@ function pickMode(): Mode {
 
 const MAX_ART_WAIT = 3500;
 
+/** The slow glide from the Save the Date down to the couple section, when the guest doesn't scroll (ms). */
+const AUTO_GLIDE_MS = 4500;
+
 export function Invitation() {
   const [mode] = useState<Mode>(pickMode);
   const [beat, setBeat] = useState(-1); // index into ORDER; -1 = waiting for the artwork
@@ -140,27 +143,40 @@ export function Invitation() {
     };
   }, [locked]);
 
-  // Save the Date → the next section: after reading time, glide on — unless the
-  // guest has already touched, scrolled or pressed anything.
+  // Save the Date → the couple section, for a guest who doesn't scroll: once the card has rested
+  // untouched for its reading time (each touch, tap or key starts the count again, so scratching the
+  // date or switching the language never stops it for good), the page glides slowly down and the
+  // couple section rises into view (the descent plays as it goes). A touch during the glide stops it
+  // where it is, and the guest takes over; scrolled away already, it stays put. Reduced motion: the
+  // couple section is simply there, without the glide.
   const done = reached("done");
   useEffect(() => {
     const readingMs = wedding.invitation.autoAdvanceMs;
-    if (!done || still || !readingMs) return;
-    let touched = false;
-    const onInput = () => {
-      touched = true;
-    };
-    USER_INPUT_EVENTS.forEach((type) => window.addEventListener(type, onInput, { passive: true }));
+    if (!done || !readingMs) return;
     let stopGlide = () => {};
-    const timer = window.setTimeout(() => {
-      const next = document.getElementById("couple");
-      if (touched || !next || window.scrollY > 40) return;
-      stopGlide = glideTo(next.getBoundingClientRect().top + window.scrollY, 1600);
-    }, readingMs);
+    let timer = 0;
+    const listen = (on: boolean) =>
+      USER_INPUT_EVENTS.forEach((type) =>
+        on ? window.addEventListener(type, arm, { passive: true }) : window.removeEventListener(type, arm),
+      );
+    function arm() {
+      clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        const next = document.getElementById("couple");
+        if (!next || window.scrollY > 40) return;
+        // on its way: from here a touch is the guest taking over, not a reason to wait again
+        listen(false);
+        const y = next.getBoundingClientRect().top + window.scrollY;
+        if (still) window.scrollTo({ top: y, behavior: "instant" });
+        else stopGlide = glideTo(y, AUTO_GLIDE_MS);
+      }, readingMs);
+    }
+    arm();
+    listen(true);
     return () => {
       clearTimeout(timer);
       stopGlide();
-      USER_INPUT_EVENTS.forEach((type) => window.removeEventListener(type, onInput));
+      listen(false);
     };
   }, [done, still]);
 

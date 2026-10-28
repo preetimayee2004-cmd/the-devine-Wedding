@@ -69,10 +69,10 @@ export const wedding = {
     /** The link at the foot of the card, under the blessing: it scrolls on to the next section. */
     viewInvitation: "View the Invitation",
     /**
-     * Once the invitation has been on screen this long (ms) and the guest
-     * hasn't touched anything, it glides on to the next section. 0 = never.
+     * For a guest who doesn't scroll: once the card has rested untouched this long (ms; each touch
+     * starts the count again), the page glides slowly down to the couple section. 0 = never.
      */
-    autoAdvanceMs: 5000,
+    autoAdvanceMs: 6000,
     /**
      * The same card in Hindi, for the EN / हिं switch (the month comes from the
      * date). SAMPLE: have the family check the wording.
