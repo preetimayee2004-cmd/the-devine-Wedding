@@ -4203,9 +4203,9 @@
       opacity: 1;
     }
   }
-  /* until the first tap: a hand on the big middle photo, tapping gently (1.8s), a soft gold ring
-     rippling from its fingertip at each press; it fades in once the tiles are home, out at the first
-     tap. Its fingertip sits at (65.5%, 58.5%) of the heart: the photo's lower right corner, on the steps. */
+  /* a hand on the big middle photo, tapping gently (1.8s), a soft gold ring rippling from its
+     fingertip at each press; it fades in once the tiles are home, out while a photo is open, and back
+     a moment (1.2s) after it closes. Its fingertip sits at (65.5%, 58.5%) of the heart: the photo's lower right corner, on the steps. */
   .hc-hand {
     position: absolute;
     z-index: 5;
@@ -4217,13 +4217,14 @@
     pointer-events: none;
     opacity: 0;
     filter: drop-shadow(0 3px 4px rgb(40 28 10 / 0.35));
-    transition: opacity 500ms ease;
+    transition: opacity 500ms ease 1200ms;
   }
   .hc-hand[data-shown] {
     opacity: 1;
   }
   .hc-hand[data-gone] {
     opacity: 0;
+    transition-delay: 0ms;
   }
   .hc-hand svg {
     display: block;
@@ -4279,7 +4280,7 @@
   .hc[data-plain] .hc-hand-ring {
     animation: none;
   }
-  /* "Tap a photo", until the first tap */
+  /* "Tap a photo": away while a photo is open, back a moment after it closes */
   .hc-hint {
     margin-top: 12px;
     min-height: 1.4em;
@@ -4289,13 +4290,14 @@
     color: rgb(var(--gold-ink));
     text-align: center;
     opacity: 0;
-    transition: opacity 700ms ease;
+    transition: opacity 700ms ease 1200ms;
   }
   .hc-hint[data-shown] {
     opacity: 1;
   }
   .hc-hint[data-gone] {
     opacity: 0;
+    transition-delay: 0ms;
   }
   /* reduced motion, or a slow phone: flat; the tiles fade in where they are */
   .hc[data-plain] {

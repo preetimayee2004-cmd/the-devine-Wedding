@@ -242,7 +242,6 @@ export function Gallery() {
   const [slow] = useState(slowDevice);
   const plain = reduced || slow;
   const [phase, setPhase] = useState<"before" | "in" | "done">("before");
-  const [tapped, setTapped] = useState(false);
   // the lightbox: the photo shown (its place in the list), the tile it opened from, and where that was
   const [viewing, setViewing] = useState<{ photo: number; tile: number; from: DOMRect } | null>(null);
   // an iPhone's gyroscope, once allowed
@@ -427,7 +426,6 @@ export function Gallery() {
     if (phase !== "done" || viewingRef.current) return;
     const from = tileRect(i);
     if (!from) return;
-    setTapped(true);
     viewingRef.current = { photo: face(cardsRef.current[i]).photo, tile: i, from };
     aim(0, 0);
     setViewing(viewingRef.current);
@@ -518,9 +516,10 @@ export function Gallery() {
               })}
             </div>
           </div>
-          {/* until the first tap: a hand tapping gently on the big photo in the middle (on its lower
-              corner, clear of the faces) — "tap a photo"; taps pass through it to the photo */}
-          <span aria-hidden className="hc-hand" data-shown={phase === "done" || undefined} data-gone={tapped || undefined}>
+          {/* a hand tapping gently on the big photo in the middle (on its lower corner, clear of the
+              faces) — "tap a photo"; away while a photo is open, back a moment after it closes; taps
+              pass through it to the photo */}
+          <span aria-hidden className="hc-hand" data-shown={phase === "done" || undefined} data-gone={viewing ? "" : undefined}>
             <span className="hc-hand-ring" />
             <svg viewBox="0 0 44 54" fill="#fffaf0" stroke="#7d5a22" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round">
               <path d="M17 6.5a3.5 3.5 0 0 1 7 0V21a3.2 3.2 0 0 1 6 1.4a3.2 3.2 0 0 1 5.6 2a3 3 0 0 1 4.4 2.6V36c0 7-5.6 12.6-12.6 12.6h-3c-3.6 0-7-1.7-9.2-4.6l-7.6-10.2a3.2 3.2 0 0 1 5-4L17 31Z" />
@@ -528,7 +527,7 @@ export function Gallery() {
             </svg>
           </span>
         </div>
-        <p className="hc-hint" data-shown={phase === "done" || undefined} data-gone={tapped || undefined} aria-hidden>
+        <p className="hc-hint" data-shown={phase === "done" || undefined} data-gone={viewing ? "" : undefined} aria-hidden>
           {gallery.hint}
         </p>
       </div>
